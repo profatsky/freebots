@@ -37,7 +37,6 @@ def get_block_model_by_type(block_type: BlockType) -> Type[UnionBlockModel]:
         BlockType.CSV_BLOCK.value: CSVBlockModel,
         BlockType.API_BLOCK.value: APIBlockModel,
     }
-
     return types_to_blocks[block_type]
 
 
@@ -55,7 +54,6 @@ def get_block_schema_by_type(block_type: BlockType) -> Type[UnionBlockReadSchema
         BlockType.CSV_BLOCK.value: CSVBlockReadSchema,
         BlockType.API_BLOCK.value: APIBlockReadSchema,
     }
-
     return types_to_blocks[block_type]
 
 

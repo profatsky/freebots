@@ -44,5 +44,5 @@ async def get_bot_code(
         media_type='application/zip',
         headers={
             'Content-Disposition': 'attachment; filename=bot.zip',
-        }
+        },
     )
