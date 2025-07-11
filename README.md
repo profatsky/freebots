@@ -1,6 +1,4 @@
-# FreeBots
-
-https://freebots.ru
+# [FreeBots](https://freebots.ru) - генерация кода Telegram-ботов
 
 No-code конструктор чат-ботов для Telegram с функционалом **генерации кода**.
 
