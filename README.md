@@ -1,10 +1,6 @@
-# chatbot-builder
+# FreeBots
 
-![GitHub top language](https://img.shields.io/github/languages/top/profatsky/chatbot-builder)
-![GitHub](https://img.shields.io/github/license/profatsky/chatbot-builder)
-![GitHub issues](https://img.shields.io/github/issues/profatsky/chatbot-builder)
-![GitHub Repo stars](https://img.shields.io/github/stars/profatsky/chatbot-builder)
-
+https://freebots.ru
 
 No-code конструктор чат-ботов для Telegram с функционалом **генерации кода**.
 
@@ -43,7 +39,6 @@ No-code конструктор чат-ботов для Telegram с функци
 библиотеки из файла `requirements.txt`, который будет находиться в скачанном ZIP-архиве.
 
 ## ⚙️ Как запустить?
-### Бекенд
 Перейти в директорию `backend`.
 
 Переименовать файл `.env.example` в `.env` и указать в нем необходимые данные:
@@ -82,24 +77,6 @@ python -m pip install -r requirements.txt
 Запустить:
 ```commandline
 uvicorn src.main:app
-```
-
-### Фронтенд
-Перейти в директорию `frontend`.
-
-Установить необходимые зависимости:
-```commandline
-npm install
-```
-
-Переименовать файл `.env.example` в `.env.local` и указать в нем необходимые данные:
-```commandline
-VITE_API_URL=http://127.0.0.1:8000/api
-```
-
-Запустить:
-```commandline
-npm run dev
 ```
 
 ## ❓Остались вопросы?
