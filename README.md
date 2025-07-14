@@ -77,5 +77,9 @@ python -m pip install -r requirements.txt
 uvicorn src.main:app
 ```
 
-## ❓Остались вопросы?
+## ❓ Остались вопросы?
 Свяжитесь со мной в [Telegram](https://t.me/profatsky) или [ВКонтакте](https://vk.com/profatsky)
+
+## 🔗 Полезные ссылки
+- [Веб-приложение](https://freebots.ru)
+- [Frontend-репозиторий](https://github.com/profatsky/freebots-frontend)
