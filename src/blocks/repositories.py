@@ -14,9 +14,9 @@ class BlockRepository:
         self._session = session
 
     async def create_block(
-            self,
-            dialogue_id: int,
-            block_data: UnionBlockCreateSchema,
+        self,
+        dialogue_id: int,
+        block_data: UnionBlockCreateSchema,
     ) -> UnionBlockReadSchema:
         blocks = await self.get_blocks(dialogue_id)
         blocks_number = len(blocks)
@@ -44,17 +44,14 @@ class BlockRepository:
         return blocks.unique().scalars().all()
 
     async def _get_block_model_instance(self, block_id: int) -> Optional[utils.UnionBlockModel]:
-        block = await self._session.execute(
-            select(BlockModel)
-            .where(BlockModel.block_id == block_id)
-        )
+        block = await self._session.execute(select(BlockModel).where(BlockModel.block_id == block_id))
         return block.scalar()
 
     async def update_block(
-            self,
-            dialogue_id: int,
-            block_id: int,
-            block_data: UnionBlockUpdateSchema,
+        self,
+        dialogue_id: int,
+        block_id: int,
+        block_data: UnionBlockUpdateSchema,
     ) -> Optional[UnionBlockReadSchema]:
         block = await self._get_block_model_instance(block_id)
 
@@ -76,9 +73,6 @@ class BlockRepository:
         return [utils.validate_block_from_db(block) for block in blocks]
 
     async def delete_block(self, dialogue_id: int, block_id: int) -> Optional[UnionBlockReadSchema]:
-        await self._session.execute(
-            delete(BlockModel)
-            .where(BlockModel.block_id == block_id)
-        )
+        await self._session.execute(delete(BlockModel).where(BlockModel.block_id == block_id))
         await self._update_blocks_sequence_numbers_without_commit(dialogue_id)
         await self._session.commit()

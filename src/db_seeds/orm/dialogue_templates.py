@@ -16,22 +16,16 @@ async def create():
 async def create_survey_dialogue_template():
     async with async_session_maker() as session:
         existing_template = await session.execute(
-            select(DialogueTemplateModel)
-            .where(DialogueTemplateModel.name == 'Опрос')
+            select(DialogueTemplateModel).where(DialogueTemplateModel.name == 'Опрос')
         )
         existing_template = existing_template.scalar()
 
         if existing_template:
             return
 
-        trigger = TriggerModel(
-            event_type=TriggerEventType.TEXT,
-            value='Опрос'
-        )
+        trigger = TriggerModel(event_type=TriggerEventType.TEXT, value='Опрос')
 
-        dialogue = DialogueModel(
-            trigger=trigger
-        )
+        dialogue = DialogueModel(trigger=trigger)
 
         blocks = [
             TextBlockModel(
@@ -77,7 +71,7 @@ async def create_survey_dialogue_template():
                     'age': '<answers[2]>',
                     'job': '<answers[3]>',
                     'phone_number': '<answers[4]>',
-                    'email': '<answers[5]>'
+                    'email': '<answers[5]>',
                 },
                 dialogue=dialogue,
             ),
@@ -88,7 +82,7 @@ async def create_survey_dialogue_template():
             ),
         ]
 
-        description = '''
+        description = """
             <p>
                 Шаблон опроса пользователей чат-бота для сбора следующей информации:
             </p>
@@ -102,7 +96,7 @@ async def create_survey_dialogue_template():
             <p>
                 Введенные пользователем данные будут сохранены в CSV файл под названием survey.csv
             </p>
-        '''
+        """
 
         template = DialogueTemplateModel(
             name='Опрос',

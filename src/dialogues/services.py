@@ -13,18 +13,18 @@ from src.projects.dependencies.services_dependencies import ProjectServiceDI
 
 class DialogueService:
     def __init__(
-            self,
-            dialogue_repository: DialogueRepositoryDI,
-            project_service: ProjectServiceDI,
+        self,
+        dialogue_repository: DialogueRepositoryDI,
+        project_service: ProjectServiceDI,
     ):
         self._dialogue_repository = dialogue_repository
         self._project_service = project_service
 
     async def create_dialogue(
-            self,
-            user_id: int,
-            project_id: int,
-            dialogue_data: DialogueCreateSchema,
+        self,
+        user_id: int,
+        project_id: int,
+        dialogue_data: DialogueCreateSchema,
     ) -> DialogueReadSchema:
         project = await self._project_service.get_project(
             user_id=user_id,
@@ -39,11 +39,11 @@ class DialogueService:
         )
 
     async def update_dialogue_trigger(
-            self,
-            user_id: int,
-            project_id: int,
-            dialogue_id: int,
-            trigger: TriggerUpdateSchema,
+        self,
+        user_id: int,
+        project_id: int,
+        dialogue_id: int,
+        trigger: TriggerUpdateSchema,
     ) -> DialogueReadSchema:
         _ = await self._project_service.get_project(
             user_id=user_id,
@@ -60,10 +60,10 @@ class DialogueService:
         return dialogue
 
     async def get_dialogue(
-            self,
-            user_id: int,
-            project_id: int,
-            dialogue_id: int,
+        self,
+        user_id: int,
+        project_id: int,
+        dialogue_id: int,
     ) -> DialogueReadSchema:
         project = await self._project_service.get_project(
             user_id=user_id,
@@ -82,10 +82,10 @@ class DialogueService:
         return dialogue_with_specified_id
 
     async def delete_dialogue(
-            self,
-            user_id: int,
-            project_id: int,
-            dialogue_id: int,
+        self,
+        user_id: int,
+        project_id: int,
+        dialogue_id: int,
     ):
         _ = await self.get_dialogue(
             user_id=user_id,

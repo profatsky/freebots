@@ -12,8 +12,8 @@ router = APIRouter(tags=['Auth'])
 
 @router.post('/register', status_code=status.HTTP_201_CREATED)
 async def register(
-        credentials: AuthCredentialsSchema,
-        auth_service: AuthServiceDI,
+    credentials: AuthCredentialsSchema,
+    auth_service: AuthServiceDI,
 ):
     try:
         access_token = await auth_service.register(credentials)
@@ -28,8 +28,8 @@ async def register(
 
 @router.post('/login')
 async def login(
-        credentials: AuthCredentialsSchema,
-        auth_service: AuthServiceDI,
+    credentials: AuthCredentialsSchema,
+    auth_service: AuthServiceDI,
 ):
     try:
         access_token = await auth_service.login(credentials)

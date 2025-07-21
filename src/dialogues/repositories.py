@@ -13,9 +13,9 @@ class DialogueRepository:
         self._session = session
 
     async def create_dialogue(
-            self,
-            project_id: int,
-            dialogue_data: DialogueCreateSchema,
+        self,
+        project_id: int,
+        dialogue_data: DialogueCreateSchema,
     ) -> DialogueReadSchema:
         trigger = TriggerModel(**dialogue_data.trigger.model_dump())
         dialogue = DialogueModel(
@@ -27,9 +27,9 @@ class DialogueRepository:
         return DialogueReadSchema.model_validate(dialogue)
 
     async def update_dialogue_trigger(
-            self,
-            dialogue_id: int,
-            trigger: TriggerUpdateSchema,
+        self,
+        dialogue_id: int,
+        trigger: TriggerUpdateSchema,
     ) -> Optional[DialogueReadSchema]:
         dialogue = await self._get_dialogue_model_instance(dialogue_id)
         if dialogue is None:
@@ -57,8 +57,5 @@ class DialogueRepository:
         return DialogueReadSchema.model_validate(dialogue)
 
     async def delete_dialogue(self, dialogue_id: int):
-        await self._session.execute(
-            delete(DialogueModel)
-            .where(DialogueModel.dialogue_id == dialogue_id)
-        )
+        await self._session.execute(delete(DialogueModel).where(DialogueModel.dialogue_id == dialogue_id))
         await self._session.commit()

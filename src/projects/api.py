@@ -27,9 +27,9 @@ router = APIRouter(
     status_code=status.HTTP_201_CREATED,
 )
 async def create_project(
-        project_data: ProjectCreateSchema,
-        project_service: ProjectServiceDI,
-        user_id: UserIDFromAccessTokenDI,
+    project_data: ProjectCreateSchema,
+    project_service: ProjectServiceDI,
+    user_id: UserIDFromAccessTokenDI,
 ):
     try:
         return await project_service.create_project(
@@ -45,8 +45,8 @@ async def create_project(
     response_model=list[ProjectReadSchema],
 )
 async def get_projects(
-        project_service: ProjectServiceDI,
-        user_id: UserIDFromAccessTokenDI,
+    project_service: ProjectServiceDI,
+    user_id: UserIDFromAccessTokenDI,
 ):
     return await project_service.get_projects(user_id)
 
@@ -56,10 +56,10 @@ async def get_projects(
     response_model=ProjectReadSchema,
 )
 async def update_project(
-        project_id: int,
-        project_data: ProjectUpdateSchema,
-        project_service: ProjectServiceDI,
-        user_id: UserIDFromAccessTokenDI,
+    project_id: int,
+    project_data: ProjectUpdateSchema,
+    project_service: ProjectServiceDI,
+    user_id: UserIDFromAccessTokenDI,
 ):
     try:
         return await project_service.update_project(
@@ -79,9 +79,9 @@ async def update_project(
     status_code=status.HTTP_204_NO_CONTENT,
 )
 async def delete_project(
-        project_id: int,
-        project_service: ProjectServiceDI,
-        user_id: UserIDFromAccessTokenDI,
+    project_id: int,
+    project_service: ProjectServiceDI,
+    user_id: UserIDFromAccessTokenDI,
 ):
     try:
         await project_service.delete_project(

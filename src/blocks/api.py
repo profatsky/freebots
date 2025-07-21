@@ -31,11 +31,11 @@ router = APIRouter(
     status_code=status.HTTP_201_CREATED,
 )
 async def create_block(
-        project_id: int,
-        dialogue_id: int,
-        block: UnionBlockCreateSchema,
-        block_service: BlockServiceDI,
-        user_id: UserIDFromAccessTokenDI,
+    project_id: int,
+    dialogue_id: int,
+    block: UnionBlockCreateSchema,
+    block_service: BlockServiceDI,
+    user_id: UserIDFromAccessTokenDI,
 ):
     try:
         return await block_service.create_block(
@@ -62,10 +62,10 @@ async def create_block(
     response_model=list[UnionBlockReadSchema],
 )
 async def get_blocks(
-        project_id: int,
-        dialogue_id: int,
-        block_service: BlockServiceDI,
-        user_id: UserIDFromAccessTokenDI,
+    project_id: int,
+    dialogue_id: int,
+    block_service: BlockServiceDI,
+    user_id: UserIDFromAccessTokenDI,
 ):
     try:
         return await block_service.get_blocks(
@@ -88,12 +88,12 @@ async def get_blocks(
     response_model=UnionBlockReadSchema,
 )
 async def update_block(
-        project_id: int,
-        dialogue_id: int,
-        block_id: int,
-        block: UnionBlockUpdateSchema,
-        block_service: BlockServiceDI,
-        user_id: UserIDFromAccessTokenDI,
+    project_id: int,
+    dialogue_id: int,
+    block_id: int,
+    block: UnionBlockUpdateSchema,
+    block_service: BlockServiceDI,
+    user_id: UserIDFromAccessTokenDI,
 ):
     try:
         return await block_service.update_block(
@@ -124,12 +124,12 @@ async def update_block(
     response_model=UnionBlockReadSchema,
 )
 async def upload_image_for_image_block(
-        project_id: int,
-        dialogue_id: int,
-        block_id: int,
-        image: UploadFile,
-        block_service: BlockServiceDI,
-        user_id: UserIDFromAccessTokenDI,
+    project_id: int,
+    dialogue_id: int,
+    block_id: int,
+    image: UploadFile,
+    block_service: BlockServiceDI,
+    user_id: UserIDFromAccessTokenDI,
 ):
     try:
         return await block_service.upload_image_for_image_block(
@@ -160,11 +160,11 @@ async def upload_image_for_image_block(
     status_code=status.HTTP_204_NO_CONTENT,
 )
 async def delete_block(
-        project_id: int,
-        dialogue_id: int,
-        block_id: int,
-        block_service: BlockServiceDI,
-        user_id: UserIDFromAccessTokenDI,
+    project_id: int,
+    dialogue_id: int,
+    block_id: int,
+    block_service: BlockServiceDI,
+    user_id: UserIDFromAccessTokenDI,
 ):
     try:
         await block_service.delete_block(

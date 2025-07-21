@@ -28,25 +28,23 @@ func_signature_for_callback_handler_with_callback_and_state = (
 # blocks
 message_answer = 'await message.answer("{message_text}")'
 
-message_answer_with_reply_kb_remove = (
-    'await message.answer("{message_text}", reply_markup=types.ReplyKeyboardRemove())'
-)
+message_answer_with_reply_kb_remove = 'await message.answer("{message_text}", reply_markup=types.ReplyKeyboardRemove())'
 
 callback_answer = 'await callback.answer()'
 callback_message = 'message = callback.message'
 
 
-image_block = '''
+image_block = """
     # Отправка изображения
     try:
         image = types.FSInputFile("{image_path}")
         await message.answer_photo(image)
     except Exception as e:
         logging.info(f"Ошибка при отправке изображения {image_path}: {{e}}")
-'''
+"""
 
 
-email_block = '''
+email_block = """
     # Отправка Email
     recipient_email = "{recipient_email}"
     try:
@@ -57,20 +55,20 @@ email_block = '''
         )
     except Exception as e:
         logging.info(f"Ошибка при отправке письма на email {{recipient_email}}: {{e}}")
-'''
+"""
 
 
-csv_block = '''
+csv_block = """
     # Сохранение данных в csv
     with open("{file_path}.csv", "a", encoding="utf-8", newline="") as csv_file:
         writer = csv.DictWriter(csv_file, fieldnames={data}.keys())
         if csv_file.tell() == 0:
             writer.writeheader()
         writer.writerow({data})
-'''
+"""
 
 
-api_block = '''
+api_block = """
     # Отправка API-запроса
     url = "{url}"
     response_data = {{}}
@@ -84,7 +82,7 @@ api_block = '''
                 response_data = await response.json()
         except aiohttp.ClientError as e:
             logging.info(f"Ошибка при отправке API-запроса на {{url}}: {{e}}")
-'''
+"""
 
 
 set_state = 'await state.set_state({states_group_name}.{state_name})'
@@ -95,31 +93,31 @@ clear_state = 'await state.clear()'
 call_start_func = 'await handler_command_start(message)'
 
 # answers type check
-answer_text_type_check = '''
+answer_text_type_check = """
     if not isinstance(message.text, str):
         return await message.answer("Неверный тип сообщения! Необходимо ввести текст!")
-'''
+"""
 
-answer_int_type_check = '''
+answer_int_type_check = """
     if not message.text.isdigit():
         return await message.answer("Неверный тип сообщения! Необходимо ввести целое число!")
-'''
+"""
 
-answer_email_type_check = '''
+answer_email_type_check = """
     if not is_email(message.text):
         return await message.answer("Неверный тип сообщения! Необходимо ввести email!")
-'''
+"""
 
-answer_phone_number_type_check = '''
+answer_phone_number_type_check = """
     if not is_phone_number(message.text):
         return await message.answer(
             "Неверный тип сообщения!" 
             "Необходимо ввести номер телефона, начинающийся с символа «+». Например: +79995552233."
         )
-'''
+"""
 
 # funcs
-is_email = '''
+is_email = """
 class EmailModel(BaseModel):
     email: EmailStr
 
@@ -130,15 +128,15 @@ def is_email(string: str) -> bool:
         return True
     except ValueError:
         return False
-'''
+"""
 
-is_phone_number = '''
+is_phone_number = """
 def is_phone_number(string: str) -> bool:
     pattern = r"^\+[0-9][0-9]{10}$"
     return bool(re.fullmatch(pattern, string))
-'''
+"""
 
-send_email = '''
+send_email = """
 async def send_email(title: str, content: str, recipient_email: str):
     smtp = SMTP(
         hostname=config.EMAIL_HOST,
@@ -158,20 +156,20 @@ async def send_email(title: str, content: str, recipient_email: str):
 
     await smtp.send_message(message)
     await smtp.quit()
-'''
+"""
 
-is_answer_from_user = '''
+is_answer_from_user = """
 def is_answer_from_user(string: str) -> bool:
     pattern = r"^answer\[\d+\]$"
     return bool(re.fullmatch(pattern, string))
-'''
+"""
 
-start_func = '''
+start_func = """
 @router.message(filters.CommandStart())
 async def handler_command_start(message: types.Message):
     keyboard = {keyboard}
     await message.answer({message_text}, reply_markup=keyboard)
-'''
+"""
 
 # keyboard
 inline_keyboard_button = 'types.InlineKeyboardButton(text="{text}", callback_data="callback_{text}")'

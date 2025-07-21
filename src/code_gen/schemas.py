@@ -22,7 +22,7 @@ class HandlerSchema(BaseModel):
     body: list[str] = Field(default_factory=list)
 
     def add_to_body(self, code: str):
-        code = code.replace('\'', '"')
+        code = code.replace("'", '"')
         code = self._process_access_to_user_answers_in_code(code)
         code = self._process_access_to_api_response_in_code(code)
         code = self._process_access_to_username_in_code(code)
@@ -47,7 +47,7 @@ class HandlerSchema(BaseModel):
 
         matches = re.finditer(pattern, code)
         for match in matches:
-            response_content = match.group(1).replace('\\"', '\'')
+            response_content = match.group(1).replace('\\"', "'")
             replaced_content = re.sub(r'\[([^\[\]]+)\]', r'.get(\1, {})', response_content)
             code = code.replace(match.group(0), f'{{response_data{replaced_content}}}')
 
@@ -72,7 +72,6 @@ class HandlerSchema(BaseModel):
     def _format_string_if_pattern_found(pattern: str, code: str) -> str:
         search_from = 0
         while match := re.search(pattern, code[search_from:]):
-
             quote_index = code.rfind('"', 0, match.start() + search_from)
             while quote_index != -1 and code[quote_index - 1] != 'f':
                 if code[quote_index - 1] == '\\':

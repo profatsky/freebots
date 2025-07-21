@@ -34,9 +34,9 @@ class ProjectService:
         return await self._project_repository.get_projects(user_id)
 
     async def get_project_to_generate_code(
-            self,
-            user_id: int,
-            project_id: int,
+        self,
+        user_id: int,
+        project_id: int,
     ) -> Optional[ProjectToGenerateCodeReadSchema]:
         project = await self._project_repository.get_project_to_generate_code(project_id)
         if project is None:
@@ -58,10 +58,10 @@ class ProjectService:
         return project
 
     async def update_project(
-            self,
-            user_id: int,
-            project_id: int,
-            project_data: ProjectUpdateSchema,
+        self,
+        user_id: int,
+        project_id: int,
+        project_data: ProjectUpdateSchema,
     ) -> Optional[ProjectReadSchema]:
         _ = await self.get_project(
             user_id=user_id,
@@ -78,9 +78,7 @@ class ProjectService:
             project_id=project_id,
         )
 
-        media_dir_path = os.path.join(
-            'src', 'media', 'users', str(user_id), 'projects', str(project_id)
-        )
+        media_dir_path = os.path.join('src', 'media', 'users', str(user_id), 'projects', str(project_id))
         if os.path.exists(media_dir_path):
             shutil.rmtree(media_dir_path)
 

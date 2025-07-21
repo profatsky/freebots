@@ -17,13 +17,10 @@ class UserRepository:
         self._session = session
 
     async def create_user(
-            self,
-            credentials: AuthCredentialsSchema,
+        self,
+        credentials: AuthCredentialsSchema,
     ) -> Optional[UserReadSchema]:
-        user = UserModel(
-            email=credentials.email,
-            hashed_password=self._hash_password(credentials.password)
-        )
+        user = UserModel(email=credentials.email, hashed_password=self._hash_password(credentials.password))
         try:
             self._session.add(user)
             await self._session.commit()
@@ -37,8 +34,8 @@ class UserRepository:
         return bcrypt.hash(password)
 
     async def get_user_by_email(
-            self,
-            email: EmailStr,
+        self,
+        email: EmailStr,
     ) -> Optional[UserReadSchema]:
         user = await self._get_user_model_instance_by_email(email)
         if user is None:
@@ -47,8 +44,7 @@ class UserRepository:
 
     async def _get_user_model_instance_by_email(self, email: EmailStr) -> Optional[UserModel]:
         user = await self._session.execute(
-            select(UserModel)
-            .where(
+            select(UserModel).where(
                 UserModel.email == email,
             )
         )
@@ -62,14 +58,14 @@ class UserRepository:
 
     @staticmethod
     def _verify_password(
-            plain_password: Password,
-            hashed_password: str,
+        plain_password: Password,
+        hashed_password: str,
     ) -> bool:
         return bcrypt.verify(plain_password, hashed_password)
 
     async def get_user_by_id(
-            self,
-            user_id: int,
+        self,
+        user_id: int,
     ) -> Optional[UserReadSchema]:
         user = await self._get_user_model_instance_by_id(user_id)
         if user is None:
@@ -77,18 +73,12 @@ class UserRepository:
         return UserReadSchema.model_validate(user)
 
     async def _get_user_model_instance_by_id(self, user_id: int) -> Optional[UserModel]:
-        user = await self._session.execute(
-            select(UserModel)
-            .where(UserModel.user_id == user_id)
-        )
+        user = await self._session.execute(select(UserModel).where(UserModel.user_id == user_id))
         return user.scalar()
 
     async def get_user_with_stats(self, user_id: int) -> Optional[UserWithStatsReadSchema]:
         query = (
-            self._session.sync_session.query(
-                UserModel,
-                func.count(ProjectModel.project_id).label('project_count')
-            )
+            self._session.sync_session.query(UserModel, func.count(ProjectModel.project_id).label('project_count'))
             .outerjoin(UserModel.projects)
             .where(UserModel.user_id == user_id)
             .group_by(UserModel.user_id)
@@ -98,15 +88,11 @@ class UserRepository:
             return
         user, project_count = result
 
-        return UserWithStatsReadSchema(
-            **user.__dict__,
-            project_count=project_count
-        )
+        return UserWithStatsReadSchema(**user.__dict__, project_count=project_count)
 
     async def delete_user(self, user_id: int):
         await self._session.execute(
-            delete(UserModel)
-            .where(
+            delete(UserModel).where(
                 UserModel.user_id == user_id,
             )
         )

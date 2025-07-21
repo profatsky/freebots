@@ -21,8 +21,8 @@ router = APIRouter(
     response_model=list[DialogueTemplateReadSchema],
 )
 async def get_dialogue_templates(
-        dialogue_template_service: DialogueTemplateServiceDI,
-        page: Annotated[int, Query(ge=1)] = 1,
+    dialogue_template_service: DialogueTemplateServiceDI,
+    page: Annotated[int, Query(ge=1)] = 1,
 ):
     return await dialogue_template_service.get_templates(page)
 
@@ -32,8 +32,8 @@ async def get_dialogue_templates(
     response_model=DialogueTemplateReadSchema,
 )
 async def get_dialogue_template(
-        template_id: int,
-        dialogue_template_service: DialogueTemplateServiceDI,
+    template_id: int,
+    dialogue_template_service: DialogueTemplateServiceDI,
 ):
     try:
         return await dialogue_template_service.get_template(template_id)
@@ -46,10 +46,10 @@ async def get_dialogue_template(
     status_code=status.HTTP_201_CREATED,
 )
 async def add_dialogue_template_to_project(
-        project_id: int,
-        template_id: Annotated[int, Body(embed=True)],
-        dialogue_template_service: DialogueTemplateServiceDI,
-        user_id: UserIDFromAccessTokenDI,
+    project_id: int,
+    template_id: Annotated[int, Body(embed=True)],
+    dialogue_template_service: DialogueTemplateServiceDI,
+    user_id: UserIDFromAccessTokenDI,
 ):
     try:
         await dialogue_template_service.create_dialogue_from_template(

@@ -21,9 +21,9 @@ router = APIRouter(
     response_model=list[DialogueWithBlocksReadSchema],
 )
 async def get_bot_code(
-        project_id: int,
-        code_gen_service: CodeGenServiceDI,
-        user_id: UserIDFromAccessTokenDI,
+    project_id: int,
+    code_gen_service: CodeGenServiceDI,
+    user_id: UserIDFromAccessTokenDI,
 ):
     try:
         zipped_bot = await code_gen_service.get_bot_code_in_zip(

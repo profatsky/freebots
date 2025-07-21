@@ -16,19 +16,19 @@ from src.blocks.exceptions.services_exceptions import BlockNotFoundError, Invali
 
 class BlockService:
     def __init__(
-            self,
-            block_repository: BlockRepositoryDI,
-            dialogue_service: DialogueServiceDI,
+        self,
+        block_repository: BlockRepositoryDI,
+        dialogue_service: DialogueServiceDI,
     ):
         self._block_repository = block_repository
         self._dialogue_service = dialogue_service
 
     async def create_block(
-            self,
-            user_id: int,
-            project_id: int,
-            dialogue_id: int,
-            block_data: UnionBlockCreateSchema,
+        self,
+        user_id: int,
+        project_id: int,
+        dialogue_id: int,
+        block_data: UnionBlockCreateSchema,
     ) -> UnionBlockReadSchema:
         _ = await self._dialogue_service.get_dialogue(
             user_id=user_id,
@@ -41,10 +41,10 @@ class BlockService:
         )
 
     async def get_blocks(
-            self,
-            user_id: int,
-            project_id: int,
-            dialogue_id: int,
+        self,
+        user_id: int,
+        project_id: int,
+        dialogue_id: int,
     ) -> list[UnionBlockReadSchema]:
         _ = await self._dialogue_service.get_dialogue(
             user_id=user_id,
@@ -57,12 +57,12 @@ class BlockService:
         return blocks
 
     async def upload_image_for_image_block(
-            self,
-            user_id: int,
-            project_id: int,
-            dialogue_id: int,
-            block_id: int,
-            image: UploadFile,
+        self,
+        user_id: int,
+        project_id: int,
+        dialogue_id: int,
+        block_id: int,
+        image: UploadFile,
     ) -> ImageBlockReadSchema:
         block_read = await self.get_block(
             user_id=user_id,
@@ -86,10 +86,9 @@ class BlockService:
         with open(image_path, 'wb+') as buffer:
             buffer.write(image.file.read())
 
-        block_update = ImageBlockReadSchema(**{
-            field_name: getattr(block_read, field_name)
-            for field_name in ImageBlockReadSchema.__fields__
-        })
+        block_update = ImageBlockReadSchema(
+            **{field_name: getattr(block_read, field_name) for field_name in ImageBlockReadSchema.__fields__}
+        )
         # TODO: use os.path.join
         block_update.image_path = image_path.replace('src/media/', '')
 
@@ -102,12 +101,12 @@ class BlockService:
         )
 
     async def update_block(
-            self,
-            user_id: int,
-            project_id: int,
-            dialogue_id: int,
-            block_id: int,
-            block_data: UnionBlockUpdateSchema,
+        self,
+        user_id: int,
+        project_id: int,
+        dialogue_id: int,
+        block_id: int,
+        block_data: UnionBlockUpdateSchema,
     ) -> UnionBlockReadSchema:
         _ = await self.get_block(
             user_id=user_id,
@@ -122,11 +121,11 @@ class BlockService:
         )
 
     async def delete_block(
-            self,
-            user_id: int,
-            project_id: int,
-            dialogue_id: int,
-            block_id: int,
+        self,
+        user_id: int,
+        project_id: int,
+        dialogue_id: int,
+        block_id: int,
     ) -> UnionBlockReadSchema:
         block = await self.get_block(
             user_id=user_id,
@@ -146,11 +145,11 @@ class BlockService:
 
     # TODO: refactor, use repo method
     async def get_block(
-            self,
-            user_id: int,
-            project_id: int,
-            dialogue_id: int,
-            block_id: int,
+        self,
+        user_id: int,
+        project_id: int,
+        dialogue_id: int,
+        block_id: int,
     ) -> UnionBlockReadSchema:
         blocks = await self.get_blocks(
             user_id=user_id,

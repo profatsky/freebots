@@ -12,8 +12,8 @@ class UserService:
         self._user_repository = user_repository
 
     async def create_user(
-            self,
-            credentials: AuthCredentialsSchema,
+        self,
+        credentials: AuthCredentialsSchema,
     ) -> UserReadSchema:
         user = await self._user_repository.create_user(credentials)
         if user is None:
@@ -21,8 +21,8 @@ class UserService:
         return user
 
     async def get_user_by_email(
-            self,
-            email: EmailStr,
+        self,
+        email: EmailStr,
     ) -> UserReadSchema:
         user = await self._user_repository.get_user_by_email(email)
         if user is None:
@@ -30,8 +30,8 @@ class UserService:
         return user
 
     async def get_user_by_credentials(
-            self,
-            credentials: AuthCredentialsSchema,
+        self,
+        credentials: AuthCredentialsSchema,
     ) -> UserReadSchema:
         user = await self._user_repository.get_user_by_credentials(credentials)
         if user is None:
@@ -39,8 +39,8 @@ class UserService:
         return user
 
     async def get_user_by_id(
-            self,
-            user_id: int,
+        self,
+        user_id: int,
     ) -> UserReadSchema:
         user = await self._user_repository.get_user_by_id(user_id)
         if user is None:
@@ -48,8 +48,8 @@ class UserService:
         return user
 
     async def get_user_with_stats(
-            self,
-            user_id: int,
+        self,
+        user_id: int,
     ) -> UserWithStatsReadSchema:
         user = await self._user_repository.get_user_with_stats(user_id)
         if user is None:

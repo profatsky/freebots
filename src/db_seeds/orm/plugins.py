@@ -16,10 +16,7 @@ async def create():
 
 async def _create_plugin(plugin: PluginCreateSchema):
     async with async_session_maker() as session:
-        existing_plugin = await session.execute(
-            select(PluginModel)
-            .where(PluginModel.name == plugin.name)
-        )
+        existing_plugin = await session.execute(select(PluginModel).where(PluginModel.name == plugin.name))
         existing_plugin = existing_plugin.scalar()
 
         if existing_plugin is None:
@@ -37,14 +34,14 @@ async def _create_plugin(plugin: PluginCreateSchema):
 
 
 async def create_statistics_plugin():
-    description = '''
+    description = """
         <p>
             Плагин Статистика предоставляет информацию о количестве пользователей вашего чат-бота.
         </p>
         <p>
             Администратор чат-бота может просматривать статистику с помощью команды <code>/stats</code>.
         </p>
-    '''
+    """
 
     image_path = os.path.join('plugins', 'statistic.png')
     handlers_file_path = os.path.join('code_gen', 'bot_templates', 'project_structure', 'handlers', 'statistic.py.j2')
@@ -63,7 +60,7 @@ async def create_statistics_plugin():
 
 
 async def create_catalog_plugin():
-    description = '''
+    description = """
         <p>
             Плагин Каталог добавляет в чат-бота функционал каталога товаров (услуг).
         </p>
@@ -82,7 +79,7 @@ async def create_catalog_plugin():
             Администратор чат-бота может добавлять новые товары в каталог с помощью команды <code>/add_product</code> 
             и удалять имеющиеся во время просмотра каталога.
         </p>
-    '''
+    """
 
     image_path = os.path.join('plugins', 'catalog.png')
     handlers_file_path = os.path.join('code_gen', 'bot_templates', 'project_structure', 'handlers', 'catalog.py.j2')
@@ -101,7 +98,7 @@ async def create_catalog_plugin():
 
 
 async def create_support_plugin():
-    description = '''
+    description = """
         <p>
             Плагин Техническая поддержка добавляет в чат-бота функционал технической поддержки. 
         </p>
@@ -116,7 +113,7 @@ async def create_support_plugin():
             С помощью команды <code>/connect</code> администратор может подключиться к чату пользователя и отправлять 
             сообщения от имени чат-бота.
         </p>
-    '''
+    """
 
     image_path = os.path.join('plugins', 'support.png')
     handlers_file_path = os.path.join('code_gen', 'bot_templates', 'project_structure', 'handlers', 'support.py.j2')

@@ -5,9 +5,9 @@ from src.users.dependencies.services_dependencies import UserServiceDI
 
 class AuthService:
     def __init__(
-            self,
-            auth_security: AuthSecurityDI,
-            user_service: UserServiceDI,
+        self,
+        auth_security: AuthSecurityDI,
+        user_service: UserServiceDI,
     ):
         self._auth_security = auth_security
         self._user_service = user_service

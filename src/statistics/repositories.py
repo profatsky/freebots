@@ -10,11 +10,7 @@ class StatisticRepository:
         self._session = session
 
     async def count_users(self) -> int:
-        return await self._session.scalar(
-            select(func.count()).select_from(UserModel)
-        )
+        return await self._session.scalar(select(func.count()).select_from(UserModel))
 
     async def count_projects(self) -> int:
-        return await self._session.scalar(
-            select(func.count()).select_from(ProjectModel)
-        )
+        return await self._session.scalar(select(func.count()).select_from(ProjectModel))

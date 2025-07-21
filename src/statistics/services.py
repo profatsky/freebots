@@ -6,9 +6,9 @@ from src.users.dependencies.services_dependencies import UserServiceDI
 
 class StatisticService:
     def __init__(
-            self,
-            user_service: UserServiceDI,
-            statistic_repository: StatisticRepositoryDI,
+        self,
+        user_service: UserServiceDI,
+        statistic_repository: StatisticRepositoryDI,
     ):
         self._user_service = user_service
         self._statistic_repository = statistic_repository

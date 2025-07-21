@@ -29,8 +29,7 @@ class ProjectRepository:
         projects = await self._session.execute(
             select(ProjectModel)
             .options(
-                selectinload(ProjectModel.dialogues)
-                .joinedload(DialogueModel.trigger),
+                selectinload(ProjectModel.dialogues).joinedload(DialogueModel.trigger),
                 selectinload(ProjectModel.plugins),
             )
             .where(ProjectModel.user_id == user_id)
@@ -49,12 +48,10 @@ class ProjectRepository:
             select(ProjectModel)
             .options(
                 selectinload(ProjectModel.plugins),
-                selectinload(ProjectModel.dialogues)
-                .options(
+                selectinload(ProjectModel.dialogues).options(
                     joinedload(DialogueModel.trigger),
-                    selectinload(DialogueModel.blocks)
-                    .selectin_polymorphic(BlockModel.__subclasses__()),
-                )
+                    selectinload(DialogueModel.blocks).selectin_polymorphic(BlockModel.__subclasses__()),
+                ),
             )
             .where(ProjectModel.project_id == project_id)
         )
@@ -64,9 +61,9 @@ class ProjectRepository:
         return ProjectToGenerateCodeReadSchema.model_validate(project)
 
     async def update_project(
-            self,
-            project_id: int,
-            project_data: ProjectUpdateSchema,
+        self,
+        project_id: int,
+        project_data: ProjectUpdateSchema,
     ) -> Optional[ProjectReadSchema]:
         project = await self._get_project_model_instance(project_id)
         if project is None:
@@ -80,8 +77,7 @@ class ProjectRepository:
 
     async def delete_project(self, project_id: int):
         await self._session.execute(
-            delete(ProjectModel)
-            .where(
+            delete(ProjectModel).where(
                 ProjectModel.project_id == project_id,
             )
         )
@@ -89,16 +85,14 @@ class ProjectRepository:
 
     async def count_projects(self, user_id: int) -> int:
         return await self._session.scalar(
-            select(func.count()).select_from(ProjectModel)
-            .where(ProjectModel.user_id == user_id)
+            select(func.count()).select_from(ProjectModel).where(ProjectModel.user_id == user_id)
         )
 
     async def _get_project_model_instance(self, project_id: int) -> Optional[ProjectModel]:
         project = await self._session.execute(
             select(ProjectModel)
             .options(
-                selectinload(ProjectModel.dialogues)
-                .joinedload(DialogueModel.trigger),
+                selectinload(ProjectModel.dialogues).joinedload(DialogueModel.trigger),
                 selectinload(ProjectModel.plugins),
             )
             .where(ProjectModel.project_id == project_id)

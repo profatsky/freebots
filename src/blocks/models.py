@@ -24,9 +24,7 @@ class BlockModel(Base):
         'polymorphic_on': 'type',
     }
 
-    __table_args__ = (
-        UniqueConstraint('dialogue_id', 'sequence_number'),
-    )
+    __table_args__ = (UniqueConstraint('dialogue_id', 'sequence_number'),)
 
 
 class TextBlockModel(BlockModel):
@@ -59,10 +57,7 @@ class QuestionBlockModel(BlockModel):
     block_id: Mapped[int] = mapped_column(ForeignKey('blocks.block_id', ondelete='CASCADE'), primary_key=True)
 
     message_text: Mapped[str] = mapped_column(String(4096))
-    answer_type: Mapped[AnswerMessageType] = mapped_column(
-        Enum(AnswerMessageType).values_callable,
-        nullable=False
-    )
+    answer_type: Mapped[AnswerMessageType] = mapped_column(Enum(AnswerMessageType).values_callable, nullable=False)
 
     __mapper_args__ = {
         'polymorphic_identity': 'question_block',
@@ -102,10 +97,7 @@ class APIBlockModel(BlockModel):
     block_id: Mapped[int] = mapped_column(ForeignKey('blocks.block_id', ondelete='CASCADE'), primary_key=True)
 
     url: Mapped[str] = mapped_column(String(2048))
-    http_method: Mapped[HTTPMethod] = mapped_column(
-        Enum(HTTPMethod).values_callable,
-        nullable=False
-    )
+    http_method: Mapped[HTTPMethod] = mapped_column(Enum(HTTPMethod).values_callable, nullable=False)
     headers: Mapped[dict] = mapped_column(JSONB)
     body: Mapped[dict] = mapped_column(JSONB)
 

@@ -16,26 +16,22 @@ class DialogueTemplateRepository:
         self._session = session
 
     async def get_templates(
-            self,
-            offset: int,
-            limit: int,
+        self,
+        offset: int,
+        limit: int,
     ) -> list[DialogueTemplateReadSchema]:
         templates = await self._session.execute(
-            select(DialogueTemplateModel)
-            .order_by(DialogueTemplateModel.created_at)
-            .offset(offset)
-            .limit(limit)
+            select(DialogueTemplateModel).order_by(DialogueTemplateModel.created_at).offset(offset).limit(limit)
         )
         templates = templates.scalars().all()
         return [DialogueTemplateReadSchema.model_validate(template) for template in templates]
 
     async def get_template(
-            self,
-            template_id: int,
+        self,
+        template_id: int,
     ) -> Optional[DialogueTemplateReadSchema]:
         template = await self._session.execute(
-            select(DialogueTemplateModel)
-            .where(DialogueTemplateModel.template_id == template_id)
+            select(DialogueTemplateModel).where(DialogueTemplateModel.template_id == template_id)
         )
         template = template.scalar()
         if not template:
@@ -43,18 +39,16 @@ class DialogueTemplateRepository:
         return DialogueTemplateReadSchema.model_validate(template)
 
     async def create_dialogue_from_template(
-            self,
-            project_id: int,
-            template_id: int,
+        self,
+        project_id: int,
+        template_id: int,
     ):
         template = await self._session.execute(
             select(DialogueTemplateModel)
             .options(
-                joinedload(DialogueTemplateModel.dialogue)
-                .options(
+                joinedload(DialogueTemplateModel.dialogue).options(
                     joinedload(DialogueModel.trigger),
-                    selectinload(DialogueModel.blocks)
-                    .selectin_polymorphic(BlockModel.__subclasses__()),
+                    selectinload(DialogueModel.blocks).selectin_polymorphic(BlockModel.__subclasses__()),
                 )
             )
             .where(DialogueTemplateModel.template_id == template_id)
@@ -97,7 +91,4 @@ class DialogueTemplateRepository:
 
     @staticmethod
     def _is_relationship(model_instance_field_value) -> bool:
-        return (
-            isinstance(model_instance_field_value, DeclarativeBase) or
-            isinstance(model_instance_field_value, list)
-        )
+        return isinstance(model_instance_field_value, DeclarativeBase) or isinstance(model_instance_field_value, list)

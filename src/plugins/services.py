@@ -14,10 +14,10 @@ PLUGINS_PER_PAGE = 9
 
 class PluginService:
     def __init__(
-            self,
-            plugin_repository: PluginRepositoryDI,
-            user_service: UserServiceDI,
-            project_service: ProjectServiceDI,
+        self,
+        plugin_repository: PluginRepositoryDI,
+        user_service: UserServiceDI,
+        project_service: ProjectServiceDI,
     ):
         self._plugin_repository = plugin_repository
         self._user_service = user_service

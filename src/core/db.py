@@ -11,11 +11,11 @@ class Base(DeclarativeBase):
 
 
 def get_postgres_dsn(
-        user=settings.DB_USER,
-        password=settings.DB_PASS,
-        host=settings.DB_HOST,
-        port=settings.DB_PORT,
-        database=settings.DB_NAME,
+    user=settings.DB_USER,
+    password=settings.DB_PASS,
+    host=settings.DB_HOST,
+    port=settings.DB_PORT,
+    database=settings.DB_NAME,
 ) -> str:
     return 'postgresql+asyncpg://{user}:{password}@{host}:{port}/{database}'.format(
         user=user,

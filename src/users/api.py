@@ -18,8 +18,8 @@ router = APIRouter(
     response_model=UserWithStatsReadSchema,
 )
 async def get_user(
-        user_service: UserServiceDI,
-        user_id: UserIDFromAccessTokenDI,
+    user_service: UserServiceDI,
+    user_id: UserIDFromAccessTokenDI,
 ):
     try:
         return await user_service.get_user_with_stats(user_id)

@@ -28,17 +28,17 @@ BOT_FILE_TEMPLATES_DIR = os.path.join('src', 'code_gen', 'bot_templates', 'proje
 # TODO: create repositories layer
 class CodeGenService:
     def __init__(
-            self,
-            session: AsyncSessionDI,
-            project_service: ProjectServiceDI,
+        self,
+        session: AsyncSessionDI,
+        project_service: ProjectServiceDI,
     ):
         self._session = session
         self._project_service = project_service
 
     async def get_bot_code_in_zip(
-            self,
-            user_id: int,
-            project_id: int,
+        self,
+        user_id: int,
+        project_id: int,
     ) -> io.BytesIO:
         project = await self._project_service.get_project_to_generate_code(
             user_id=user_id,
@@ -51,7 +51,6 @@ class CodeGenService:
         zip_data = io.BytesIO()
 
         with zipfile.ZipFile(zip_data, mode='w') as zipf:
-
             self._add_custom_handlers_code_to_zip(project, zipf)
             self._add_plugins_code_to_zip(project, zipf)
             self._add_images_to_zip(project, zipf)
@@ -82,11 +81,7 @@ class CodeGenService:
         return zip_data
 
     # TODO refactoring
-    def _add_plugins_code_to_zip(
-            self,
-            project: ProjectToGenerateCodeReadSchema,
-            zip_file: zipfile.ZipFile
-    ):
+    def _add_plugins_code_to_zip(self, project: ProjectToGenerateCodeReadSchema, zip_file: zipfile.ZipFile):
         handlers_file_names = []
         db_funcs_file_names = []
 
@@ -112,35 +107,32 @@ class CodeGenService:
             zip_file.write(db_funcs_file_path, os.path.join('db', db_funcs_file_name_with_py_extension))
 
         handlers_init_template = self._get_template(os.path.join(BOT_FILE_TEMPLATES_DIR, 'handlers', '__init__.py.j2'))
-        handlers_init_code = handlers_init_template.render({
-            'handlers_file_names': handlers_file_names,
-        })
+        handlers_init_code = handlers_init_template.render(
+            {
+                'handlers_file_names': handlers_file_names,
+            }
+        )
         handlers_init_in_memory_file = io.BytesIO(str.encode(handlers_init_code))
         zip_file.writestr(os.path.join('handlers', '__init__.py'), handlers_init_in_memory_file.getvalue())
 
         db_funcs_init_template = self._get_template(os.path.join(BOT_FILE_TEMPLATES_DIR, 'db', '__init__.py.j2'))
-        db_funcs_init_code = db_funcs_init_template.render({
-            'db_funcs_file_names': db_funcs_file_names,
-        })
+        db_funcs_init_code = db_funcs_init_template.render(
+            {
+                'db_funcs_file_names': db_funcs_file_names,
+            }
+        )
         db_funcs_init_in_memory_file = io.BytesIO(str.encode(db_funcs_init_code))
         zip_file.writestr(os.path.join('db', '__init__.py'), db_funcs_init_in_memory_file.getvalue())
 
     @staticmethod
-    def _add_images_to_zip(
-            project: ProjectToGenerateCodeReadSchema,
-            zip_file: zipfile.ZipFile
-    ):
+    def _add_images_to_zip(project: ProjectToGenerateCodeReadSchema, zip_file: zipfile.ZipFile):
         for dialogue in project.dialogues:
             for block in dialogue.blocks:
                 if block.type == BlockType.IMAGE_BLOCK.value:
                     image_path = os.path.join('src', 'media', block.image_path)
                     zip_file.write(image_path, os.path.join('img', os.path.basename(block.image_path)))
 
-    def _add_custom_handlers_code_to_zip(
-            self,
-            project: ProjectToGenerateCodeReadSchema,
-            zip_file: zipfile.ZipFile
-    ):
+    def _add_custom_handlers_code_to_zip(self, project: ProjectToGenerateCodeReadSchema, zip_file: zipfile.ZipFile):
         custom_handlers_code = self._generate_custom_handlers_code(project)
         custom_handlers_in_memory_file = io.BytesIO(str.encode(custom_handlers_code))
         zip_file.writestr(os.path.join('handlers', 'custom.py'), custom_handlers_in_memory_file.getvalue())
@@ -148,10 +140,7 @@ class CodeGenService:
     # TODO refactoring
     # TODO add customize env variables
     # TODO change start func call
-    def _generate_custom_handlers_code(
-            self,
-            project: ProjectToGenerateCodeReadSchema
-    ) -> str:
+    def _generate_custom_handlers_code(self, project: ProjectToGenerateCodeReadSchema) -> str:
         utils_funcs = set()
         states_groups: list[StatesGroupSchema] = []
         handlers: list[HandlerSchema] = []
@@ -160,7 +149,6 @@ class CodeGenService:
         start_keyboard = self._get_start_keyboard(project.start_keyboard_type)
 
         for dialogue in project.dialogues:
-
             if not dialogue.trigger.value:
                 continue
 
@@ -178,9 +166,7 @@ class CodeGenService:
 
             elif dialogue.trigger.event_type == TriggerEventType.BUTTON:
                 if project.start_keyboard_type == KeyboardType.INLINE_KEYBOARD:
-                    start_keyboard.add_to_buttons(
-                        code.inline_keyboard_button.format(text=dialogue.trigger.value)
-                    )
+                    start_keyboard.add_to_buttons(code.inline_keyboard_button.format(text=dialogue.trigger.value))
                     handler.decorator = code.callback_button_decorator.format(trigger_value=dialogue.trigger.value)
                     handler.signature = code.func_signature_for_callback_handler_with_callback.format(
                         trigger_event_type=dialogue.trigger.event_type.value,
@@ -190,9 +176,7 @@ class CodeGenService:
                     handler.add_to_body(code.callback_answer)
                     handler.add_to_body(code.callback_message)
                 else:
-                    start_keyboard.add_to_buttons(
-                        code.reply_keyboard_button.format(text=dialogue.trigger.value)
-                    )
+                    start_keyboard.add_to_buttons(code.reply_keyboard_button.format(text=dialogue.trigger.value))
                     handler.decorator = code.text_button_decorator.format(trigger_value=dialogue.trigger.value)
 
             elif dialogue.trigger.event_type == TriggerEventType.TEXT:
@@ -203,14 +187,11 @@ class CodeGenService:
 
             dialogue_blocks = sorted(dialogue.blocks, key=lambda x: x.sequence_number)
             for block in dialogue_blocks:
-
                 if block.is_draft:
                     continue
 
                 if block.type == BlockType.TEXT_BLOCK.value:
-                    handler.add_to_body(
-                        code.message_answer.format(message_text=escape_inner_text(block.message_text))
-                    )
+                    handler.add_to_body(code.message_answer.format(message_text=escape_inner_text(block.message_text)))
 
                 elif block.type == BlockType.IMAGE_BLOCK.value:
                     image_path_in_bot_project = os.path.join('img/', os.path.basename(block.image_path))
@@ -219,10 +200,7 @@ class CodeGenService:
                 elif block.type == BlockType.QUESTION_BLOCK.value:
                     if states_group is None:
                         state = StateSchema(name=f'state_from_block{block.sequence_number}')
-                        states_group = StatesGroupSchema(
-                            name=f'StatesGroup{len(states_groups) + 1}',
-                            states=[state]
-                        )
+                        states_group = StatesGroupSchema(name=f'StatesGroup{len(states_groups) + 1}', states=[state])
                         states_groups.append(states_group)
 
                         handler.add_to_body(
@@ -326,19 +304,21 @@ class CodeGenService:
             start_keyboard = None
 
         template = self._get_template(os.path.join(BOT_FILE_TEMPLATES_DIR, 'handlers', 'custom.py.j2'))
-        bot_code = template.render({
-            'utils_funcs': utils_funcs,
-            'states_groups': states_groups,
-            'handlers': handlers,
-            'commands_values': commands_values,
-            'start_keyboard': start_keyboard,
-            'start_message': escape_inner_text(project.start_message) if project.start_message else 'Главное меню',
-        })
+        bot_code = template.render(
+            {
+                'utils_funcs': utils_funcs,
+                'states_groups': states_groups,
+                'handlers': handlers,
+                'commands_values': commands_values,
+                'start_keyboard': start_keyboard,
+                'start_message': escape_inner_text(project.start_message) if project.start_message else 'Главное меню',
+            }
+        )
         return bot_code
 
     @staticmethod
     def _get_start_keyboard(
-            keyboard_type: KeyboardType,
+        keyboard_type: KeyboardType,
     ) -> KeyboardSchema:
         start_keyboard = KeyboardSchema()
         if keyboard_type == KeyboardType.INLINE_KEYBOARD:
@@ -349,7 +329,7 @@ class CodeGenService:
 
     @staticmethod
     def _get_answer_type_check_code(
-            answer_type: AnswerMessageType,
+        answer_type: AnswerMessageType,
     ) -> Optional[str]:
         types_to_code = {
             AnswerMessageType.ANY: None,
@@ -362,7 +342,7 @@ class CodeGenService:
 
     @staticmethod
     def _get_utils_func_code_for_answer_type_check(
-            answer_type: AnswerMessageType,
+        answer_type: AnswerMessageType,
     ) -> Optional[str]:
         types_to_code = {
             AnswerMessageType.ANY: None,
@@ -375,7 +355,7 @@ class CodeGenService:
 
     @staticmethod
     def _get_aiohttp_session_method(
-            http_method: HTTPMethod,
+        http_method: HTTPMethod,
     ) -> AiohttpSessionMethod:
         http_methods_to_aiohttp_methods = {
             http_method.GET: AiohttpSessionMethod.GET,
@@ -395,9 +375,7 @@ class CodeGenService:
             template_str = f.read()
 
         env = Environment(
-            loader=FileSystemLoader(
-                os.path.join('src', 'code_gen', 'bot_templates')
-            ),
+            loader=FileSystemLoader(os.path.join('src', 'code_gen', 'bot_templates')),
             trim_blocks=True,
             lstrip_blocks=True,
         )

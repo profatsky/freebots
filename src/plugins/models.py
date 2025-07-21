@@ -10,7 +10,7 @@ projects_plugins = Table(
     'projects_plugins',
     Base.metadata,
     Column('project_id', Integer, ForeignKey('projects.project_id', ondelete='CASCADE'), primary_key=True),
-    Column('plugin_id', Integer, ForeignKey('plugins.plugin_id', ondelete='CASCADE'), primary_key=True)
+    Column('plugin_id', Integer, ForeignKey('plugins.plugin_id', ondelete='CASCADE'), primary_key=True),
 )
 
 

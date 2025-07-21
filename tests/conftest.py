@@ -58,9 +58,7 @@ async def cleanup_tables(session):
     yield
     async with session.begin():
         for table in reversed(Base.metadata.sorted_tables):
-            await session.execute(
-                text(f'TRUNCATE TABLE {table.name} RESTART IDENTITY CASCADE')
-            )
+            await session.execute(text(f'TRUNCATE TABLE {table.name} RESTART IDENTITY CASCADE'))
         await session.commit()
 
 
@@ -75,10 +73,8 @@ async def client(session) -> AsyncClient:
     app.dependency_overrides[get_async_session] = override_get_session
     async with LifespanManager(app) as manager:
         async with AsyncClient(
-                transport=ASGITransport(
-                    app=manager.app
-                ),
-                base_url='http://127.0.0.1:8000/api',
+            transport=ASGITransport(app=manager.app),
+            base_url='http://127.0.0.1:8000/api',
         ) as cli:
             yield cli
 
@@ -97,10 +93,7 @@ async def test_user_credentials(session) -> AuthCredentialsSchema:
 
 
 @pytest_asyncio.fixture(scope='function', loop_scope='session')
-async def test_user(
-        user_repository: UserRepository,
-        test_user_credentials: AuthCredentialsSchema
-) -> UserReadSchema:
+async def test_user(user_repository: UserRepository, test_user_credentials: AuthCredentialsSchema) -> UserReadSchema:
     user = await user_repository.create_user(test_user_credentials)
     yield user
     await user_repository.delete_user(user.user_id)
@@ -116,8 +109,7 @@ async def another_user_credentials(session) -> AuthCredentialsSchema:
 
 @pytest_asyncio.fixture(scope='function', loop_scope='session')
 async def another_user(
-        user_repository: UserRepository,
-        another_user_credentials: AuthCredentialsSchema
+    user_repository: UserRepository, another_user_credentials: AuthCredentialsSchema
 ) -> UserReadSchema:
     user = await user_repository.create_user(another_user_credentials)
     yield user
@@ -126,9 +118,9 @@ async def another_user(
 
 @pytest_asyncio.fixture(scope='function', loop_scope='session')
 async def authorized_test_client(
-        client: AsyncClient,
-        test_user: UserReadSchema,
-        test_user_credentials: AuthCredentialsSchema,
+    client: AsyncClient,
+    test_user: UserReadSchema,
+    test_user_credentials: AuthCredentialsSchema,
 ) -> AsyncClient:
     response = await client.post('/login', json=test_user_credentials.model_dump())
 
@@ -140,9 +132,9 @@ async def authorized_test_client(
 
 @pytest_asyncio.fixture(scope='function', loop_scope='session')
 async def authorized_another_client(
-        client: AsyncClient,
-        another_user: UserReadSchema,
-        another_user_credentials: AuthCredentialsSchema,
+    client: AsyncClient,
+    another_user: UserReadSchema,
+    another_user_credentials: AuthCredentialsSchema,
 ) -> AsyncClient:
     response = await client.post('/login', json=another_user_credentials.model_dump())
 
@@ -159,8 +151,8 @@ async def project_repository(session) -> ProjectRepository:
 
 @pytest_asyncio.fixture(scope='function', loop_scope='session')
 async def test_project(
-        test_user: UserReadSchema,
-        project_repository: ProjectRepository,
+    test_user: UserReadSchema,
+    project_repository: ProjectRepository,
 ) -> ProjectReadSchema:
     project = await project_repository.create_project(
         user_id=test_user.user_id,
@@ -172,10 +164,10 @@ async def test_project(
 
 @pytest_asyncio.fixture(scope='function', loop_scope='session')
 async def created_projects(
-        test_user: UserReadSchema,
-        project_repository: ProjectRepository,
-        dialogue_repository: DialogueRepository,
-        request,
+    test_user: UserReadSchema,
+    project_repository: ProjectRepository,
+    dialogue_repository: DialogueRepository,
+    request,
 ) -> list[ProjectReadSchema]:
     num_projects = getattr(request, 'param', 1)
 

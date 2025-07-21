@@ -29,8 +29,8 @@ router = APIRouter(
     response_model=list[PluginReadSchema],
 )
 async def get_plugins(
-        plugin_service: PluginServiceDI,
-        page: Annotated[int, Query(ge=1)] = 1,
+    plugin_service: PluginServiceDI,
+    page: Annotated[int, Query(ge=1)] = 1,
 ):
     return await plugin_service.get_plugins(page)
 
@@ -40,8 +40,8 @@ async def get_plugins(
     response_model=PluginReadSchema,
 )
 async def get_plugin(
-        plugin_id: int,
-        plugin_service: PluginServiceDI,
+    plugin_id: int,
+    plugin_service: PluginServiceDI,
 ):
     try:
         return await plugin_service.get_plugin(plugin_id)
@@ -54,10 +54,10 @@ async def get_plugin(
     status_code=status.HTTP_201_CREATED,
 )
 async def add_plugin_to_project(
-        project_id: int,
-        plugin_id: Annotated[int, Body(embed=True)],
-        plugin_service: PluginServiceDI,
-        user_id: UserIDFromAccessTokenDI,
+    project_id: int,
+    plugin_id: Annotated[int, Body(embed=True)],
+    plugin_service: PluginServiceDI,
+    user_id: UserIDFromAccessTokenDI,
 ):
     try:
         await plugin_service.add_plugin_to_project(
@@ -84,10 +84,10 @@ async def add_plugin_to_project(
     status_code=status.HTTP_204_NO_CONTENT,
 )
 async def remove_plugin_from_project(
-        project_id: int,
-        plugin_id: int,
-        plugin_service: PluginServiceDI,
-        user_id: UserIDFromAccessTokenDI,
+    project_id: int,
+    plugin_id: int,
+    plugin_service: PluginServiceDI,
+    user_id: UserIDFromAccessTokenDI,
 ):
     try:
         await plugin_service.remove_plugin_from_project(

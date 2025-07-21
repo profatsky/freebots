@@ -16,8 +16,8 @@ router = APIRouter(
 # TODO: admin privileges require
 @router.get('', response_model=StatisticSchema)
 async def get_statistic(
-        statistic_service: StatisticServiceDI,
-        user_id: UserIDFromAccessTokenDI,
+    statistic_service: StatisticServiceDI,
+    user_id: UserIDFromAccessTokenDI,
 ):
     try:
         return await statistic_service.get_statistic(user_id)

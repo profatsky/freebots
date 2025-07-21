@@ -11,9 +11,9 @@ from tests.utils.projects import assert_project_response
 class TestProjectsApi:
     @pytest.mark.asyncio
     async def test_create_project_success(
-            self,
-            test_user: UserReadSchema,
-            authorized_test_client: AsyncClient,
+        self,
+        test_user: UserReadSchema,
+        authorized_test_client: AsyncClient,
     ):
         project_data = ProjectCreateSchemaFactory()
 
@@ -33,10 +33,10 @@ class TestProjectsApi:
     @pytest.mark.asyncio
     @pytest.mark.parametrize('created_projects', [5], indirect=True)
     async def test_create_project_limit_exceeded(
-            self,
-            test_user: UserReadSchema,
-            authorized_test_client: AsyncClient,
-            created_projects: list[ProjectReadSchema],
+        self,
+        test_user: UserReadSchema,
+        authorized_test_client: AsyncClient,
+        created_projects: list[ProjectReadSchema],
     ):
         response = await authorized_test_client.post(
             '/projects',
@@ -49,11 +49,11 @@ class TestProjectsApi:
     @pytest.mark.asyncio
     @pytest.mark.parametrize('created_projects', [5], indirect=True)
     async def test_get_projects_success(
-            self,
-            test_user: UserReadSchema,
-            authorized_test_client: AsyncClient,
-            project_repository: ProjectRepository,
-            created_projects: list[ProjectReadSchema],
+        self,
+        test_user: UserReadSchema,
+        authorized_test_client: AsyncClient,
+        project_repository: ProjectRepository,
+        created_projects: list[ProjectReadSchema],
     ):
         response = await authorized_test_client.get('/projects')
         assert response.status_code == 200
@@ -77,9 +77,9 @@ class TestProjectsApi:
 
     @pytest.mark.asyncio
     async def test_update_project_success(
-            self,
-            authorized_test_client: AsyncClient,
-            test_project: ProjectReadSchema,
+        self,
+        authorized_test_client: AsyncClient,
+        test_project: ProjectReadSchema,
     ):
         update_data = ProjectUpdateSchemaFactory()
 
@@ -96,10 +96,10 @@ class TestProjectsApi:
 
     @pytest.mark.asyncio
     async def test_update_project_no_permission(
-            self,
-            authorized_another_client: AsyncClient,
-            test_project: ProjectReadSchema,
-            project_repository: ProjectRepository,
+        self,
+        authorized_another_client: AsyncClient,
+        test_project: ProjectReadSchema,
+        project_repository: ProjectRepository,
     ):
         update_data = ProjectUpdateSchemaFactory()
         response = await authorized_another_client.put(
@@ -126,10 +126,10 @@ class TestProjectsApi:
 
     @pytest.mark.asyncio
     async def test_delete_project_success(
-            self,
-            authorized_test_client: AsyncClient,
-            test_project: ProjectReadSchema,
-            project_repository: ProjectRepository,
+        self,
+        authorized_test_client: AsyncClient,
+        test_project: ProjectReadSchema,
+        project_repository: ProjectRepository,
     ):
         response = await authorized_test_client.delete(
             f'/projects/{test_project.project_id}',
@@ -141,9 +141,9 @@ class TestProjectsApi:
 
     @pytest.mark.asyncio
     async def test_delete_project_no_permission(
-            self,
-            authorized_another_client: AsyncClient,
-            test_project: ProjectReadSchema,
+        self,
+        authorized_another_client: AsyncClient,
+        test_project: ProjectReadSchema,
     ):
         response = await authorized_another_client.delete(
             f'/projects/{test_project.project_id}',

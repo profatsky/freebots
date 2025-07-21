@@ -194,7 +194,7 @@ UnionBlockReadSchema = Annotated[
         CSVBlockReadSchema,
         APIBlockReadSchema,
     ],
-    Field(discriminator='type')
+    Field(discriminator='type'),
 ]
 UnionBlockCreateSchema = Annotated[
     Union[
@@ -205,7 +205,7 @@ UnionBlockCreateSchema = Annotated[
         CSVBlockCreateSchema,
         APIBlockCreateSchema,
     ],
-    Field(discriminator='type')
+    Field(discriminator='type'),
 ]
 
 UnionBlockUpdateSchema = Annotated[
@@ -217,5 +217,5 @@ UnionBlockUpdateSchema = Annotated[
         CSVBlockUpdateSchema,
         APIBlockUpdateSchema,
     ],
-    Field(discriminator='type')
+    Field(discriminator='type'),
 ]

@@ -21,10 +21,10 @@ class TestRegisterAPI:
 
     @pytest.mark.asyncio
     async def test_register_existing_user(
-            self,
-            client: AsyncClient,
-            test_user: UserReadSchema,
-            test_user_credentials: AuthCredentialsSchema,
+        self,
+        client: AsyncClient,
+        test_user: UserReadSchema,
+        test_user_credentials: AuthCredentialsSchema,
     ):
         response = await client.post('/register', json=test_user_credentials.model_dump())
         assert response.status_code == 409
@@ -69,10 +69,10 @@ class TestRegisterAPI:
 class TestLoginAPI:
     @pytest.mark.asyncio
     async def test_login_success(
-            self,
-            client: AsyncClient,
-            test_user: UserReadSchema,
-            test_user_credentials: AuthCredentialsSchema,
+        self,
+        client: AsyncClient,
+        test_user: UserReadSchema,
+        test_user_credentials: AuthCredentialsSchema,
     ):
         response = await client.post('/login', json=test_user_credentials.model_dump())
         assert response.status_code == 200

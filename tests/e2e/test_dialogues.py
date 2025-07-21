@@ -10,9 +10,9 @@ from tests.factories.dialogues import DialogueCreateSchemaFactory, TriggerUpdate
 class TestDialoguesAPI:
     @pytest.mark.asyncio
     async def test_create_dialogue_success(
-            self,
-            authorized_test_client: AsyncClient,
-            test_project: ProjectReadSchema,
+        self,
+        authorized_test_client: AsyncClient,
+        test_project: ProjectReadSchema,
     ):
         dialogue = DialogueCreateSchemaFactory()
         response = await authorized_test_client.post(
@@ -41,9 +41,9 @@ class TestDialoguesAPI:
 
     @pytest.mark.asyncio
     async def test_create_dialogue_no_permission(
-            self,
-            authorized_another_client: AsyncClient,
-            test_project: ProjectReadSchema,
+        self,
+        authorized_another_client: AsyncClient,
+        test_project: ProjectReadSchema,
     ):
         dialogue = DialogueCreateSchemaFactory()
         response = await authorized_another_client.post(
@@ -56,10 +56,10 @@ class TestDialoguesAPI:
 
     @pytest.mark.asyncio
     async def test_create_dialogue_limit_exceeded(
-            self,
-            authorized_test_client: AsyncClient,
-            test_project: ProjectReadSchema,
-            dialogue_repository: DialogueRepository,
+        self,
+        authorized_test_client: AsyncClient,
+        test_project: ProjectReadSchema,
+        dialogue_repository: DialogueRepository,
     ):
         for _ in range(10):
             await dialogue_repository.create_dialogue(
@@ -77,10 +77,10 @@ class TestDialoguesAPI:
 
     @pytest.mark.asyncio
     async def test_update_dialogue_trigger_success(
-            self,
-            authorized_test_client: AsyncClient,
-            test_project: ProjectReadSchema,
-            test_dialogue: DialogueReadSchema,
+        self,
+        authorized_test_client: AsyncClient,
+        test_project: ProjectReadSchema,
+        test_dialogue: DialogueReadSchema,
     ):
         update_data = TriggerUpdateSchemaFactory()
         response = await authorized_test_client.put(
@@ -95,9 +95,9 @@ class TestDialoguesAPI:
 
     @pytest.mark.asyncio
     async def test_update_dialogue_trigger_project_not_found(
-            self,
-            authorized_test_client: AsyncClient,
-            test_dialogue: DialogueReadSchema,
+        self,
+        authorized_test_client: AsyncClient,
+        test_dialogue: DialogueReadSchema,
     ):
         update_data = TriggerUpdateSchemaFactory()
         response = await authorized_test_client.put(
@@ -110,10 +110,10 @@ class TestDialoguesAPI:
 
     @pytest.mark.asyncio
     async def test_update_dialogue_trigger_no_permission(
-            self,
-            authorized_another_client: AsyncClient,
-            test_project: ProjectReadSchema,
-            test_dialogue: DialogueReadSchema,
+        self,
+        authorized_another_client: AsyncClient,
+        test_project: ProjectReadSchema,
+        test_dialogue: DialogueReadSchema,
     ):
         update_data = TriggerUpdateSchemaFactory()
         response = await authorized_another_client.put(
@@ -126,9 +126,9 @@ class TestDialoguesAPI:
 
     @pytest.mark.asyncio
     async def test_update_dialogue_trigger_dialogue_not_found(
-            self,
-            authorized_test_client: AsyncClient,
-            test_project: ProjectReadSchema,
+        self,
+        authorized_test_client: AsyncClient,
+        test_project: ProjectReadSchema,
     ):
         update_data = TriggerUpdateSchemaFactory()
         response = await authorized_test_client.put(
@@ -141,11 +141,11 @@ class TestDialoguesAPI:
 
     @pytest.mark.asyncio
     async def test_delete_dialogue_success(
-            self,
-            authorized_test_client: AsyncClient,
-            test_project: ProjectReadSchema,
-            test_dialogue: DialogueReadSchema,
-            dialogue_repository: DialogueRepository,
+        self,
+        authorized_test_client: AsyncClient,
+        test_project: ProjectReadSchema,
+        test_dialogue: DialogueReadSchema,
+        dialogue_repository: DialogueRepository,
     ):
         response = await authorized_test_client.delete(
             f'/projects/{test_project.project_id}/dialogues/{test_dialogue.dialogue_id}',
@@ -157,9 +157,9 @@ class TestDialoguesAPI:
 
     @pytest.mark.asyncio
     async def test_delete_dialogue_project_not_found(
-            self,
-            authorized_test_client: AsyncClient,
-            test_dialogue: DialogueReadSchema,
+        self,
+        authorized_test_client: AsyncClient,
+        test_dialogue: DialogueReadSchema,
     ):
         response = await authorized_test_client.delete(
             f'/projects/999999/dialogues/{test_dialogue.dialogue_id}',
@@ -170,10 +170,10 @@ class TestDialoguesAPI:
 
     @pytest.mark.asyncio
     async def test_delete_dialogue_no_permission(
-            self,
-            authorized_another_client: AsyncClient,
-            test_project: ProjectReadSchema,
-            test_dialogue: DialogueReadSchema,
+        self,
+        authorized_another_client: AsyncClient,
+        test_project: ProjectReadSchema,
+        test_dialogue: DialogueReadSchema,
     ):
         response = await authorized_another_client.delete(
             f'/projects/{test_project.project_id}/dialogues/{test_dialogue.dialogue_id}',
@@ -184,9 +184,9 @@ class TestDialoguesAPI:
 
     @pytest.mark.asyncio
     async def test_delete_dialogue_not_found(
-            self,
-            authorized_test_client: AsyncClient,
-            test_project: ProjectReadSchema,
+        self,
+        authorized_test_client: AsyncClient,
+        test_project: ProjectReadSchema,
     ):
         response = await authorized_test_client.delete(
             f'/projects/{test_project.project_id}/dialogues/999999',
