@@ -16,3 +16,19 @@ dependencies = [
     "pytest-asyncio>=1.1.0",
     "sqlalchemy>=2.0.41",
 ]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.12.4",
+]
+
+[tool.ruff]
+show-fixes = true
+line-length = 120
+exclude = ["alembic/"]
+
+[tool.ruff.lint]
+ignore = ["F821"]
+
+[tool.ruff.format]
+quote-style = "single"

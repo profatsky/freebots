@@ -1,7 +1,7 @@
 import factory
 from faker import Faker
 
-from src.dialogues.schemas import DialogueCreateSchema, TriggerCreateSchema, TriggerUpdateSchema
+from src.dialogues.schemas import DialogueCreateSchema, TriggerCreateSchema
 from src.enums import TriggerEventType
 
 fake = Faker()
