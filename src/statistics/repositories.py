@@ -1,14 +1,11 @@
 from sqlalchemy import func, select
 
-from src.infrastructure.db.dependencies import AsyncSessionDI
+from src.core.base_repository import BaseRepository
 from src.projects.models import ProjectModel
 from src.users.models import UserModel
 
 
-class StatisticRepository:
-    def __init__(self, session: AsyncSessionDI):
-        self._session = session
-
+class StatisticRepository(BaseRepository):
     async def count_users(self) -> int:
         return await self._session.scalar(select(func.count()).select_from(UserModel))
 

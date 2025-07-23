@@ -2,15 +2,12 @@ from typing import Optional
 
 from sqlalchemy import select, insert, delete
 
-from src.infrastructure.db.dependencies import AsyncSessionDI
+from src.core.base_repository import BaseRepository
 from src.plugins.models import PluginModel, projects_plugins
 from src.plugins.schemas import PluginReadSchema
 
 
-class PluginRepository:
-    def __init__(self, session: AsyncSessionDI):
-        self._session = session
-
+class PluginRepository(BaseRepository):
     async def get_plugins(self, offset: int, limit: int) -> list[PluginReadSchema]:
         plugins = await self._session.execute(
             select(PluginModel).order_by(PluginModel.created_at).offset(offset).limit(limit)

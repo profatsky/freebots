@@ -6,16 +6,13 @@ from sqlalchemy import select, func, delete
 from sqlalchemy.exc import IntegrityError
 
 from src.auth.schemas import AuthCredentialsSchema, Password
-from src.infrastructure.db.dependencies import AsyncSessionDI
+from src.core.base_repository import BaseRepository
 from src.projects.models import ProjectModel
 from src.users.models import UserModel
 from src.users.schemas import UserReadSchema, UserWithStatsReadSchema
 
 
-class UserRepository:
-    def __init__(self, session: AsyncSessionDI):
-        self._session = session
-
+class UserRepository(BaseRepository):
     async def create_user(
         self,
         credentials: AuthCredentialsSchema,

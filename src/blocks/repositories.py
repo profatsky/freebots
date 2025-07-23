@@ -6,13 +6,10 @@ from sqlalchemy.orm import selectin_polymorphic
 from src.blocks.models import BlockModel
 from src.blocks.schemas import UnionBlockCreateSchema, UnionBlockReadSchema, UnionBlockUpdateSchema
 from src.blocks import utils
-from src.infrastructure.db.dependencies import AsyncSessionDI
+from src.core.base_repository import BaseRepository
 
 
-class BlockRepository:
-    def __init__(self, session: AsyncSessionDI):
-        self._session = session
-
+class BlockRepository(BaseRepository):
     async def create_block(
         self,
         dialogue_id: int,

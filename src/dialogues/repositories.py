@@ -3,15 +3,12 @@ from typing import Optional
 from sqlalchemy import select, delete
 from sqlalchemy.orm import joinedload
 
+from src.core.base_repository import BaseRepository
 from src.dialogues.models import TriggerModel, DialogueModel
 from src.dialogues.schemas import DialogueCreateSchema, DialogueReadSchema, TriggerUpdateSchema
-from src.infrastructure.db.dependencies import AsyncSessionDI
 
 
-class DialogueRepository:
-    def __init__(self, session: AsyncSessionDI):
-        self._session = session
-
+class DialogueRepository(BaseRepository):
     async def create_dialogue(
         self,
         project_id: int,

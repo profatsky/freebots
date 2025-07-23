@@ -4,8 +4,8 @@ from sqlalchemy import select, delete, func
 from sqlalchemy.orm import selectinload, joinedload
 
 from src.blocks.models import BlockModel
+from src.core.base_repository import BaseRepository
 from src.dialogues.models import DialogueModel
-from src.infrastructure.db.dependencies import AsyncSessionDI
 from src.projects.models import ProjectModel
 from src.projects.schemas import (
     ProjectReadSchema,
@@ -15,10 +15,7 @@ from src.projects.schemas import (
 )
 
 
-class ProjectRepository:
-    def __init__(self, session: AsyncSessionDI):
-        self._session = session
-
+class ProjectRepository(BaseRepository):
     async def create_project(self, user_id: int, project_data: ProjectCreateSchema) -> ProjectReadSchema:
         project = ProjectModel(**project_data.model_dump(), user_id=user_id)
         self._session.add(project)
