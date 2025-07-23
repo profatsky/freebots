@@ -4,11 +4,11 @@ from sqlalchemy import select
 from sqlalchemy.orm import joinedload, selectinload, DeclarativeBase
 
 from src.blocks.models import BlockModel
-from src.core.dependencies.db_dependencies import AsyncSessionDI
 from src.dialogue_templates.models import DialogueTemplateModel
 from src.dialogue_templates.schemas import DialogueTemplateReadSchema
 from src.blocks import utils
 from src.dialogues.models import DialogueModel, TriggerModel
+from src.infrastructure.db.dependencies import AsyncSessionDI
 
 
 class DialogueTemplateRepository:

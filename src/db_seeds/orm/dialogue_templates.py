@@ -2,11 +2,11 @@ import asyncio
 
 from sqlalchemy import select
 
-from src.core.db import async_session_maker
 from src.enums import TriggerEventType, AnswerMessageType
 from src.dialogues.models import DialogueModel, TriggerModel
 from src.blocks.models import TextBlockModel, QuestionBlockModel, CSVBlockModel
 from src.dialogue_templates.models import DialogueTemplateModel
+from src.infrastructure.db.sessions import async_session_maker
 
 
 async def create():

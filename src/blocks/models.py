@@ -2,7 +2,7 @@ from sqlalchemy import String, ForeignKey, Enum, UniqueConstraint
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from src.core.db import Base
+from src.infrastructure.db.sessions import Base
 from src.enums import AnswerMessageType, HTTPMethod
 from src.dialogues.models import DialogueModel
 

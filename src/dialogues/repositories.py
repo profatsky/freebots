@@ -3,9 +3,9 @@ from typing import Optional
 from sqlalchemy import select, delete
 from sqlalchemy.orm import joinedload
 
-from src.core.dependencies.db_dependencies import AsyncSessionDI
 from src.dialogues.models import TriggerModel, DialogueModel
 from src.dialogues.schemas import DialogueCreateSchema, DialogueReadSchema, TriggerUpdateSchema
+from src.infrastructure.db.dependencies import AsyncSessionDI
 
 
 class DialogueRepository:

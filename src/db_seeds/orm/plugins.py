@@ -3,7 +3,7 @@ import os
 
 from sqlalchemy import select
 
-from src.core.db import async_session_maker
+from src.infrastructure.db.sessions import async_session_maker
 from src.plugins.models import PluginModel
 from src.plugins.schemas import PluginCreateSchema
 

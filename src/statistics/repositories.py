@@ -1,6 +1,6 @@
 from sqlalchemy import func, select
 
-from src.core.dependencies.db_dependencies import AsyncSessionDI
+from src.infrastructure.db.dependencies import AsyncSessionDI
 from src.projects.models import ProjectModel
 from src.users.models import UserModel
 

@@ -6,7 +6,7 @@ from sqlalchemy.orm import selectin_polymorphic
 from src.blocks.models import BlockModel
 from src.blocks.schemas import UnionBlockCreateSchema, UnionBlockReadSchema, UnionBlockUpdateSchema
 from src.blocks import utils
-from src.core.dependencies.db_dependencies import AsyncSessionDI
+from src.infrastructure.db.dependencies import AsyncSessionDI
 
 
 class BlockRepository:

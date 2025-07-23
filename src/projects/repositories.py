@@ -4,8 +4,8 @@ from sqlalchemy import select, delete, func
 from sqlalchemy.orm import selectinload, joinedload
 
 from src.blocks.models import BlockModel
-from src.core.dependencies.db_dependencies import AsyncSessionDI
 from src.dialogues.models import DialogueModel
+from src.infrastructure.db.dependencies import AsyncSessionDI
 from src.projects.models import ProjectModel
 from src.projects.schemas import (
     ProjectReadSchema,

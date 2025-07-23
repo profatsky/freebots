@@ -2,7 +2,7 @@ from typing import Optional
 
 from sqlalchemy import select, insert, delete
 
-from src.core.dependencies.db_dependencies import AsyncSessionDI
+from src.infrastructure.db.dependencies import AsyncSessionDI
 from src.plugins.models import PluginModel, projects_plugins
 from src.plugins.schemas import PluginReadSchema
 

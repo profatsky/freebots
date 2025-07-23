@@ -5,7 +5,6 @@ from typing import Optional
 
 from jinja2 import Template, Environment, FileSystemLoader
 
-from src.core.dependencies.db_dependencies import AsyncSessionDI
 from src.enums import (
     KeyboardType,
     HandlerType,
@@ -16,6 +15,7 @@ from src.enums import (
     AiohttpSessionMethod,
 )
 from src.code_gen.schemas import HandlerSchema, StateSchema, StatesGroupSchema, KeyboardSchema
+from src.infrastructure.db.dependencies import AsyncSessionDI
 from src.projects.dependencies.services_dependencies import ProjectServiceDI
 from src.projects.schemas import ProjectToGenerateCodeReadSchema
 from src.dialogues.exceptions.services_exceptions import NoDialoguesInProjectError

@@ -6,7 +6,7 @@ from sqlalchemy import select, func, delete
 from sqlalchemy.exc import IntegrityError
 
 from src.auth.schemas import AuthCredentialsSchema, Password
-from src.core.dependencies.db_dependencies import AsyncSessionDI
+from src.infrastructure.db.dependencies import AsyncSessionDI
 from src.projects.models import ProjectModel
 from src.users.models import UserModel
 from src.users.schemas import UserReadSchema, UserWithStatsReadSchema

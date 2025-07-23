@@ -3,7 +3,7 @@ import datetime
 from sqlalchemy import String, DateTime, func, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from src.core.db import Base
+from src.infrastructure.db.sessions import Base
 
 
 class DialogueTemplateModel(Base):
