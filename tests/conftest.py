@@ -9,9 +9,10 @@ from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sess
 
 from src.auth.schemas import AuthCredentialsSchema
 from src.core.config import settings
-from src.core.db import Base, get_async_session, get_postgres_dsn
 from src.dialogues.repositories import DialogueRepository
 from src.dialogues.schemas import DialogueReadSchema
+from src.infrastructure.db.sessions import get_async_session, Base
+from src.infrastructure.db.utils import get_dsn
 from src.main import app
 from src.projects.repositories import ProjectRepository
 from src.projects.schemas import ProjectReadSchema
@@ -20,7 +21,8 @@ from src.users.schemas import UserReadSchema
 from tests.factories.dialogues import DialogueCreateSchemaFactory
 from tests.factories.projects import ProjectCreateSchemaFactory
 
-SQLALCHEMY_DATABASE_URL = get_postgres_dsn(
+SQLALCHEMY_DATABASE_URL = get_dsn(
+    prefix='postgresql+asyncpg',
     user=settings.DB_USER,
     password=settings.DB_PASS,
     host=settings.DB_HOST,
