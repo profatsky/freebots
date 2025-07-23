@@ -1,4 +1,4 @@
-from src.core import settings
+from src.core.config import settings
 
 
 def get_dsn(

@@ -8,14 +8,15 @@ from fastapi.requests import Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
-from src.core import settings
+import src.core.config
+from src.core.config import settings
 from src.core.router import get_app_router
 from src.db_seeds.orm import seed_database
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    auth_security = AuthX(config=settings.auth_config)
+    auth_security = AuthX(config=src.core.config.auth_config)
     auth_security.handle_errors(app)
 
     await seed_database()

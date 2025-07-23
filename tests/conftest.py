@@ -8,7 +8,7 @@ from sqlalchemy import text
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
 
 from src.auth.schemas import AuthCredentialsSchema
-from src.core import settings
+from src.core.config import settings
 from src.core.db import Base, get_async_session, get_postgres_dsn
 from src.dialogues.repositories import DialogueRepository
 from src.dialogues.schemas import DialogueReadSchema
