@@ -45,33 +45,45 @@ No-code конструктор чат-ботов для Telegram с функци
 ```
 CLIENT_APP_URL = http://localhost:5173
 
-DB_HOST = 
-DB_PORT = 
-DB_NAME = 
-DB_USER = 
-DB_PASS = 
-TEST_DB_NAME = 
+DB_HOST= 
+DB_PORT= 
+DB_NAME= 
+DB_USER= 
+DB_PASS= 
+TEST_DB_NAME= 
 
-JWT_SECRET = 
+JWT_SECRET= 
+
+# Docker-compose specified variables
+BACKEND_PORT=
 ```
 
-Есть два способа запустить бекенд: с помощью Docker или вручную.
+Есть 3 способа запустить бекенд:
 
-#### Запуск с помощью Docker
+#### 1) Запуск с помощью Docker Compose
 ```commandline
-docker-compose up -d
+docker compose up -d
 ```
 
-#### Запуск вручную
-Настроить виртуальное окружения и установить зависимости:
+#### 2) Запуск вручную, настроив окружение через uv
+```commandline
+uv sync
+uvicorn src.main:app
+```
+
+### 3) Запуск вручную, настроив окружение самостоятельно
+Настроить окружение для Windows:
 ```commandline
 python -m venv venv
-
-venv\Scripts\activate.bat - для Windows
-
-source venv/bin/activate - для Unix
-
+venv\Scripts\activate
 python -m pip install -r requirements.txt
+```
+
+Настроить окружение для Unix:
+```commandline
+python -m venv venv
+source venv/bin/activate
+python3 -m pip install -r requirements.txt
 ```
 
 Запустить:
