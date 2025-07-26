@@ -1,9 +1,9 @@
 import pytest
 from httpx import AsyncClient
 
-from src.projects.repositories import ProjectRepository
-from src.projects.schemas import ProjectReadSchema
-from src.users.schemas import UserReadSchema
+from src.apps.projects.repositories import ProjectRepository
+from src.apps.projects.schemas import ProjectReadSchema
+from src.apps.users.schemas import UserReadSchema
 from tests.factories.projects import ProjectCreateSchemaFactory, ProjectUpdateSchemaFactory
 from tests.utils.projects import assert_project_response
 

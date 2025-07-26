@@ -1,4 +1,4 @@
-from src.projects.schemas import ProjectCreateSchema, ProjectReadSchema
+from src.apps.projects.schemas import ProjectCreateSchema, ProjectReadSchema
 
 
 def assert_project_response(response_data: dict, expected_data: ProjectCreateSchema | ProjectReadSchema, user_id: int):

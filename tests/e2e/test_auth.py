@@ -1,8 +1,8 @@
 import pytest
 from httpx import AsyncClient
 
-from src.auth.schemas import AuthCredentialsSchema
-from src.users.schemas import UserReadSchema
+from src.apps.auth.schemas import AuthCredentialsSchema
+from src.apps.users.schemas import UserReadSchema
 
 
 class TestRegisterAPI:

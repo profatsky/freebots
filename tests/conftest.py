@@ -7,17 +7,17 @@ from httpx import AsyncClient, ASGITransport
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
 
-from src.auth.schemas import AuthCredentialsSchema
+from src.apps.auth.schemas import AuthCredentialsSchema
 from src.core.config import settings
-from src.dialogues.repositories import DialogueRepository
-from src.dialogues.schemas import DialogueReadSchema
+from src.apps.dialogues.repositories import DialogueRepository
+from src.apps.dialogues.schemas import DialogueReadSchema
 from src.infrastructure.db.sessions import get_async_session, Base
 from src.infrastructure.db.utils import get_dsn
 from src.main import app
-from src.projects.repositories import ProjectRepository
-from src.projects.schemas import ProjectReadSchema
-from src.users.repositories import UserRepository
-from src.users.schemas import UserReadSchema
+from src.apps.projects.repositories import ProjectRepository
+from src.apps.projects.schemas import ProjectReadSchema
+from src.apps.users.repositories import UserRepository
+from src.apps.users.schemas import UserReadSchema
 from tests.factories.dialogues import DialogueCreateSchemaFactory
 from tests.factories.projects import ProjectCreateSchemaFactory
 

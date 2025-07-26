@@ -1,9 +1,9 @@
 import pytest
 from httpx import AsyncClient
 
-from src.dialogues.repositories import DialogueRepository
-from src.dialogues.schemas import DialogueReadSchema
-from src.projects.schemas import ProjectReadSchema
+from src.apps.dialogues.repositories import DialogueRepository
+from src.apps.dialogues.schemas import DialogueReadSchema
+from src.apps.projects.schemas import ProjectReadSchema
 from tests.factories.dialogues import DialogueCreateSchemaFactory, TriggerUpdateSchemaFactory
 
 

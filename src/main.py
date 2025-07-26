@@ -10,8 +10,8 @@ from fastapi.staticfiles import StaticFiles
 
 import src.core.config
 from src.core.config import settings
-from src.core.router import get_app_router
-from src.db_seeds.orm import seed_database
+from src.apps.router import get_app_router
+from src.infrastructure.db.seeds.orm import seed_database
 
 
 @asynccontextmanager
