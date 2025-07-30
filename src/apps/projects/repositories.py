@@ -1,6 +1,6 @@
 from typing import Optional
 
-from sqlalchemy import select, delete, func
+from sqlalchemy import select, delete, func, exists
 from sqlalchemy.orm import selectinload, joinedload
 
 from src.apps.blocks.models import BlockModel
@@ -95,3 +95,13 @@ class ProjectRepository(BaseRepository):
             .where(ProjectModel.project_id == project_id)
         )
         return project.scalar()
+
+    async def exists_by_id(self, user_id: int, project_id: int) -> bool:
+        return await self._session.scalar(
+            select(
+                exists().where(
+                    ProjectModel.user_id == user_id,
+                    ProjectModel.project_id == project_id,
+                )
+            )
+        )

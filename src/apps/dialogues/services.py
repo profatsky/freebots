@@ -26,17 +26,11 @@ class DialogueService:
         project_id: int,
         dialogue_data: DialogueCreateSchema,
     ) -> DialogueReadSchema:
-        project = await self._project_service.get_project(
-            user_id=user_id,
-            project_id=project_id,
-        )
+        project = await self._project_service.get_project(user_id, project_id)
         if len(project.dialogues) >= 10:
             raise DialoguesLimitExceededError
 
-        return await self._dialogue_repository.create_dialogue(
-            project_id=project_id,
-            dialogue_data=dialogue_data,
-        )
+        return await self._dialogue_repository.create_dialogue(project_id, dialogue_data)
 
     async def update_dialogue_trigger(
         self,
@@ -45,20 +39,14 @@ class DialogueService:
         dialogue_id: int,
         trigger: TriggerUpdateSchema,
     ) -> DialogueReadSchema:
-        _ = await self._project_service.get_project(
-            user_id=user_id,
-            project_id=project_id,
-        )
-
-        dialogue = await self._dialogue_repository.update_dialogue_trigger(
-            dialogue_id=dialogue_id,
-            trigger=trigger,
-        )
+        await self._project_service.raise_error_if_not_exists(user_id, project_id)
+        dialogue = await self._dialogue_repository.update_dialogue_trigger(dialogue_id, trigger)
         if dialogue is None:
             raise DialogueNotFoundError
 
         return dialogue
 
+    # TODO: refactor!
     async def get_dialogue(
         self,
         user_id: int,
@@ -87,11 +75,7 @@ class DialogueService:
         project_id: int,
         dialogue_id: int,
     ):
-        _ = await self.get_dialogue(
-            user_id=user_id,
-            project_id=project_id,
-            dialogue_id=dialogue_id,
-        )
+        await self.raise_error_if_not_exists(user_id, project_id, dialogue_id)
 
         media_dir_path = os.path.join(
             'src', 'media', 'users', str(user_id), 'projects', str(project_id), 'dialogues', str(dialogue_id)
@@ -100,3 +84,8 @@ class DialogueService:
             shutil.rmtree(media_dir_path)
 
         await self._dialogue_repository.delete_dialogue(dialogue_id)
+
+    async def raise_error_if_not_exists(self, user_id: int, project_id: int, dialogue_id: int):
+        await self._project_service.raise_error_if_not_exists(user_id, project_id)
+        if not await self._dialogue_repository.exists_by_id(project_id, dialogue_id):
+            raise DialogueNotFoundError

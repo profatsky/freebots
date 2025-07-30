@@ -1,6 +1,6 @@
 from typing import Optional
 
-from sqlalchemy import select, delete
+from sqlalchemy import select, delete, exists
 from sqlalchemy.orm import selectin_polymorphic
 
 from src.apps.blocks.models import BlockModel
@@ -73,3 +73,13 @@ class BlockRepository(BaseRepository):
         await self._session.execute(delete(BlockModel).where(BlockModel.block_id == block_id))
         await self._update_blocks_sequence_numbers_without_commit(dialogue_id)
         await self._session.commit()
+
+    async def exists_by_id(self, dialogue_id: int, block_id: int) -> bool:
+        return await self._session.scalar(
+            select(
+                exists().where(
+                    BlockModel.dialogue_id == dialogue_id,
+                    BlockModel.block_id == block_id,
+                )
+            )
+        )

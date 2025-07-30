@@ -63,23 +63,21 @@ class ProjectService:
         project_id: int,
         project_data: ProjectUpdateSchema,
     ) -> Optional[ProjectReadSchema]:
-        _ = await self.get_project(
-            user_id=user_id,
-            project_id=project_id,
-        )
+        await self.raise_error_if_not_exists(user_id, project_id)
         return await self._project_repository.update_project(
             project_id=project_id,
             project_data=project_data,
         )
 
     async def delete_project(self, user_id: int, project_id: int):
-        _ = await self.get_project(
-            user_id=user_id,
-            project_id=project_id,
-        )
+        await self.raise_error_if_not_exists(user_id, project_id)
 
         media_dir_path = os.path.join('src', 'media', 'users', str(user_id), 'projects', str(project_id))
         if os.path.exists(media_dir_path):
             shutil.rmtree(media_dir_path)
 
         await self._project_repository.delete_project(project_id)
+
+    async def raise_error_if_not_exists(self, user_id: int, project_id: int):
+        if not await self._project_repository.exists_by_id(user_id, project_id):
+            raise ProjectNotFoundError

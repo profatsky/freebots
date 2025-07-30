@@ -107,8 +107,8 @@ class TestProjectsApi:
             json=update_data.model_dump(mode='json'),
         )
 
-        assert response.status_code == 403
-        assert response.json() == {'detail': 'No permission for this project'}
+        assert response.status_code == 404
+        assert response.json() == {'detail': 'Project does not exist'}
 
         project_after_update = await project_repository.get_project(test_project.project_id)
         assert test_project == project_after_update
@@ -148,8 +148,8 @@ class TestProjectsApi:
         response = await authorized_another_client.delete(
             f'/projects/{test_project.project_id}',
         )
-        assert response.status_code == 403
-        assert response.json() == {'detail': 'No permission for this project'}
+        assert response.status_code == 404
+        assert response.json() == {'detail': 'Project does not exist'}
 
     @pytest.mark.asyncio
     async def test_delete_project_not_found(self, authorized_test_client: AsyncClient):

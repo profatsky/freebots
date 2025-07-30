@@ -121,8 +121,8 @@ class TestDialoguesAPI:
             json=update_data.model_dump(mode='json'),
         )
 
-        assert response.status_code == 403
-        assert response.json() == {'detail': 'No permission for this project'}
+        assert response.status_code == 404
+        assert response.json() == {'detail': 'Project does not exist'}
 
     @pytest.mark.asyncio
     async def test_update_dialogue_trigger_dialogue_not_found(
@@ -179,8 +179,8 @@ class TestDialoguesAPI:
             f'/projects/{test_project.project_id}/dialogues/{test_dialogue.dialogue_id}',
         )
 
-        assert response.status_code == 403
-        assert response.json() == {'detail': 'No permission for this project'}
+        assert response.status_code == 404
+        assert response.json() == {'detail': 'Project does not exist'}
 
     @pytest.mark.asyncio
     async def test_delete_dialogue_not_found(

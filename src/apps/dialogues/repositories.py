@@ -1,6 +1,6 @@
 from typing import Optional
 
-from sqlalchemy import select, delete
+from sqlalchemy import select, delete, exists
 from sqlalchemy.orm import joinedload
 
 from src.core.base_repository import BaseRepository
@@ -15,10 +15,7 @@ class DialogueRepository(BaseRepository):
         dialogue_data: DialogueCreateSchema,
     ) -> DialogueReadSchema:
         trigger = TriggerModel(**dialogue_data.trigger.model_dump())
-        dialogue = DialogueModel(
-            trigger=trigger,
-            project_id=project_id,
-        )
+        dialogue = DialogueModel(trigger=trigger, project_id=project_id)
         self._session.add(dialogue)
         await self._session.commit()
         return DialogueReadSchema.model_validate(dialogue)
@@ -56,3 +53,13 @@ class DialogueRepository(BaseRepository):
     async def delete_dialogue(self, dialogue_id: int):
         await self._session.execute(delete(DialogueModel).where(DialogueModel.dialogue_id == dialogue_id))
         await self._session.commit()
+
+    async def exists_by_id(self, project_id: int, dialogue_id: int) -> bool:
+        return await self._session.scalar(
+            select(
+                exists().where(
+                    DialogueModel.project_id == project_id,
+                    DialogueModel.dialogue_id == dialogue_id,
+                )
+            )
+        )

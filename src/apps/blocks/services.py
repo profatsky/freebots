@@ -30,15 +30,8 @@ class BlockService:
         dialogue_id: int,
         block_data: UnionBlockCreateSchema,
     ) -> UnionBlockReadSchema:
-        _ = await self._dialogue_service.get_dialogue(
-            user_id=user_id,
-            project_id=project_id,
-            dialogue_id=dialogue_id,
-        )
-        return await self._block_repository.create_block(
-            dialogue_id=dialogue_id,
-            block_data=block_data,
-        )
+        await self._dialogue_service.raise_error_if_not_exists(user_id, project_id, dialogue_id)
+        return await self._block_repository.create_block(dialogue_id, block_data)
 
     async def get_blocks(
         self,
@@ -46,12 +39,7 @@ class BlockService:
         project_id: int,
         dialogue_id: int,
     ) -> list[UnionBlockReadSchema]:
-        _ = await self._dialogue_service.get_dialogue(
-            user_id=user_id,
-            project_id=project_id,
-            dialogue_id=dialogue_id,
-        )
-
+        await self._dialogue_service.raise_error_if_not_exists(user_id, project_id, dialogue_id)
         blocks = await self._block_repository.get_blocks(dialogue_id)
         blocks.sort(key=lambda x: x.sequence_number)
         return blocks
@@ -108,7 +96,7 @@ class BlockService:
         block_id: int,
         block_data: UnionBlockUpdateSchema,
     ) -> UnionBlockReadSchema:
-        _ = await self.get_block(
+        await self.raise_error_if_not_exists(
             user_id=user_id,
             project_id=project_id,
             dialogue_id=dialogue_id,
@@ -138,10 +126,7 @@ class BlockService:
             if os.path.exists(full_image_path):
                 os.remove(full_image_path)
 
-        await self._block_repository.delete_block(
-            dialogue_id=dialogue_id,
-            block_id=block_id,
-        )
+        await self._block_repository.delete_block(dialogue_id, block_id)
 
     # TODO: refactor, use repo method
     async def get_block(
@@ -162,3 +147,8 @@ class BlockService:
             raise BlockNotFoundError
 
         return block_with_specified_id[0]
+
+    async def raise_error_if_not_exists(self, user_id: int, project_id: int, dialogue_id: int, block_id: int):
+        await self._dialogue_service.raise_error_if_not_exists(user_id, project_id, dialogue_id)
+        if not await self._block_repository.exists_by_id(dialogue_id, block_id):
+            raise BlockNotFoundError
