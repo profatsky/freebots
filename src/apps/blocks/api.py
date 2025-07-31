@@ -1,4 +1,6 @@
-from fastapi import APIRouter, status, UploadFile, Depends
+from typing import Annotated
+
+from fastapi import APIRouter, status, UploadFile, Depends, Body
 
 from src.apps.auth.dependencies.auth_dependencies import UserIDFromAccessTokenDI, access_token_required
 from src.apps.blocks.dependencies.services_dependencies import BlockServiceDI
@@ -12,6 +14,7 @@ from src.apps.blocks.exceptions.services_exceptions import (
     BlockNotFoundError,
     InvalidBlockTypeError,
 )
+from src.apps.blocks.openapi_examples import BLOCK_CREATE_SCHEMA_EXAMPLES
 from src.apps.blocks.schemas import UnionBlockCreateSchema, UnionBlockReadSchema, UnionBlockUpdateSchema
 from src.apps.dialogues.exceptions.http_exceptions import DialogueNotFoundHTTPException
 from src.apps.dialogues.exceptions.services_exceptions import DialogueNotFoundError
@@ -36,7 +39,10 @@ router = APIRouter(
 async def create_block(
     project_id: int,
     dialogue_id: int,
-    block: UnionBlockCreateSchema,
+    block: Annotated[
+        UnionBlockCreateSchema,
+        Body(openapi_examples=BLOCK_CREATE_SCHEMA_EXAMPLES),
+    ],
     block_service: BlockServiceDI,
     user_id: UserIDFromAccessTokenDI,
 ):
