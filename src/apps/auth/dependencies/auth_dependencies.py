@@ -3,6 +3,8 @@ from typing import Annotated
 from authx import TokenPayload, AuthX
 from fastapi import Depends, Request
 
+from src.core.config import oauth2_scheme
+
 
 def get_auth_security(request: Request):
     return request.state.auth_security
@@ -11,7 +13,9 @@ def get_auth_security(request: Request):
 AuthSecurityDI = Annotated[AuthX, Depends(get_auth_security)]
 
 
-async def access_token_required(request: Request, auth_security: AuthSecurityDI) -> TokenPayload:
+async def access_token_required(
+    request: Request, auth_security: AuthSecurityDI, _: Annotated[str, Depends(oauth2_scheme)]
+) -> TokenPayload:
     auth_required = auth_security.token_required()
     token = await auth_required(request)
     return token

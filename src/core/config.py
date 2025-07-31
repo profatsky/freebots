@@ -1,6 +1,7 @@
 from datetime import timedelta
 
 from authx import AuthXConfig
+from fastapi.security import OAuth2PasswordBearer
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -27,3 +28,4 @@ auth_config = AuthXConfig(
     JWT_TOKEN_LOCATION=['headers'],
     JWT_ACCESS_TOKEN_EXPIRES=timedelta(days=30),
 )
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl='/api/swagger_login')

@@ -1,4 +1,8 @@
-from fastapi import APIRouter, status
+from typing import Annotated
+
+from fastapi import APIRouter, status, Depends, HTTPException
+from fastapi.security import OAuth2PasswordRequestForm
+from pydantic import ValidationError
 
 from src.apps.auth.dependencies.services_dependencies import AuthServiceDI
 from src.apps.auth.exceptions.http_exception import InvalidCredentialsHTTPException
@@ -39,4 +43,28 @@ async def login(
     return {
         'detail': 'Authorization was successful',
         'access_token': access_token,
+    }
+
+
+@router.post('/swagger_login')
+async def login_via_swagger(
+    form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
+    auth_service: AuthServiceDI,
+):
+    try:
+        credentials = AuthCredentialsSchema(
+            email=form_data.username,
+            password=form_data.password,
+        )
+    except ValidationError as exc:
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=exc.errors())
+
+    try:
+        access_token = await auth_service.login(credentials)
+    except InvalidCredentialsError:
+        raise InvalidCredentialsHTTPException
+
+    return {
+        'access_token': access_token,
+        'token_type': 'bearer',
     }
