@@ -79,6 +79,9 @@ class CodeGenService:
             dockerfile = os.path.join(BOT_FILE_TEMPLATES_DIR, 'Dockerfile.j2')
             zipf.write(dockerfile, 'Dockerfile')
 
+            manual_file = os.path.join(BOT_FILE_TEMPLATES_DIR, 'manual.txt.j2')
+            zipf.write(manual_file, 'manual.txt')
+
         zip_data.seek(0)
 
         return zip_data
