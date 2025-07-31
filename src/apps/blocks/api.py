@@ -14,7 +14,7 @@ from src.apps.blocks.exceptions.services_exceptions import (
     BlockNotFoundError,
     InvalidBlockTypeError,
 )
-from src.apps.blocks.openapi_examples import BLOCK_CREATE_SCHEMA_EXAMPLES
+from src.apps.blocks.openapi_examples import BLOCK_CREATE_SCHEMA_EXAMPLES, BLOCK_UPDATE_SCHEMA_EXAMPLES
 from src.apps.blocks.schemas import UnionBlockCreateSchema, UnionBlockReadSchema, UnionBlockUpdateSchema
 from src.apps.dialogues.exceptions.http_exceptions import DialogueNotFoundHTTPException
 from src.apps.dialogues.exceptions.services_exceptions import DialogueNotFoundError
@@ -100,7 +100,10 @@ async def update_block(
     project_id: int,
     dialogue_id: int,
     block_id: int,
-    block: UnionBlockUpdateSchema,
+    block: Annotated[
+        UnionBlockUpdateSchema,
+        Body(openapi_examples=BLOCK_UPDATE_SCHEMA_EXAMPLES),
+    ],
     block_service: BlockServiceDI,
     user_id: UserIDFromAccessTokenDI,
 ):
