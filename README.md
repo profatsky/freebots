@@ -45,24 +45,7 @@ No-code конструктор чат-ботов для Telegram с уникал
 библиотеки из файла `requirements.txt`, который будет находиться в скачанном ZIP-архиве.
 
 ## ⚙️ Как запустить?
-Перейти в директорию `backend`.
-
-Переименовать файл `.env.example` в `.env` и указать в нем необходимые данные:
-```
-CLIENT_APP_URL = http://localhost:5173
-
-DB_HOST= 
-DB_PORT= 
-DB_NAME= 
-DB_USER= 
-DB_PASS= 
-TEST_DB_NAME= 
-
-JWT_SECRET= 
-
-# Docker-compose specified variables
-BACKEND_PORT=
-```
+Прежде всего необходимо переименовать файл `.env.example` в `.env` и указать в нем необходимые данные.
 
 Есть 3 способа запустить бекенд:
 
