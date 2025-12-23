@@ -2,12 +2,17 @@ services:
   backend:
     build: .
     restart: unless-stopped
+    env_file:
+      - .env
     environment:
       DB_HOST: postgres
+      REDIS_HOST: redis
     ports:
       - ${BACKEND_PORT}:8000
     depends_on:
       postgres:
+        condition: service_healthy
+      redis:
         condition: service_healthy
     networks:
       - freebots_network
@@ -32,8 +37,28 @@ services:
     networks:
       - freebots_network
 
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+      REDIS_USER: ${REDIS_USER}
+      REDIS_USER_PASSWORD: ${REDIS_USER_PASSWORD}
+    ports:
+      - ${REDIS_PORT}:6379
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: [ "CMD", "redis-cli", "-a", "$REDIS_PASSWORD", "ping" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    networks:
+      - freebots_network
+
 volumes:
   postgres_data:
+  redis_data:
 
 networks:
   freebots_network:

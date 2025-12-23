@@ -18,6 +18,12 @@ class Settings(BaseSettings):
     DB_USER: str
     DB_PASS: str
 
+    REDIS_HOST: str
+    REDIS_PORT: int
+    REDIS_PASSWORD: str
+    REDIS_USER: str
+    REDIS_USER_PASSWORD: str
+
     TEST_DB_NAME: str
 
 

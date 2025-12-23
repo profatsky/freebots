@@ -11,6 +11,7 @@ from fastapi.staticfiles import StaticFiles
 import src.core.config
 from src.core.config import settings
 from src.apps.router import get_app_router
+from src.infrastructure.cache.client import CacheClient
 from src.infrastructure.db.seeds.orm import seed_database
 
 
@@ -21,7 +22,8 @@ async def lifespan(app: FastAPI):
 
     await seed_database()
 
-    yield {'auth_security': auth_security}
+    async with CacheClient() as cache_client:
+        yield {'auth_security': auth_security, 'cache_cli': cache_client}
 
 
 app = FastAPI(title='Chatbot Builder', lifespan=lifespan)
