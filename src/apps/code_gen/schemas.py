@@ -3,7 +3,7 @@ from typing import Optional
 
 from pydantic import BaseModel, Field
 
-from src.apps.enums import HandlerType
+from src.apps.enums import HandlerType, KeyboardType
 
 
 class StateSchema(BaseModel):
@@ -87,6 +87,7 @@ class HandlerSchema(BaseModel):
 
 
 class KeyboardSchema(BaseModel):
+    type: KeyboardType
     declaration: str = None
     buttons: list[str] = Field(default_factory=list)
 

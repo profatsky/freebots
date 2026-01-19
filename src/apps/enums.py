@@ -23,6 +23,7 @@ class BlockType(enum.Enum):
     QUESTION_BLOCK = 'question_block'
     EMAIL_BLOCK = 'email_block'
     CSV_BLOCK = 'csv_block'
+    EXCEL_BLOCK = 'excel_block'
     API_BLOCK = 'api_block'
 
 

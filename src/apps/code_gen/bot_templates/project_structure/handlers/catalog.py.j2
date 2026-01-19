@@ -11,6 +11,10 @@ from loader import db_connector, bot
 
 router = Router()
 
+IMG_DIR = 'img'
+if not os.path.exists(IMG_DIR):
+    os.makedirs(IMG_DIR)
+
 
 class CatalogState(StatesGroup):
     show_product = State()
@@ -21,8 +25,14 @@ button_back = types.InlineKeyboardButton(text="◀ Назад", callback_data="p
 button_delete = types.InlineKeyboardButton(text="❌ Удалить", callback_data="delete_product")
 
 
-@router.message(filters.StateFilter(None), filters.Command("catalog"))
-async def get_catalog(
+@router.callback_query(filters.StateFilter(None), F.data == 'callback_🛍️ Каталог')
+async def get_catalog_by_inline_button(callback: types.CallbackQuery, state: FSMContext):
+    await callback.answer()
+    await get_catalog_by_reply_button(message=callback.message, state=state)
+
+
+@router.message(filters.StateFilter(None), F.text == '🛍️ Каталог')
+async def get_catalog_by_reply_button(
         message: types.Message,
         state: FSMContext,
         counter: int = 0,
@@ -101,7 +111,7 @@ async def catalog_operation(callback: types.CallbackQuery, state: FSMContext):
     data = await state.get_data()
 
     if callback.data == "next_product":
-        await get_catalog(
+        await get_catalog_by_reply_button(
             message=callback.message,
             state=state,
             counter=data["counter"] + 1,
@@ -110,7 +120,7 @@ async def catalog_operation(callback: types.CallbackQuery, state: FSMContext):
             is_admin=data["is_admin"]
         )
     elif callback.data == "prev_product":
-        await get_catalog(
+        await get_catalog_by_reply_button(
             message=callback.message,
             state=state,
             counter=data["counter"] - 1,
@@ -122,7 +132,7 @@ async def catalog_operation(callback: types.CallbackQuery, state: FSMContext):
         current_product = data["products"].pop(data["counter"])
         await delete_product(db_connector, current_product["name"])
         await callback.message.answer('✅ Товар успешно удален!')
-        await get_catalog(
+        await get_catalog_by_reply_button(
             message=callback.message,
             state=state,
             counter=0,
@@ -159,8 +169,14 @@ class AddProductState(StatesGroup):
     specify_seller_username = State()
 
 
-@router.message(filters.StateFilter(None), filters.Command("add_product"))
-async def add_product_command(message: types.Message):
+@router.callback_query(filters.StateFilter(None), F.data == 'callback_➕ Добавить товар')
+async def add_product_by_inline_button(callback: types.CallbackQuery):
+    await callback.answer()
+    await add_product_by_reply_button(callback.message)
+
+
+@router.message(filters.StateFilter(None), F.text == '➕ Добавить товар')
+async def add_product_by_reply_button(message: types.Message):
     if message.from_user.id == int(config.ADMIN_ID):
         await message.answer(
             "❗ Для добавления товара необходимо предоставить следующие данные о нем:\n\n"

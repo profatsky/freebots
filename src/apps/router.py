@@ -9,6 +9,12 @@ from src.apps.blocks.api import router as blocks_router
 from src.apps.plugins.api import router as plugins_router
 from src.apps.code_gen.api import router as code_gen_router
 from src.apps.statistics.api import router as statistics_router
+from src.apps.subscriptions.api import router as subscriptions_router
+
+try:
+    from src.apps.payments.api import router as payments_router
+except ImportError:
+    payments_router = APIRouter(prefix='/payments', tags=['payments'])
 
 
 def get_app_router() -> APIRouter:
@@ -24,6 +30,8 @@ def get_app_router() -> APIRouter:
         plugins_router,
         code_gen_router,
         statistics_router,
+        subscriptions_router,
+        payments_router,
     ]
 
     for router in routers:

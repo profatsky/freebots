@@ -8,7 +8,7 @@ from src.core.base_repository import BaseRepository
 from src.apps.dialogue_templates.models import DialogueTemplateModel
 from src.apps.dialogue_templates.schemas import DialogueTemplateReadSchema
 from src.apps.blocks import utils
-from src.apps.dialogues.models import DialogueModel, TriggerModel
+from src.apps.dialogues.models import DialogueModel, DialogueTriggerModel
 
 
 class DialogueTemplateRepository(BaseRepository):
@@ -53,7 +53,7 @@ class DialogueTemplateRepository(BaseRepository):
         template = template.scalar()
 
         trigger_in_template = template.dialogue.trigger
-        new_trigger = TriggerModel(**self._get_db_table_row(trigger_in_template))
+        new_trigger = DialogueTriggerModel(**self._get_db_table_row(trigger_in_template))
         new_trigger.trigger_id = None
 
         dialogue_in_template = template.dialogue

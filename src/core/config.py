@@ -3,6 +3,7 @@ from datetime import timedelta
 from authx import AuthXConfig
 from fastapi.security import OAuth2PasswordBearer
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from yookassa import Configuration
 
 
 class Settings(BaseSettings):
@@ -24,10 +25,16 @@ class Settings(BaseSettings):
     REDIS_USER: str
     REDIS_USER_PASSWORD: str
 
+    AUTH_BOT_SECRET: str
+
+    YOOKASSA_SHOP_ID: str
+    YOOKASSA_API_KEY: str
+
     TEST_DB_NAME: str
 
 
 settings = Settings()
+
 auth_config = AuthXConfig(
     JWT_ALGORITHM='HS256',
     JWT_SECRET_KEY=settings.JWT_SECRET,
@@ -35,3 +42,6 @@ auth_config = AuthXConfig(
     JWT_ACCESS_TOKEN_EXPIRES=timedelta(days=30),
 )
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl='/api/swagger_login')
+
+Configuration.account_id = settings.YOOKASSA_SHOP_ID
+Configuration.secret_key = settings.YOOKASSA_API_KEY

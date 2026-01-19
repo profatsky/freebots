@@ -1,6 +1,7 @@
 services:
   backend:
     build: .
+    container_name: backend
     restart: unless-stopped
     env_file:
       - .env
@@ -15,7 +16,7 @@ services:
       redis:
         condition: service_healthy
     networks:
-      - freebots_network
+      - freebots_shared_network
 
   postgres:
     image: postgres:17
@@ -35,7 +36,7 @@ services:
       retries: 5
       start_period: 10s
     networks:
-      - freebots_network
+      - freebots_shared_network
 
   redis:
     image: redis:7-alpine
@@ -50,15 +51,17 @@ services:
       - redis_data:/data
     healthcheck:
       test: [ "CMD", "redis-cli", "-a", "$REDIS_PASSWORD", "ping" ]
-      interval: 30s
-      timeout: 10s
+      interval: 10s
+      timeout: 5s
       retries: 5
+      start_period: 10s
     networks:
-      - freebots_network
+      - freebots_shared_network
 
 volumes:
   postgres_data:
   redis_data:
 
 networks:
-  freebots_network:
+  freebots_shared_network:
+    external: true

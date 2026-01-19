@@ -163,3 +163,8 @@ cython_debug/
 src/media/users
 
 .DS_Store
+
+# Closed functionality
+src/apps/payments/**
+!src/apps/payments/__init__.py
+!src/apps/payments/models.py

@@ -1,9 +1,9 @@
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, Field
 from typing_extensions import Annotated
 
 Password = Annotated[str, Field(min_length=8, max_length=32)]
 
 
-class AuthCredentialsSchema(BaseModel):
-    email: EmailStr
-    password: Password
+class TelegramCredentialsSchema(BaseModel):
+    tg_id: int
+    code: str

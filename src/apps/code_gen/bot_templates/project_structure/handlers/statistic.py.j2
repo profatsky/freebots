@@ -1,4 +1,4 @@
-from aiogram import types, filters, Router
+from aiogram import types, filters, Router, F
 
 import config
 from db.statistic import count_users
@@ -7,8 +7,23 @@ from loader import db_connector
 router = Router()
 
 
-@router.message(filters.StateFilter(None), filters.Command("stats"))
-async def get_users_stats(message: types.Message):
+@router.callback_query(filters.StateFilter(None), F.data == 'callback_📊 Статистика')
+async def get_users_stats_by_reply_button(callback: types.CallbackQuery):
+    await callback.answer()
+    await _get_users_stats(callback.message)
+
+
+@router.message(filters.StateFilter(None), F.text == '📊 Статистика')
+async def get_users_stats_by_reply_button(message: types.Message):
+    await _get_users_stats(message)
+
+
+@router.message(filters.StateFilter(None), filters.Command('stats'))
+async def get_users_stats_by_command(message: types.Message):
+    await _get_users_stats(message)
+
+
+async def _get_users_stats(message: types.Message):
     if message.from_user.id == int(config.ADMIN_ID):
         num_of_users = await count_users(db_connector)
         await message.answer(f"Количество пользователей в чат-боте: {num_of_users}")

@@ -3,14 +3,17 @@ from fastapi.responses import StreamingResponse
 
 from src.apps.auth.dependencies.auth_dependencies import UserIDFromAccessTokenDI, access_token_required
 from src.apps.code_gen.dependencies.services_dependencies import CodeGenServiceDI
-from src.apps.dialogues.exceptions.http_exceptions import NoDialoguesInProjectHTTPException
-from src.apps.dialogues.exceptions.services_exceptions import NoDialoguesInProjectError
+from src.apps.dialogues.exceptions.http_exceptions import DialoguesLimitExceededHTTPException
+from src.apps.dialogues.exceptions.services_exceptions import DialoguesLimitExceededError
 from src.apps.dialogues.schemas import DialogueWithBlocksReadSchema
+from src.apps.plugins.exceptions.http_exceptions import PluginsNotAvailableForFreeUsersHTTPException
+from src.apps.plugins.exceptions.services_exceptions import PluginsNotAvailableForFreeUsersError
 from src.apps.projects.exceptions.http_exceptions import (
     ProjectNotFoundHTTPException,
     NoPermissionForProjectHTTPException,
 )
 from src.apps.projects.exceptions.services_exceptions import ProjectNotFoundError, NoPermissionForProjectError
+from src.apps.statistics.dependencies.services_dependencies import StatisticServiceDI
 
 router = APIRouter(
     prefix='/projects',
@@ -26,6 +29,7 @@ router = APIRouter(
 async def get_bot_code(
     project_id: int,
     code_gen_service: CodeGenServiceDI,
+    statistic_service: StatisticServiceDI,
     user_id: UserIDFromAccessTokenDI,
 ):
     try:
@@ -39,8 +43,13 @@ async def get_bot_code(
     except NoPermissionForProjectError:
         raise NoPermissionForProjectHTTPException
 
-    except NoDialoguesInProjectError:
-        raise NoDialoguesInProjectHTTPException
+    except DialoguesLimitExceededError:
+        raise DialoguesLimitExceededHTTPException
+
+    except PluginsNotAvailableForFreeUsersError:
+        raise PluginsNotAvailableForFreeUsersHTTPException
+
+    await statistic_service.save_download_to_history(user_id=user_id, project_id=project_id)
 
     return StreamingResponse(
         content=zipped_bot,

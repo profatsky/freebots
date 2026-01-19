@@ -1,4 +1,5 @@
 import datetime
+from uuid import UUID
 
 from pydantic import BaseModel, Field
 
@@ -10,7 +11,7 @@ from src.apps.plugins.schemas import PluginReadSchema
 class ProjectReadSchema(BaseModel):
     project_id: int
     name: str = Field(max_length=256)
-    user_id: int
+    user_id: UUID
     start_message: str = Field(max_length=4098)
     start_keyboard_type: KeyboardType
     created_at: datetime.datetime

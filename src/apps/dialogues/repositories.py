@@ -4,7 +4,7 @@ from sqlalchemy import select, delete, exists
 from sqlalchemy.orm import joinedload
 
 from src.core.base_repository import BaseRepository
-from src.apps.dialogues.models import TriggerModel, DialogueModel
+from src.apps.dialogues.models import DialogueTriggerModel, DialogueModel
 from src.apps.dialogues.schemas import DialogueCreateSchema, DialogueReadSchema, TriggerUpdateSchema
 
 
@@ -14,7 +14,7 @@ class DialogueRepository(BaseRepository):
         project_id: int,
         dialogue_data: DialogueCreateSchema,
     ) -> DialogueReadSchema:
-        trigger = TriggerModel(**dialogue_data.trigger.model_dump())
+        trigger = DialogueTriggerModel(**dialogue_data.trigger.model_dump())
         dialogue = DialogueModel(trigger=trigger, project_id=project_id)
         self._session.add(dialogue)
         await self._session.commit()
@@ -27,7 +27,7 @@ class DialogueRepository(BaseRepository):
     ) -> Optional[DialogueReadSchema]:
         dialogue = await self._get_dialogue_model_instance(dialogue_id)
         if dialogue is None:
-            return
+            return None
 
         dialogue.trigger.event_type = trigger.event_type
         dialogue.trigger.value = trigger.value
@@ -47,7 +47,7 @@ class DialogueRepository(BaseRepository):
     async def get_dialogue(self, dialogue_id: int) -> Optional[DialogueReadSchema]:
         dialogue = await self._get_dialogue_model_instance(dialogue_id)
         if dialogue is None:
-            return
+            return None
         return DialogueReadSchema.model_validate(dialogue)
 
     async def delete_dialogue(self, dialogue_id: int):

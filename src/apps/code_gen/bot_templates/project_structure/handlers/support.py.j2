@@ -1,38 +1,68 @@
 import aiogram.exceptions
-from aiogram import types, filters, Router
+from aiogram import types, filters, Router, F
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 
 import config
 from db import support as support_db
 from db import base as base_db
+from handlers.custom import handler_command_start
 from loader import db_connector, bot
 
 router = Router()
 
+cancel_kb = types.ReplyKeyboardMarkup(
+    keyboard=[
+        [
+            types.KeyboardButton(text="❌ Отмена"),
+        ]
+    ],
+    resize_keyboard=True,
+)
 
-@router.message(filters.StateFilter(None), filters.Command("support"))
-async def send_support_request(message: types.Message, command: filters.CommandObject):
-    if command.args is None:
-        return await message.answer(
-            "❗ Необходимо указать текст сообщения в тех.поддержку: /support [текст]"
-        )
 
-    if len(command.args) > 512:
-        return await message.answer(
-            "❗ Длина текста не должна превышать 512 символов!"
-        )
+class SendRequestState(StatesGroup):
+    TYPE_TEXT = State()
+
+
+@router.callback_query(filters.StateFilter(None), F.data == 'callback_❓Тех.поддержка')
+async def send_support_request_by_inline_button(callback: types.CallbackQuery, state: FSMContext):
+    await callback.answer()
+    await send_support_request_by_reply_button(message=callback.message, state=state)
+
+
+@router.message(filters.StateFilter(None), F.text == '❓Тех.поддержка')
+async def send_support_request_by_reply_button(message: types.Message, state: FSMContext):
+    await message.answer('✏️ Введите текст вопроса', keyboard=cancel_kb)
+    await state.set_state(SendRequestState.TYPE_TEXT)
+
+
+@router.message(filters.StateFilter(SendRequestState.TYPE_TEXT))
+async def type_text_to_send_request(message: types.Message, state: FSMContext):
+    if message.text == "❌ Отмена":
+        await state.clear()
+        return await handler_command_start(message)
+
+    if len(message.text) > 512:
+        return await message.answer("❗ Длина текста не должна превышать 512 символов!")
 
     await support_db.create_support_request(
         db_connector=db_connector,
-        question=command.args,
+        question=message.text,
         tg_id=message.from_user.id
     )
     await message.answer("✅ Обращение в тех.поддержку успешно отправлено")
+    await state.clear()
+    await handler_command_start(message)
 
 
-@router.message(filters.StateFilter(None), filters.Command("requests"))
-async def get_opened_support_requests(message: types.Message):
+@router.callback_query(filters.StateFilter(None), F.data == 'callback_❓Обращения в тех.поддержку')
+async def get_opened_support_requests(callback: types.CallbackQuery, state: FSMContext):
+    await callback.answer()
+    await get_opened_support_requests_by_reply_button(message=callback.message, state=state)
+
+@router.message(filters.StateFilter(None), F.text == '❓Обращения в тех.поддержку')
+async def get_opened_support_requests_by_reply_button(message: types.Message):
     user = await base_db.get_user(db_connector, tg_id=message.from_user.id)
     if not user["is_admin"]:
         return

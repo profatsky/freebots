@@ -68,6 +68,23 @@ csv_block = """
 """
 
 
+excel_block = """
+    # Сохранение данных в Excel
+    file_path = "{file_path}.xlsx"
+    data = {data}
+    if os.path.exists(file_path):
+        wb = load_workbook(file_path)
+        ws = wb.active
+    else:
+        wb = Workbook()
+        ws = wb.active
+        ws.append(list(data.keys()))
+    
+    ws.append(list(data.values()))
+    wb.save(file_path)
+"""
+
+
 api_block = """
     # Отправка API-запроса
     url = "{url}"
@@ -75,9 +92,10 @@ api_block = """
     async with aiohttp.ClientSession() as session:
         try:
             async with session.{aiohttp_session_method}(
-                    url=url,
-                    headers={headers},
-                    json={body}
+                url=url,
+                headers={headers},
+                json={body},
+                ssl=False,
             ) as response:
                 response_data = await response.json()
         except aiohttp.ClientError as e:

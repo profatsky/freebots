@@ -143,6 +143,36 @@ class CSVBlockUpdateSchema(CSVBlockSchema, BlockUpdateSchema):
     pass
 
 
+# Excel block
+class ExcelBlockSchema(BaseModel):
+    file_path: str = Field(max_length=256)
+    data: dict[str, Union[int, str]]
+    type: Literal[BlockType.EXCEL_BLOCK.value]
+
+    @field_validator('data')
+    @classmethod
+    def check_data_length(cls, v: dict[str, Union[int, str]]) -> dict[str, Union[int, str]]:
+        if len(v) > 25:
+            raise ValueError('The length of the "data" field should not exceed 25')
+        return v
+
+    @property
+    def is_draft(self) -> bool:
+        return not (self.file_path and self.data)
+
+
+class ExcelBlockReadSchema(ExcelBlockSchema, BlockReadSchema):
+    pass
+
+
+class ExcelBlockCreateSchema(ExcelBlockSchema, BlockCreateSchema):
+    pass
+
+
+class ExcelBlockUpdateSchema(ExcelBlockSchema, BlockUpdateSchema):
+    pass
+
+
 # API block
 # TODO url validation
 class APIBlockSchema(BaseModel):
@@ -192,6 +222,7 @@ UnionBlockReadSchema = Annotated[
         QuestionBlockReadSchema,
         EmailBlockReadSchema,
         CSVBlockReadSchema,
+        ExcelBlockReadSchema,
         APIBlockReadSchema,
     ],
     Field(discriminator='type'),
@@ -203,6 +234,7 @@ UnionBlockCreateSchema = Annotated[
         QuestionBlockCreateSchema,
         EmailBlockCreateSchema,
         CSVBlockCreateSchema,
+        ExcelBlockCreateSchema,
         APIBlockCreateSchema,
     ],
     Field(discriminator='type'),
@@ -215,6 +247,7 @@ UnionBlockUpdateSchema = Annotated[
         QuestionBlockUpdateSchema,
         EmailBlockUpdateSchema,
         CSVBlockUpdateSchema,
+        ExcelBlockUpdateSchema,
         APIBlockUpdateSchema,
     ],
     Field(discriminator='type'),
