@@ -32,6 +32,7 @@ app.include_router(get_app_router())
 
 origins = [
     settings.CLIENT_APP_URL,
+    *settings.YOOKASSA_IPS,
 ]
 
 app.add_middleware(

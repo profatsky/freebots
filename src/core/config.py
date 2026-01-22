@@ -1,8 +1,10 @@
 from datetime import timedelta
+from typing import Annotated
 
 from authx import AuthXConfig
 from fastapi.security import OAuth2PasswordBearer
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic import field_validator
+from pydantic_settings import BaseSettings, SettingsConfigDict, NoDecode
 from yookassa import Configuration
 
 
@@ -29,8 +31,14 @@ class Settings(BaseSettings):
 
     YOOKASSA_SHOP_ID: str
     YOOKASSA_API_KEY: str
+    YOOKASSA_IPS: Annotated[list[str], NoDecode]
 
     TEST_DB_NAME: str
+
+    @field_validator('YOOKASSA_IPS', mode='before')
+    @classmethod
+    def validate_yookassa_ips(cls, value: str) -> list[str]:
+        return value.split(',')
 
 
 settings = Settings()
