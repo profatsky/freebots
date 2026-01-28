@@ -36,6 +36,16 @@ BLOCK_CREATE_SCHEMA_EXAMPLES = {
             'type': 'csv_block',
         },
     },
+    'Excel block': {
+        'value': {
+            'file_path': 'string',
+            'data': {
+                'additionalProp1': 'string',
+                'additionalProp2': 0,
+            },
+            'type': 'excel_block',
+        },
+    },
     'API block': {
         'value': {
             'url': 'https://example.com/api',

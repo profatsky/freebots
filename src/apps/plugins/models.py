@@ -1,8 +1,10 @@
 import datetime
 
-from sqlalchemy import String, Table, Column, Integer, ForeignKey, DateTime, func
+from sqlalchemy import String, Table, Column, Integer, ForeignKey, DateTime, func, Boolean
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.dialects.postgresql import ENUM
 
+from src.apps.enums import TriggerEventType
 from src.infrastructure.db.sessions import Base
 
 
@@ -21,7 +23,6 @@ class PluginModel(Base):
 
     name: Mapped[str] = mapped_column(String(128), unique=True)
     summary: Mapped[str] = mapped_column(String(512))
-    description: Mapped[str] = mapped_column(String(4096))
     image_path: Mapped[str] = mapped_column(String(512))
     created_at: Mapped[datetime.datetime] = mapped_column(
         DateTime(timezone=True),
@@ -30,8 +31,22 @@ class PluginModel(Base):
 
     handlers_file_path: Mapped[str] = mapped_column(String(256))
     db_funcs_file_path: Mapped[str] = mapped_column(String(256))
+    readme_file_path: Mapped[str] = mapped_column(String(256))
 
+    triggers: Mapped[list['PluginTriggerModel']] = relationship(back_populates='plugin')
     projects: Mapped[list['ProjectModel']] = relationship(
         secondary=projects_plugins,
         back_populates='plugins',
     )
+
+
+class PluginTriggerModel(Base):
+    __tablename__ = 'plugin_triggers'
+
+    trigger_id: Mapped[int] = mapped_column(primary_key=True)
+    event_type: Mapped[TriggerEventType] = mapped_column(ENUM(TriggerEventType, create_type=False), nullable=False)
+    value: Mapped[str] = mapped_column(String(64))
+    is_admin: Mapped[bool] = mapped_column(Boolean, nullable=False)
+
+    plugin_id: Mapped[int] = mapped_column(ForeignKey('plugins.plugin_id', ondelete='CASCADE'), nullable=False)
+    plugin: Mapped[PluginModel] = relationship(back_populates='triggers')

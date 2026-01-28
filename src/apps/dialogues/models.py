@@ -13,7 +13,7 @@ class DialogueModel(Base):
     dialogue_id: Mapped[int] = mapped_column(primary_key=True)
 
     trigger_id: Mapped[int] = mapped_column(ForeignKey('triggers.trigger_id', ondelete='RESTRICT'))
-    trigger: Mapped['TriggerModel'] = relationship(back_populates='dialogue')
+    trigger: Mapped['DialogueTriggerModel'] = relationship(back_populates='dialogue')
 
     project_id: Mapped[int] = mapped_column(ForeignKey('projects.project_id', ondelete='CASCADE'), nullable=True)
     project: Mapped['ProjectModel'] = relationship(back_populates='dialogues')
@@ -28,7 +28,7 @@ class DialogueModel(Base):
     template: Mapped['DialogueTemplateModel'] = relationship(back_populates='dialogue')
 
 
-class TriggerModel(Base):
+class DialogueTriggerModel(Base):
     __tablename__ = 'triggers'
 
     trigger_id: Mapped[int] = mapped_column(primary_key=True)

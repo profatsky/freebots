@@ -1,5 +1,6 @@
 import os
 import shutil
+from uuid import UUID
 
 from src.apps.dialogues.dependencies.repositories_dependencies import DialogueRepositoryDI
 from src.apps.dialogues.schemas import (
@@ -9,6 +10,8 @@ from src.apps.dialogues.schemas import (
 )
 from src.apps.dialogues.exceptions.services_exceptions import DialogueNotFoundError, DialoguesLimitExceededError
 from src.apps.projects.dependencies.services_dependencies import ProjectServiceDI
+from src.apps.subscriptions.dependencies.services_dependencies import SubscriptionServiceDI
+from src.core.consts import MAX_DIALOGUES_WITH_FREE_PLAN, MAX_DIALOGUES_WITH_PRO_PLAN
 
 
 class DialogueService:
@@ -16,25 +19,31 @@ class DialogueService:
         self,
         dialogue_repository: DialogueRepositoryDI,
         project_service: ProjectServiceDI,
+        subscription_service: SubscriptionServiceDI,
     ):
         self._dialogue_repository = dialogue_repository
         self._project_service = project_service
+        self._subscription_service = subscription_service
 
     async def create_dialogue(
         self,
-        user_id: int,
+        user_id: UUID,
         project_id: int,
         dialogue_data: DialogueCreateSchema,
     ) -> DialogueReadSchema:
         project = await self._project_service.get_project(user_id, project_id)
-        if len(project.dialogues) >= 10:
+
+        active_subscription = await self._subscription_service.get_active_subscription(user_id)
+        max_dialogues = MAX_DIALOGUES_WITH_PRO_PLAN if active_subscription else MAX_DIALOGUES_WITH_FREE_PLAN
+
+        if len(project.dialogues) >= max_dialogues:
             raise DialoguesLimitExceededError
 
         return await self._dialogue_repository.create_dialogue(project_id, dialogue_data)
 
     async def update_dialogue_trigger(
         self,
-        user_id: int,
+        user_id: UUID,
         project_id: int,
         dialogue_id: int,
         trigger: TriggerUpdateSchema,
@@ -49,7 +58,7 @@ class DialogueService:
     # TODO: refactor!
     async def get_dialogue(
         self,
-        user_id: int,
+        user_id: UUID,
         project_id: int,
         dialogue_id: int,
     ) -> DialogueReadSchema:
@@ -71,7 +80,7 @@ class DialogueService:
 
     async def delete_dialogue(
         self,
-        user_id: int,
+        user_id: UUID,
         project_id: int,
         dialogue_id: int,
     ):
@@ -85,7 +94,7 @@ class DialogueService:
 
         await self._dialogue_repository.delete_dialogue(dialogue_id)
 
-    async def raise_error_if_not_exists(self, user_id: int, project_id: int, dialogue_id: int):
+    async def raise_error_if_not_exists(self, user_id: UUID, project_id: int, dialogue_id: int):
         await self._project_service.raise_error_if_not_exists(user_id, project_id)
         if not await self._dialogue_repository.exists_by_id(project_id, dialogue_id):
             raise DialogueNotFoundError

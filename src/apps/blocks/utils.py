@@ -7,6 +7,7 @@ from src.apps.blocks.models import (
     QuestionBlockModel,
     EmailBlockModel,
     CSVBlockModel,
+    ExcelBlockModel,
     APIBlockModel,
 )
 from src.apps.blocks.schemas import (
@@ -16,6 +17,7 @@ from src.apps.blocks.schemas import (
     QuestionBlockReadSchema,
     EmailBlockReadSchema,
     CSVBlockReadSchema,
+    ExcelBlockReadSchema,
     APIBlockReadSchema,
 )
 
@@ -25,6 +27,8 @@ UnionBlockModel = Union[
     QuestionBlockModel,
     EmailBlockModel,
     CSVBlockModel,
+    ExcelBlockModel,
+    APIBlockModel,
 ]
 
 
@@ -35,6 +39,7 @@ def get_block_model_by_type(block_type: BlockType) -> Type[UnionBlockModel]:
         BlockType.QUESTION_BLOCK.value: QuestionBlockModel,
         BlockType.EMAIL_BLOCK.value: EmailBlockModel,
         BlockType.CSV_BLOCK.value: CSVBlockModel,
+        BlockType.EXCEL_BLOCK.value: ExcelBlockModel,
         BlockType.API_BLOCK.value: APIBlockModel,
     }
     return types_to_blocks[block_type]
@@ -52,6 +57,7 @@ def get_block_schema_by_type(block_type: BlockType) -> Type[UnionBlockReadSchema
         BlockType.QUESTION_BLOCK.value: QuestionBlockReadSchema,
         BlockType.EMAIL_BLOCK.value: EmailBlockReadSchema,
         BlockType.CSV_BLOCK.value: CSVBlockReadSchema,
+        BlockType.EXCEL_BLOCK.value: ExcelBlockReadSchema,
         BlockType.API_BLOCK.value: APIBlockReadSchema,
     }
     return types_to_blocks[block_type]

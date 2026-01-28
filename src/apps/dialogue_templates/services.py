@@ -1,7 +1,12 @@
+from uuid import UUID
+
 from src.apps.dialogue_templates.dependencies.repositories_dependencies import DialogueTemplateRepositoryDI
 from src.apps.dialogue_templates.exceptions.services_exceptions import DialogueTemplateNotFoundError
 from src.apps.dialogue_templates.schemas import DialogueTemplateReadSchema
+from src.apps.dialogues.exceptions.services_exceptions import DialoguesLimitExceededError
 from src.apps.projects.dependencies.services_dependencies import ProjectServiceDI
+from src.apps.subscriptions.dependencies.services_dependencies import SubscriptionServiceDI
+from src.core.consts import MAX_DIALOGUES_WITH_FREE_PLAN, MAX_DIALOGUES_WITH_PRO_PLAN
 
 DIALOGUE_TEMPLATES_PER_PAGE = 9
 
@@ -11,9 +16,11 @@ class DialogueTemplateService:
         self,
         dialogue_template_repository: DialogueTemplateRepositoryDI,
         project_service: ProjectServiceDI,
+        subscription_service: SubscriptionServiceDI,
     ):
         self._dialogue_template_repository = dialogue_template_repository
         self._project_service = project_service
+        self._subscription_service = subscription_service
 
     async def get_templates(
         self,
@@ -35,14 +42,20 @@ class DialogueTemplateService:
 
     async def create_dialogue_from_template(
         self,
-        user_id: int,
+        user_id: UUID,
         project_id: int,
         template_id: int,
     ):
-        _ = await self._project_service.get_project(
+        project = await self._project_service.get_project(
             user_id=user_id,
             project_id=project_id,
         )
+
+        active_subscription = await self._subscription_service.get_active_subscription(user_id)
+        max_dialogues = MAX_DIALOGUES_WITH_PRO_PLAN if active_subscription else MAX_DIALOGUES_WITH_FREE_PLAN
+
+        if len(project.dialogues) >= max_dialogues:
+            raise DialoguesLimitExceededError
 
         _ = await self.get_template(template_id)
 

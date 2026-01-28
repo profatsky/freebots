@@ -1,4 +1,5 @@
 import os
+from uuid import UUID
 
 from fastapi import UploadFile
 
@@ -25,7 +26,7 @@ class BlockService:
 
     async def create_block(
         self,
-        user_id: int,
+        user_id: UUID,
         project_id: int,
         dialogue_id: int,
         block_data: UnionBlockCreateSchema,
@@ -35,7 +36,7 @@ class BlockService:
 
     async def get_blocks(
         self,
-        user_id: int,
+        user_id: UUID,
         project_id: int,
         dialogue_id: int,
     ) -> list[UnionBlockReadSchema]:
@@ -46,7 +47,7 @@ class BlockService:
 
     async def upload_image_for_image_block(
         self,
-        user_id: int,
+        user_id: UUID,
         project_id: int,
         dialogue_id: int,
         block_id: int,
@@ -90,7 +91,7 @@ class BlockService:
 
     async def update_block(
         self,
-        user_id: int,
+        user_id: UUID,
         project_id: int,
         dialogue_id: int,
         block_id: int,
@@ -110,7 +111,7 @@ class BlockService:
 
     async def delete_block(
         self,
-        user_id: int,
+        user_id: UUID,
         project_id: int,
         dialogue_id: int,
         block_id: int,
@@ -131,7 +132,7 @@ class BlockService:
     # TODO: refactor, use repo method
     async def get_block(
         self,
-        user_id: int,
+        user_id: UUID,
         project_id: int,
         dialogue_id: int,
         block_id: int,
@@ -148,7 +149,7 @@ class BlockService:
 
         return block_with_specified_id[0]
 
-    async def raise_error_if_not_exists(self, user_id: int, project_id: int, dialogue_id: int, block_id: int):
+    async def raise_error_if_not_exists(self, user_id: UUID, project_id: int, dialogue_id: int, block_id: int):
         await self._dialogue_service.raise_error_if_not_exists(user_id, project_id, dialogue_id)
         if not await self._block_repository.exists_by_id(dialogue_id, block_id):
             raise BlockNotFoundError

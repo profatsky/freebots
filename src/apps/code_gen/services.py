@@ -2,9 +2,12 @@ import io
 import os
 import zipfile
 from typing import Optional
+from uuid import UUID
 
 from jinja2 import Template, Environment, FileSystemLoader
 
+from src.apps.dialogues.exceptions.services_exceptions import DialoguesLimitExceededError
+from src.apps.plugins.exceptions.services_exceptions import PluginsNotAvailableForFreeUsersError
 from src.apps.enums import (
     KeyboardType,
     HandlerType,
@@ -15,10 +18,11 @@ from src.apps.enums import (
     AiohttpSessionMethod,
 )
 from src.apps.code_gen.schemas import HandlerSchema, StateSchema, StatesGroupSchema, KeyboardSchema
+from src.apps.subscriptions.dependencies import SubscriptionServiceDI
+from src.core.consts import MAX_DIALOGUES_WITH_FREE_PLAN
 from src.infrastructure.db.dependencies import AsyncSessionDI
 from src.apps.projects.dependencies.services_dependencies import ProjectServiceDI
 from src.apps.projects.schemas import ProjectToGenerateCodeReadSchema
-from src.apps.dialogues.exceptions.services_exceptions import NoDialoguesInProjectError
 from src.apps.code_gen.bot_templates import code
 from src.apps.blocks.utils import escape_inner_text
 
@@ -31,13 +35,15 @@ class CodeGenService:
         self,
         session: AsyncSessionDI,
         project_service: ProjectServiceDI,
+        subscription_service: SubscriptionServiceDI,
     ):
         self._session = session
         self._project_service = project_service
+        self._subscription_service = subscription_service
 
     async def get_bot_code_in_zip(
         self,
-        user_id: int,
+        user_id: UUID,
         project_id: int,
     ) -> io.BytesIO:
         project = await self._project_service.get_project_to_generate_code(
@@ -45,8 +51,12 @@ class CodeGenService:
             project_id=project_id,
         )
 
-        if not project.dialogues:
-            raise NoDialoguesInProjectError
+        active_subscription = await self._subscription_service.get_active_subscription(user_id)
+        if active_subscription is None:
+            if project.plugins:
+                raise PluginsNotAvailableForFreeUsersError
+            if len(project.dialogues) > MAX_DIALOGUES_WITH_FREE_PLAN:
+                raise DialoguesLimitExceededError
 
         zip_data = io.BytesIO()
 
@@ -79,8 +89,8 @@ class CodeGenService:
             dockerfile = os.path.join(BOT_FILE_TEMPLATES_DIR, 'Dockerfile')
             zipf.write(dockerfile, 'Dockerfile')
 
-            manual_file = os.path.join(BOT_FILE_TEMPLATES_DIR, 'manual.txt')
-            zipf.write(manual_file, 'manual.txt')
+            manual_file = os.path.join(BOT_FILE_TEMPLATES_DIR, 'ИНСТРУКЦИЯ.txt')
+            zipf.write(manual_file, 'ИНСТРУКЦИЯ.txt')
 
         zip_data.seek(0)
 
@@ -288,6 +298,14 @@ class CodeGenService:
                         )
                     )
 
+                elif block.type == BlockType.EXCEL_BLOCK.value:
+                    handler.add_to_body(
+                        code.excel_block.format(
+                            file_path=block.file_path,
+                            data=block.data,
+                        )
+                    )
+
                 elif block.type == BlockType.API_BLOCK.value:
                     aiohttp_session_method = self._get_aiohttp_session_method(block.http_method)
 
@@ -306,8 +324,19 @@ class CodeGenService:
             handler.add_to_body(code.call_start_func)
             handlers.append(handler)
 
-        if not start_keyboard.buttons:
-            start_keyboard = None
+        admin_keyboard = self._get_start_keyboard(project.start_keyboard_type)
+        for plugin in project.plugins:
+            for trigger in plugin.triggers:
+                if trigger.event_type == TriggerEventType.BUTTON:
+                    if trigger.is_admin:
+                        keyboard = admin_keyboard
+                    else:
+                        keyboard = start_keyboard
+
+                    if project.start_keyboard_type == KeyboardType.INLINE_KEYBOARD:
+                        keyboard.add_to_buttons(code.inline_keyboard_button.format(text=trigger.value))
+                    else:
+                        keyboard.add_to_buttons(code.reply_keyboard_button.format(text=trigger.value))
 
         template = self._get_template(os.path.join(BOT_FILE_TEMPLATES_DIR, 'handlers', 'custom.py.j2'))
         bot_code = template.render(
@@ -317,21 +346,19 @@ class CodeGenService:
                 'handlers': handlers,
                 'commands_values': commands_values,
                 'start_keyboard': start_keyboard,
+                'admin_keyboard': admin_keyboard,
                 'start_message': escape_inner_text(project.start_message) if project.start_message else 'Главное меню',
             }
         )
         return bot_code
 
     @staticmethod
-    def _get_start_keyboard(
-        keyboard_type: KeyboardType,
-    ) -> KeyboardSchema:
-        start_keyboard = KeyboardSchema()
+    def _get_start_keyboard(keyboard_type: KeyboardType) -> KeyboardSchema:
         if keyboard_type == KeyboardType.INLINE_KEYBOARD:
-            start_keyboard.declaration = code.inline_keyboard_declaration
+            declaration = code.inline_keyboard_declaration
         else:
-            start_keyboard.declaration = code.reply_keyboard_declaration
-        return start_keyboard
+            declaration = code.reply_keyboard_declaration
+        return KeyboardSchema(type=keyboard_type, declaration=declaration)
 
     @staticmethod
     def _get_answer_type_check_code(

@@ -1,6 +1,7 @@
 from typing import Optional
 
 from sqlalchemy import select, insert, delete
+from sqlalchemy.orm import selectinload
 
 from src.core.base_repository import BaseRepository
 from src.apps.plugins.models import PluginModel, projects_plugins
@@ -10,15 +11,21 @@ from src.apps.plugins.schemas import PluginReadSchema
 class PluginRepository(BaseRepository):
     async def get_plugins(self, offset: int, limit: int) -> list[PluginReadSchema]:
         plugins = await self._session.execute(
-            select(PluginModel).order_by(PluginModel.created_at).offset(offset).limit(limit)
+            select(PluginModel)
+            .options(selectinload(PluginModel.triggers))
+            .order_by(PluginModel.created_at)
+            .offset(offset)
+            .limit(limit)
         )
         return [PluginReadSchema.model_validate(plugin) for plugin in plugins.scalars().all()]
 
     async def get_plugin(self, plugin_id: int) -> Optional[PluginReadSchema]:
-        plugin = await self._session.execute(select(PluginModel).where(PluginModel.plugin_id == plugin_id))
+        plugin = await self._session.execute(
+            select(PluginModel).options(selectinload(PluginModel.triggers)).where(PluginModel.plugin_id == plugin_id)
+        )
         plugin = plugin.scalar()
         if plugin is None:
-            return
+            return None
         return PluginReadSchema.model_validate(plugin)
 
     async def add_plugin_to_project(self, project_id: int, plugin_id: int):

@@ -91,6 +91,19 @@ class CSVBlockModel(BlockModel):
     }
 
 
+class ExcelBlockModel(BlockModel):
+    __tablename__ = 'excel_blocks'
+
+    block_id: Mapped[int] = mapped_column(ForeignKey('blocks.block_id', ondelete='CASCADE'), primary_key=True)
+
+    file_path: Mapped[str] = mapped_column(String(256))
+    data: Mapped[dict] = mapped_column(JSONB)
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'excel_block',
+    }
+
+
 class APIBlockModel(BlockModel):
     __tablename__ = 'api_blocks'
 

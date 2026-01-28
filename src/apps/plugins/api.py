@@ -8,11 +8,13 @@ from src.apps.plugins.exceptions.http_exceptions import (
     PluginNotFoundHTTPException,
     PluginAlreadyInProjectHTTPException,
     PluginIsNotInProjectHTTPException,
+    PluginsLimitExceededHTTPException,
 )
 from src.apps.plugins.exceptions.services_exceptions import (
     PluginNotFoundError,
     PluginAlreadyInProjectError,
     PluginIsNotInProjectError,
+    PluginsLimitExceededError,
 )
 from src.apps.plugins.schemas import PluginReadSchema
 from src.apps.projects.exceptions.http_exceptions import (
@@ -80,6 +82,9 @@ async def add_plugin_to_project(
 
     except PluginNotFoundError:
         raise PluginNotFoundHTTPException
+
+    except PluginsLimitExceededError:
+        raise PluginsLimitExceededHTTPException
 
 
 @router.delete(

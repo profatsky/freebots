@@ -13,7 +13,7 @@ class PluginAlreadyInProjectHTTPException(HTTPException):
     def __init__(self):
         super().__init__(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail='The specified plugin is already in the project',
+            detail='Указанный плагин уже добавлен в проект',
         )
 
 
@@ -22,4 +22,20 @@ class PluginIsNotInProjectHTTPException(HTTPException):
         super().__init__(
             status_code=status.HTTP_403_FORBIDDEN,
             detail='The specified plugin is not in the project',
+        )
+
+
+class PluginsLimitExceededHTTPException(HTTPException):
+    def __init__(self):
+        super().__init__(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail='Достигнут лимит по количеству плагинов с тарифом Базовый',
+        )
+
+
+class PluginsNotAvailableForFreeUsersHTTPException(HTTPException):
+    def __init__(self):
+        super().__init__(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail='Боты с плагинами доступны только с тарифом PRO',
         )

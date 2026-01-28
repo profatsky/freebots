@@ -7,6 +7,8 @@ from src.apps.dialogue_templates.dependencies.services_dependencies import Dialo
 from src.apps.dialogue_templates.exceptions.http_exceptions import DialogueTemplateNotFoundHTTPException
 from src.apps.dialogue_templates.exceptions.services_exceptions import DialogueTemplateNotFoundError
 from src.apps.dialogue_templates.schemas import DialogueTemplateReadSchema
+from src.apps.dialogues.exceptions.http_exceptions import DialoguesLimitExceededHTTPException
+from src.apps.dialogues.exceptions.services_exceptions import DialoguesLimitExceededError
 from src.apps.projects.exceptions.http_exceptions import (
     ProjectNotFoundHTTPException,
     NoPermissionForProjectHTTPException,
@@ -68,3 +70,6 @@ async def add_dialogue_template_to_project(
 
     except DialogueTemplateNotFoundError:
         raise DialogueTemplateNotFoundHTTPException
+
+    except DialoguesLimitExceededError:
+        raise DialoguesLimitExceededHTTPException

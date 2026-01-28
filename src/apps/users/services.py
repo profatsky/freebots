@@ -1,9 +1,7 @@
-from pydantic import EmailStr
+from uuid import UUID
 
-from src.apps.auth.schemas import AuthCredentialsSchema
 from src.apps.users.dependencies.repositories_dependencies import UserRepositoryDI
 from src.apps.users.exceptions.services_exceptions import UserAlreadyExistsError, UserNotFoundError
-from src.apps.auth.exceptions.services_exceptions import InvalidCredentialsError
 from src.apps.users.schemas import UserReadSchema, UserWithStatsReadSchema
 
 
@@ -11,47 +9,30 @@ class UserService:
     def __init__(self, user_repository: UserRepositoryDI):
         self._user_repository = user_repository
 
-    async def create_user(
-        self,
-        credentials: AuthCredentialsSchema,
-    ) -> UserReadSchema:
-        user = await self._user_repository.create_user(credentials)
+    async def create_user(self, tg_id: int) -> UserReadSchema:
+        user = await self._user_repository.create_user(tg_id)
         if user is None:
             raise UserAlreadyExistsError
         return user
 
-    async def get_user_by_email(
-        self,
-        email: EmailStr,
-    ) -> UserReadSchema:
-        user = await self._user_repository.get_user_by_email(email)
+    async def get_user_by_tg_id(self, tg_id: int) -> UserReadSchema:
+        user = await self._user_repository.get_user_by_tg_id(tg_id)
         if user is None:
             raise UserNotFoundError
         return user
 
-    async def get_user_by_credentials(
-        self,
-        credentials: AuthCredentialsSchema,
-    ) -> UserReadSchema:
-        user = await self._user_repository.get_user_by_credentials(credentials)
-        if user is None:
-            raise InvalidCredentialsError
-        return user
-
-    async def get_user_by_id(
-        self,
-        user_id: int,
-    ) -> UserReadSchema:
+    async def get_user_by_id(self, user_id: UUID) -> UserReadSchema:
         user = await self._user_repository.get_user_by_id(user_id)
         if user is None:
             raise UserNotFoundError
         return user
 
-    async def get_user_with_stats(
-        self,
-        user_id: int,
-    ) -> UserWithStatsReadSchema:
+    async def get_user_with_stats(self, user_id: UUID) -> UserWithStatsReadSchema:
         user = await self._user_repository.get_user_with_stats(user_id)
         if user is None:
             raise UserNotFoundError
         return user
+
+    async def raise_error_if_not_exists(self, user_id: UUID):
+        if not await self._user_repository.exists_by_id(user_id):
+            raise UserNotFoundError

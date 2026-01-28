@@ -1,4 +1,5 @@
 import datetime
+from uuid import UUID
 
 from sqlalchemy import String, DateTime, func, ForeignKey, Enum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -21,7 +22,7 @@ class ProjectModel(Base):
         server_default=func.now(),
     )
 
-    user_id: Mapped[int] = mapped_column(ForeignKey('users.user_id', ondelete='CASCADE'))
+    user_id: Mapped[UUID] = mapped_column(ForeignKey('users.user_id', ondelete='CASCADE'))
     user: Mapped['UserModel'] = relationship(back_populates='projects')
 
     dialogues: Mapped[list['DialogueModel']] = relationship(back_populates='project')

@@ -8,3 +8,11 @@ class PluginAlreadyInProjectError(Exception):
 
 class PluginIsNotInProjectError(Exception):
     pass
+
+
+class PluginsLimitExceededError(Exception):
+    pass
+
+
+class PluginsNotAvailableForFreeUsersError(Exception):
+    pass

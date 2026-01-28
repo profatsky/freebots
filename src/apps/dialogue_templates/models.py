@@ -20,5 +20,7 @@ class DialogueTemplateModel(Base):
         server_default=func.now(),
     )
 
+    readme_file_path: Mapped[str] = mapped_column(String(256))
+
     dialogue_id: Mapped[int] = mapped_column(ForeignKey('dialogues.dialogue_id', ondelete='CASCADE'))
     dialogue: Mapped['DialogueModel'] = relationship(back_populates='template')

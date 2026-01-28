@@ -23,3 +23,11 @@ class UnauthorizedHTTPException(HTTPException):
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail='Unauthorized user',
         )
+
+
+class UserNotFoundHTTPException(HTTPException):
+    def __init__(self):
+        super().__init__(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail='User not found',
+        )

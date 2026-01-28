@@ -1,3 +1,4 @@
+import os
 import csv
 import re
 import logging
@@ -9,6 +10,7 @@ from aiogram.fsm.state import StatesGroup, State
 from aiogram.fsm.context import FSMContext
 from aiosmtplib import SMTP
 from pydantic import BaseModel, EmailStr
+from openpyxl import load_workbook, Workbook
 
 import config
 
@@ -37,7 +39,17 @@ class {{ states_group.name }}(StatesGroup):
 
 @router.message(filters.StateFilter(None), filters.CommandStart())
 async def handler_command_start(message: types.Message):
-{% if start_keyboard %}
+{% if start_keyboard.buttons and admin_keyboard.buttons %}
+    admin_buttons = [
+    {% for i in range(0, admin_keyboard.buttons|length, 3) %}
+        {% set buttons_slice = admin_keyboard.buttons[i:i+3] %}
+        [
+        {% for button in buttons_slice %}
+            {{ button }},
+        {% endfor %}
+        ],
+    {% endfor %}
+    ]
     buttons = [
     {% for i in range(0, start_keyboard.buttons|length, 3) %}
         {% set buttons_slice = start_keyboard.buttons[i:i+3] %}
@@ -48,7 +60,40 @@ async def handler_command_start(message: types.Message):
         ],
     {% endfor %}
     ]
+    if message.from_user.id == int(config.ADMIN_ID):
+        buttons += admin_buttons
     start_keyboard = {{ start_keyboard.declaration }}
+
+{% elif start_keyboard.buttons %}
+    buttons = [
+    {% for i in range(0, start_keyboard.buttons|length, 3) %}
+        {% set buttons_slice = start_keyboard.buttons[i:i+3] %}
+        [
+        {% for button in buttons_slice %}
+            {{ button }},
+        {% endfor %}
+        ],
+    {% endfor %}
+    ]
+
+    start_keyboard = {{ start_keyboard.declaration }}
+
+{% elif admin_keyboard.buttons %}
+    admin_buttons = [
+    {% for i in range(0, admin_keyboard.buttons|length, 3) %}
+        {% set buttons_slice = admin_keyboard.buttons[i:i+3] %}
+        [
+        {% for button in buttons_slice %}
+            {{ button }},
+        {% endfor %}
+        ],
+    {% endfor %}
+    ]
+    if message.from_user.id == int(config.ADMIN_ID):
+        buttons = admin_buttons
+        start_keyboard = {{ start_keyboard.declaration }}
+    else:
+        start_keyboard = None
 {% else %}
     start_keyboard = None
 {% endif %}

@@ -1,13 +1,17 @@
+from uuid import UUID
+
 from src.apps.plugins.dependencies.repositories_dependencies import PluginRepositoryDI
 from src.apps.plugins.exceptions.services_exceptions import (
     PluginNotFoundError,
     PluginAlreadyInProjectError,
     PluginIsNotInProjectError,
+    PluginsLimitExceededError,
 )
 from src.apps.plugins.schemas import PluginReadSchema
 from src.apps.projects.dependencies.services_dependencies import ProjectServiceDI
 from src.apps.projects.schemas import ProjectReadSchema
 from src.apps.users.dependencies.services_dependencies import UserServiceDI
+from src.core.consts import MAX_PLUGINS_PER_PROJECT
 
 PLUGINS_PER_PAGE = 9
 
@@ -35,7 +39,7 @@ class PluginService:
             raise PluginNotFoundError
         return plugin
 
-    async def add_plugin_to_project(self, user_id: int, project_id: int, plugin_id: int) -> PluginReadSchema:
+    async def add_plugin_to_project(self, user_id: UUID, project_id: int, plugin_id: int) -> PluginReadSchema:
         project = await self._project_service.get_project(
             user_id=user_id,
             project_id=project_id,
@@ -46,13 +50,15 @@ class PluginService:
 
         _ = await self.get_plugin(plugin_id)
 
-        # TODO add a limit on the number of plugins in a project
+        if len(project.plugins) >= MAX_PLUGINS_PER_PROJECT:
+            raise PluginsLimitExceededError
+
         return await self._plugin_repository.add_plugin_to_project(
             project_id=project_id,
             plugin_id=plugin_id,
         )
 
-    async def remove_plugin_from_project(self, user_id: int, project_id: int, plugin_id: int):
+    async def remove_plugin_from_project(self, user_id: UUID, project_id: int, plugin_id: int):
         project = await self._project_service.get_project(
             user_id=user_id,
             project_id=project_id,

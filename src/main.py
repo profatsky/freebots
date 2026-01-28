@@ -11,6 +11,7 @@ from fastapi.staticfiles import StaticFiles
 import src.core.config
 from src.core.config import settings
 from src.apps.router import get_app_router
+from src.infrastructure.cache.client import CacheClient
 from src.infrastructure.db.seeds.orm import seed_database
 
 
@@ -21,15 +22,17 @@ async def lifespan(app: FastAPI):
 
     await seed_database()
 
-    yield {'auth_security': auth_security}
+    async with CacheClient() as cache_client:
+        yield {'auth_security': auth_security, 'cache_cli': cache_client}
 
 
-app = FastAPI(title='Chatbot Builder', lifespan=lifespan)
+app = FastAPI(title='Freebots', lifespan=lifespan)
 app.mount('/api/media', StaticFiles(directory='src/media'), name='media')
 app.include_router(get_app_router())
 
 origins = [
     settings.CLIENT_APP_URL,
+    *settings.YOOKASSA_IPS,
 ]
 
 app.add_middleware(
