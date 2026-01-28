@@ -16,11 +16,10 @@ class DatabaseConnector:
         await self.conn.close()
 
     async def __aenter__(self):
-        await self.connect()
         return self.conn
 
     async def __aexit__(self, exc_type, exc_val, exc_tb):
-        await self.close_connection()
+        pass
 
 
 async def _create_user_table(db_connector: DatabaseConnector):
@@ -43,12 +42,12 @@ async def create_tables(db_connector: DatabaseConnector):
 
 
 async def add_user(
-        db_connector: DatabaseConnector,
-        tg_id: int,
-        first_name: str,
-        last_name: str,
-        username: str,
-        is_admin: bool,
+    db_connector: DatabaseConnector,
+    tg_id: int,
+    first_name: str,
+    last_name: str,
+    username: str,
+    is_admin: bool,
 ):
     user = await get_user(db_connector, tg_id)
 

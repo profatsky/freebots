@@ -29,11 +29,15 @@ async def send_start_msg_to_admin():
 
 
 async def main():
-    for func in create_tables_funcs:
-        await func(db_connector)
+    try:
+        await db_connector.connect()
+        for func in create_tables_funcs:
+            await func(db_connector)
 
-    await send_start_msg_to_admin()
-    await dp.start_polling(bot)
+        await send_start_msg_to_admin()
+        await dp.start_polling(bot)
+    finally:
+        await db_connector.close_connection()
 
 
 if __name__ == '__main__':

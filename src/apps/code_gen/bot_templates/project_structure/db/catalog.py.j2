@@ -37,12 +37,12 @@ async def get_products(db_connector: DatabaseConnector):
 
 
 async def add_product(
-        db_connector: DatabaseConnector,
-        name: str,
-        description: str,
-        price: str,
-        image_path: str,
-        seller_username: str,
+    db_connector: DatabaseConnector,
+    name: str,
+    description: str,
+    price: str,
+    image_path: str,
+    seller_username: str,
 ):
     created_at = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
@@ -57,10 +57,7 @@ async def add_product(
         await conn.commit()
 
 
-async def delete_product(
-        db_connector: DatabaseConnector,
-        name: str,
-):
+async def delete_product(db_connector: DatabaseConnector, name: str):
     async with db_connector as conn:
         await conn.execute(
             '''

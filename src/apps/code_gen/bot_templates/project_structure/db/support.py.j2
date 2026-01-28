@@ -24,9 +24,9 @@ async def _create_support_requests_table(db_connector: DatabaseConnector):
 
 
 async def create_support_request(
-        db_connector: DatabaseConnector,
-        question: str,
-        tg_id: int,
+    db_connector: DatabaseConnector,
+    question: str,
+    tg_id: int,
 ):
     created_at = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     async with db_connector as conn:
@@ -56,10 +56,10 @@ async def get_open_support_requests(db_connector: DatabaseConnector):
 
 
 async def save_answer_from_support(
-        db_connector: DatabaseConnector,
-        request_id: int,
-        answer: str,
-        support_id: int,
+    db_connector: DatabaseConnector,
+    request_id: int,
+    answer: str,
+    support_id: int,
 ):
     async with db_connector as conn:
         await conn.execute(
