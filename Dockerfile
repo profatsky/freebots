@@ -10,7 +10,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     UV_PROJECT_ENVIRONMENT="/usr/local/"
 
-RUN pip install uv==0.7.6
+RUN pip install uv==0.9.30
 
 COPY ./pyproject.toml uv.lock ./
 RUN uv sync --frozen --no-cache
