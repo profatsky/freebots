@@ -80,9 +80,12 @@ python3 -m pip install -r requirements.txt
 uvicorn src.main:app
 ```
 
+После запуска вы можете открыть OpenAPI-документацию в браузере по ссылке http://127.0.0.1:8000/docs. 
+
+
 ## ❓ Остались вопросы?
 Свяжитесь со мной в [Telegram](https://t.me/profatsky) или [ВКонтакте](https://vk.com/profatsky)
 
 ## 🔗 Полезные ссылки
 - [Веб-приложение](https://freebots.ru)
-- [Frontend-репозиторий](https://github.com/profatsky/freebots-frontend)
+- [Frontend-репозиторий (не актуализирован, обращайтесь в Telegram)](https://github.com/profatsky/freebots-frontend)
