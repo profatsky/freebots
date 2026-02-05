@@ -168,3 +168,4 @@ src/media/users
 src/apps/payments/**
 !src/apps/payments/__init__.py
 !src/apps/payments/models.py
+!src/apps/payments/enums.py
