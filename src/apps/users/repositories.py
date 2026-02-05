@@ -11,8 +11,8 @@ from src.apps.users.schemas import UserReadSchema, UserWithStatsReadSchema
 
 
 class UserRepository(BaseRepository):
-    async def create_user(self, tg_id: int) -> Optional[UserReadSchema]:
-        user = UserModel(tg_id=tg_id)
+    async def create_user(self, tg_id: int, is_superuser: bool = False) -> Optional[UserReadSchema]:
+        user = UserModel(tg_id=tg_id, is_superuser=is_superuser)
         try:
             self._session.add(user)
             await self._session.commit()

@@ -11,6 +11,8 @@ from yookassa import Configuration
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file='.env', env_file_encoding='utf-8', extra='allow')
 
+    DEBUG: bool = False
+
     CLIENT_APP_URL: str
 
     JWT_SECRET: str

@@ -26,7 +26,7 @@ async def lifespan(app: FastAPI):
         yield {'auth_security': auth_security, 'cache_cli': cache_client}
 
 
-app = FastAPI(title='Freebots', lifespan=lifespan)
+app = FastAPI(title='Freebots', lifespan=lifespan, debug=settings.DEBUG)
 app.mount('/api/media', StaticFiles(directory='src/media'), name='media')
 app.include_router(get_app_router())
 

@@ -11,8 +11,8 @@ class AuthService:
         self._auth_security = auth_security
         self._user_repository = user_repository
 
-    async def register_or_login(self, tg_id: int):
+    async def register_or_login(self, tg_id: int, is_superuser: bool = False):
         user = await self._user_repository.get_user_by_tg_id(tg_id)
         if user is None:
-            user = await self._user_repository.create_user(tg_id)
+            user = await self._user_repository.create_user(tg_id, is_superuser)
         return self._auth_security.create_access_token(uid=str(user.user_id))

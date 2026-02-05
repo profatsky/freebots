@@ -1,5 +1,7 @@
 from typing import Self, Any
 
+import redis
+from loguru import logger
 from redis.asyncio import Redis
 
 from src.core.config import settings
@@ -16,8 +18,14 @@ class CacheClient:
             username=settings.REDIS_USER,
             password=settings.REDIS_USER_PASSWORD,
         )
-        await self._client.ping()
+        await self.ping()
         return self
+
+    async def ping(self):
+        try:
+            await self._client.ping()
+        except redis.exceptions.ConnectionError:
+            logger.warning('Redis connection failed')
 
     async def get(self, name: str) -> Any:
         return await self._client.get(name)

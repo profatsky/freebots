@@ -18,6 +18,9 @@ async def login_via_swagger(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
     auth_service: AuthServiceDI,
 ):
+    if settings.DEBUG:
+        access_token = await auth_service.register_or_login(tg_id=0, is_superuser=True)
+        return {'access_token': access_token, 'token_type': 'bearer'}
     return await _login_via_telegram(request=request, auth_service=auth_service, code=int(form_data.password))
 
 
