@@ -12,7 +12,7 @@ from src.apps.subscriptions.exceptions.http_exceptions import (
 from src.apps.subscriptions.exceptions.services_exceptions import SubscriptionAlreadyExistsError
 from src.apps.subscriptions.schemas import SubscriptionReadSchema, SubscriptionCreateSchema
 from src.apps.users.dependencies.services_dependencies import UserServiceDI
-from src.apps.users.exceptions.services_exceptions import UserNotFoundError, DontHavePermissionError
+from src.apps.users.errors import UserNotFoundError, DontHavePermissionError
 
 
 router = APIRouter(

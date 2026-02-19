@@ -2,7 +2,7 @@ from uuid import UUID
 
 from src.apps.statistics.dependencies.repositories_dependencies import StatisticRepositoryDI
 from src.apps.statistics.schemas import StatisticSchema
-from src.apps.users.exceptions.services_exceptions import DontHavePermissionError
+from src.apps.users.errors import DontHavePermissionError
 from src.apps.users.dependencies.services_dependencies import UserServiceDI
 
 

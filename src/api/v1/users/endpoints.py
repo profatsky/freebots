@@ -5,7 +5,7 @@ from src.api.v1.users.schemas import UserWithStatsReadSchema
 from src.apps.auth.dependencies.auth_dependencies import UserIDFromAccessTokenDI, access_token_required
 from src.apps.projects.dependencies.services_dependencies import ProjectServiceDI
 from src.apps.users.dependencies.services_dependencies import UserServiceDI
-from src.apps.users.exceptions.services_exceptions import UserNotFoundError
+from src.apps.users.errors import UserNotFoundError
 
 router = APIRouter(
     prefix='/users',

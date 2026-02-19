@@ -4,7 +4,7 @@ from src.api.v1.users.exceptions import DontHavePermissionHTTPException
 from src.apps.auth.dependencies.auth_dependencies import UserIDFromAccessTokenDI, access_token_required
 from src.apps.statistics.dependencies.services_dependencies import StatisticServiceDI
 from src.apps.statistics.schemas import StatisticSchema
-from src.apps.users.exceptions.services_exceptions import DontHavePermissionError
+from src.apps.users.errors import DontHavePermissionError
 
 router = APIRouter(
     prefix='/statistics',

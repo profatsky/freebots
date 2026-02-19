@@ -2,7 +2,7 @@ from uuid import UUID
 
 from src.apps.users.dependencies.repositories_dependencies import UserRepositoryDI
 from src.apps.users.dto import UserReadDTO
-from src.apps.users.exceptions.services_exceptions import UserAlreadyExistsError, UserNotFoundError
+from src.apps.users.errors import UserAlreadyExistsError, UserNotFoundError
 
 
 class UserService:
