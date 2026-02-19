@@ -9,8 +9,6 @@ from src.core.config import settings
 
 router = APIRouter(tags=['Auth'])
 
-CODE_TTL = 300
-
 
 @router.post('/swagger_login')
 async def login_via_swagger(
@@ -24,20 +22,16 @@ async def login_via_swagger(
     return await _login_via_telegram(request=request, auth_service=auth_service, code=int(form_data.password))
 
 
-# TODO: service and repository layers
 @router.post('/save_tg_code', status_code=status.HTTP_201_CREATED)
 async def save_tg_code(
-    request: Request,
     tg_credentials: TelegramCredentialsSchema,
+    auth_service: AuthServiceDI,
     x_bot_secret: str = Header(alias='X-BOT-SECRET'),
 ):
     if x_bot_secret != settings.AUTH_BOT_SECRET:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Invalid bot secret')
 
-    cache_client = request.state.cache_cli
-
-    key = f'tg_code:{tg_credentials.code}'
-    await cache_client.set(name=key, value=tg_credentials.tg_id, ex=CODE_TTL)
+    await auth_service.save_tg_code(tg_id=tg_credentials.tg_id, code=tg_credentials.code)
     return {'detail': 'Code saved'}
 
 
