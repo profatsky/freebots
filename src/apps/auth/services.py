@@ -1,4 +1,5 @@
 from src.apps.auth.dependencies.auth_dependencies import AuthSecurityDI
+from src.apps.auth.exceptions.services_exceptions import InvalidCodeError, ExpiredCodeError
 from src.apps.users.dependencies.repositories_dependencies import UserRepositoryDI
 from src.infrastructure.cache.dependencies import CacheClientDI
 
@@ -25,3 +26,17 @@ class AuthService:
     async def save_tg_code(self, tg_id: int, code: str) -> None:
         key = f'tg_code:{code}'
         await self._cache_cli.set(name=key, value=tg_id, ex=self.CODE_TTL)
+
+    async def get_tg_id_by_code(self, code: str) -> int:
+        key = f'tg_code:{code}'
+        stored_tg_id = await self._cache_cli.get(key)
+        if stored_tg_id is None:
+            raise InvalidCodeError
+
+        ttl = await self._cache_cli.ttl(key)
+        if ttl == -1:
+            raise ExpiredCodeError
+
+        await self._cache_cli.delete(key)
+
+        return int(stored_tg_id.decode())
