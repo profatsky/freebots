@@ -90,6 +90,9 @@ class ProjectService:
 
         await self._project_repository.delete_project(project_id)
 
+    async def count_projects(self, user_id: UUID) -> int:
+        return await self._project_repository.count_projects(user_id)
+
     async def raise_error_if_not_exists(self, user_id: UUID, project_id: int):
         if not await self._project_repository.exists_by_id(user_id, project_id):
             raise ProjectNotFoundError

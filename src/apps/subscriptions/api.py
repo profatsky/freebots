@@ -3,6 +3,7 @@ from uuid import UUID
 
 from fastapi import APIRouter, status, Depends
 
+from src.api.v1.users.exceptions import UserNotFoundHTTPException, DontHavePermissionHTTPException
 from src.apps.auth.dependencies.auth_dependencies import UserIDFromAccessTokenDI, access_token_required
 from src.apps.subscriptions.dependencies.services_dependencies import SubscriptionServiceDI
 from src.apps.subscriptions.exceptions.http_exceptions import (
@@ -11,10 +12,6 @@ from src.apps.subscriptions.exceptions.http_exceptions import (
 from src.apps.subscriptions.exceptions.services_exceptions import SubscriptionAlreadyExistsError
 from src.apps.subscriptions.schemas import SubscriptionReadSchema, SubscriptionCreateSchema
 from src.apps.users.dependencies.services_dependencies import UserServiceDI
-from src.apps.users.exceptions.http_exceptions import (
-    UserNotFoundHTTPException,
-    DontHavePermissionHTTPException,
-)
 from src.apps.users.exceptions.services_exceptions import UserNotFoundError, DontHavePermissionError
 
 

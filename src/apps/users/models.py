@@ -5,6 +5,7 @@ from sqlalchemy import DateTime, func, BigInteger
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.apps.payments.models import PaymentModel
+from src.apps.users.dto import UserReadDTO
 from src.infrastructure.db.sessions import Base
 
 
@@ -28,3 +29,12 @@ class UserModel(Base):
     projects: Mapped[list['ProjectModel']] = relationship(back_populates='user')
     subscriptions: Mapped[list['SubscriptionModel']] = relationship(back_populates='user')
     payments: Mapped[list[PaymentModel]] = relationship(back_populates='user')
+
+    @classmethod
+    def convert_to_dto(cls, user: 'UserModel') -> UserReadDTO:
+        return UserReadDTO(
+            user_id=user.user_id,
+            tg_id=user.tg_id,
+            is_superuser=user.is_superuser,
+            created_at=user.created_at,
+        )
