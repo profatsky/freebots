@@ -6,7 +6,7 @@ from pydantic import BaseModel, Field
 
 from src.apps.enums import KeyboardType
 from src.apps.dialogues.schemas import DialogueReadSchema, DialogueWithBlocksReadSchema
-from src.apps.plugins.schemas import PluginReadSchema
+from src.api.v1.plugins.schemas import PluginReadSchema
 from src.apps.projects.dto import (
     ProjectCreateDTO,
     ProjectReadDTO,
@@ -28,14 +28,14 @@ class ProjectReadSchema(BaseModel):
     }
 
     @classmethod
-    def from_dto(cls, project: ProjectReadDTO) -> Self:
-        return ProjectReadSchema(
-            project_id=project.project_id,
-            name=project.name,
-            user_id=project.user_id,
-            start_message=project.start_message,
-            start_keyboard_type=project.start_keyboard_type,
-            created_at=project.created_at,
+    def from_dto(cls, dto: ProjectReadDTO) -> Self:
+        return cls(
+            project_id=dto.project_id,
+            name=dto.name,
+            user_id=dto.user_id,
+            start_message=dto.start_message,
+            start_keyboard_type=dto.start_keyboard_type,
+            created_at=dto.created_at,
         )
 
 
@@ -44,16 +44,16 @@ class ProjectWithDialoguesAndPluginsReadSchema(ProjectReadSchema):
     plugins: list[PluginReadSchema] = Field(default_factory=list)
 
     @classmethod
-    def from_dto(cls, project: ProjectWithDialoguesAndPluginsReadDTO) -> Self:
-        return ProjectWithDialoguesAndPluginsReadSchema(
-            project_id=project.project_id,
-            name=project.name,
-            user_id=project.user_id,
-            start_message=project.start_message,
-            start_keyboard_type=project.start_keyboard_type,
-            created_at=project.created_at,
-            dialogues=project.dialogues,
-            plugins=project.plugins,
+    def from_dto(cls, dto: ProjectWithDialoguesAndPluginsReadDTO) -> Self:
+        return cls(
+            project_id=dto.project_id,
+            name=dto.name,
+            user_id=dto.user_id,
+            start_message=dto.start_message,
+            start_keyboard_type=dto.start_keyboard_type,
+            created_at=dto.created_at,
+            dialogues=dto.dialogues,
+            plugins=dto.plugins,
         )
 
 

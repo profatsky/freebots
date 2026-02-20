@@ -3,6 +3,7 @@ from datetime import datetime
 from uuid import UUID
 
 from src.apps.enums import KeyboardType
+from src.apps.plugins.dto import PluginReadDTO
 
 
 @dataclass(frozen=True)
@@ -33,10 +34,18 @@ class ProjectReadDTO(ProjectCreateDTO):
 
 
 @dataclass(frozen=True)
+class ProjectWithPluginsReadDTO(ProjectReadDTO):
+    plugins: list[PluginReadDTO]
+
+    def contains_specific_plugin(self, plugin_id: int) -> bool:
+        return plugin_id in [plugin.plugin_id for plugin in self.plugins]
+
+
+@dataclass(frozen=True)
 class ProjectWithDialoguesAndPluginsReadDTO(ProjectReadDTO):
     # TODO: uncomment
     dialogues: list  # list[DialogueReadDTO]
-    plugins: list  # list[PluginReadDTO]
+    plugins: list[PluginReadDTO]
 
 
 @dataclass(frozen=True)

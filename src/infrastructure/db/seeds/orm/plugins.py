@@ -6,7 +6,7 @@ from sqlalchemy import select
 from src.apps.enums import TriggerEventType
 from src.infrastructure.db.sessions import async_session_maker
 from src.apps.plugins.models import PluginModel, PluginTriggerModel
-from src.apps.plugins.schemas import PluginCreateSchema, PluginTriggerCreateSchema
+from src.api.v1.plugins.schemas import PluginCreateSchema, PluginTriggerCreateSchema
 
 
 async def create():

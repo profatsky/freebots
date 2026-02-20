@@ -5,6 +5,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.dialects.postgresql import ENUM
 
 from src.apps.enums import TriggerEventType
+from src.apps.plugins.dto import PluginReadDTO, PluginTriggerReadDTO
 from src.infrastructure.db.sessions import Base
 
 
@@ -39,6 +40,20 @@ class PluginModel(Base):
         back_populates='plugins',
     )
 
+    def to_dto(self) -> PluginReadDTO:
+        triggers = [trigger.to_dto() for trigger in self.triggers]
+        return PluginReadDTO(
+            plugin_id=self.plugin_id,
+            name=self.name,
+            summary=self.summary,
+            image_path=self.image_path,
+            created_at=self.created_at,
+            handlers_file_path=self.handlers_file_path,
+            db_funcs_file_path=self.db_funcs_file_path,
+            readme_file_path=self.readme_file_path,
+            triggers=triggers,
+        )
+
 
 class PluginTriggerModel(Base):
     __tablename__ = 'plugin_triggers'
@@ -50,3 +65,11 @@ class PluginTriggerModel(Base):
 
     plugin_id: Mapped[int] = mapped_column(ForeignKey('plugins.plugin_id', ondelete='CASCADE'), nullable=False)
     plugin: Mapped[PluginModel] = relationship(back_populates='triggers')
+
+    def to_dto(self) -> PluginTriggerReadDTO:
+        return PluginTriggerReadDTO(
+            trigger_id=self.trigger_id,
+            event_type=self.event_type,
+            value=self.value,
+            is_admin=self.is_admin,
+        )

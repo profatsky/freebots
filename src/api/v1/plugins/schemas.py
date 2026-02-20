@@ -1,8 +1,10 @@
 import datetime
+from typing import Self
 
 from pydantic import BaseModel, Field
 
 from src.apps.enums import TriggerEventType
+from src.apps.plugins.dto import PluginReadDTO, PluginTriggerReadDTO
 
 
 class PluginTriggerCreateSchema(BaseModel):
@@ -21,6 +23,15 @@ class PluginTriggerReadSchema(BaseModel):
         'from_attributes': True,
     }
 
+    @classmethod
+    def from_dto(cls, dto: PluginTriggerReadDTO) -> Self:
+        return cls(
+            trigger_id=dto.trigger_id,
+            event_type=dto.event_type,
+            value=dto.value,
+            is_admin=dto.is_admin,
+        )
+
 
 class PluginReadSchema(BaseModel):
     plugin_id: int
@@ -36,6 +47,21 @@ class PluginReadSchema(BaseModel):
     model_config = {
         'from_attributes': True,
     }
+
+    @classmethod
+    def from_dto(cls, dto: PluginReadDTO) -> Self:
+        triggers = [PluginTriggerReadSchema.from_dto(trigger) for trigger in dto.triggers]
+        return cls(
+            plugin_id=dto.plugin_id,
+            name=dto.name,
+            summary=dto.summary,
+            image_path=dto.image_path,
+            created_at=dto.created_at,
+            handlers_file_path=dto.handlers_file_path,
+            db_funcs_file_path=dto.db_funcs_file_path,
+            triggers=triggers,
+            readme_file_path=dto.readme_file_path,
+        )
 
 
 class PluginCreateSchema(BaseModel):

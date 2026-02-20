@@ -8,6 +8,7 @@ from src.apps.projects.dto import (
     ProjectReadDTO,
     ProjectWithDialoguesAndPluginsReadDTO,
     ProjectUpdateDTO,
+    ProjectWithPluginsReadDTO,
 )
 from src.apps.projects.errors import (
     ProjectNotFoundError,
@@ -62,10 +63,16 @@ class ProjectService:
         project = await self._project_repository.get_project(project_id)
         if project is None:
             raise ProjectNotFoundError
-
         if project.user_id != user_id:
             raise NoPermissionForProjectError
+        return project
 
+    async def get_project_with_plugins(self, user_id: UUID, project_id: int) -> ProjectWithPluginsReadDTO:
+        project = await self._project_repository.get_project_with_plugins(project_id)
+        if project is None:
+            raise ProjectNotFoundError
+        if project.user_id != user_id:
+            raise NoPermissionForProjectError
         return project
 
     async def update_project(self, project: ProjectUpdateDTO) -> Optional[ProjectReadDTO]:

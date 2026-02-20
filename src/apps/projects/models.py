@@ -6,7 +6,12 @@ from sqlalchemy import String, DateTime, func, ForeignKey, Enum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.apps.enums import KeyboardType
-from src.apps.projects.dto import ProjectCreateDTO, ProjectReadDTO, ProjectWithDialoguesAndPluginsReadDTO
+from src.apps.projects.dto import (
+    ProjectCreateDTO,
+    ProjectReadDTO,
+    ProjectWithDialoguesAndPluginsReadDTO,
+    ProjectWithPluginsReadDTO,
+)
 from src.infrastructure.db.sessions import Base
 from src.apps.plugins.models import projects_plugins
 
@@ -53,7 +58,18 @@ class ProjectModel(Base):
             created_at=self.created_at,
         )
 
-    def to_extended_dto(self) -> ProjectWithDialoguesAndPluginsReadDTO:
+    def to_dto_with_plugins(self) -> ProjectWithPluginsReadDTO:
+        return ProjectWithPluginsReadDTO(
+            project_id=self.project_id,
+            user_id=self.user_id,
+            name=self.name,
+            start_message=self.start_message,
+            start_keyboard_type=self.start_keyboard_type,
+            created_at=self.created_at,
+            plugins=self.plugins,
+        )
+
+    def to_dto_with_dialogues_and_plugins(self) -> ProjectWithDialoguesAndPluginsReadDTO:
         return ProjectWithDialoguesAndPluginsReadDTO(
             project_id=self.project_id,
             user_id=self.user_id,

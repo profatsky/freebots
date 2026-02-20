@@ -36,7 +36,6 @@ async def create_project(
         project = await project_service.create_project(project.to_dto(user_id=user_id))
     except ProjectsLimitExceededError:
         raise ProjectsLimitExceededHTTPException
-
     return ProjectReadSchema.from_dto(project)
 
 
@@ -62,7 +61,6 @@ async def update_project(
         raise ProjectNotFoundHTTPException
     except NoPermissionForProjectError:
         raise NoPermissionForProjectHTTPException
-
     return ProjectReadSchema.from_dto(project)
 
 
