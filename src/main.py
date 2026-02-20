@@ -10,7 +10,7 @@ from fastapi.staticfiles import StaticFiles
 
 import src.core.config
 from src.core.config import settings
-from src.apps.router import get_app_router
+from src.api.router import get_app_router
 from src.infrastructure.cache.client import CacheClient
 from src.infrastructure.db.seeds.orm import seed_database
 
