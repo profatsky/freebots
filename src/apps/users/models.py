@@ -30,11 +30,10 @@ class UserModel(Base):
     subscriptions: Mapped[list['SubscriptionModel']] = relationship(back_populates='user')
     payments: Mapped[list[PaymentModel]] = relationship(back_populates='user')
 
-    @classmethod
-    def convert_to_dto(cls, user: 'UserModel') -> UserReadDTO:
+    def to_dto(self) -> UserReadDTO:
         return UserReadDTO(
-            user_id=user.user_id,
-            tg_id=user.tg_id,
-            is_superuser=user.is_superuser,
-            created_at=user.created_at,
+            user_id=self.user_id,
+            tg_id=self.tg_id,
+            is_superuser=self.is_superuser,
+            created_at=self.created_at,
         )

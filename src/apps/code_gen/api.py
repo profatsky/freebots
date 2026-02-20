@@ -8,11 +8,11 @@ from src.apps.dialogues.exceptions.services_exceptions import DialoguesLimitExce
 from src.apps.dialogues.schemas import DialogueWithBlocksReadSchema
 from src.apps.plugins.exceptions.http_exceptions import PluginsNotAvailableForFreeUsersHTTPException
 from src.apps.plugins.exceptions.services_exceptions import PluginsNotAvailableForFreeUsersError
-from src.apps.projects.exceptions.http_exceptions import (
+from src.api.v1.projects.exceptions import (
     ProjectNotFoundHTTPException,
     NoPermissionForProjectHTTPException,
 )
-from src.apps.projects.exceptions.services_exceptions import ProjectNotFoundError, NoPermissionForProjectError
+from src.apps.projects.errors import ProjectNotFoundError, NoPermissionForProjectError
 from src.apps.statistics.dependencies.services_dependencies import StatisticServiceDI
 
 router = APIRouter(

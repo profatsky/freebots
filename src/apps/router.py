@@ -2,7 +2,7 @@ from fastapi import APIRouter
 
 from src.apps.auth.api import router as auth_router
 from src.api.v1.users.endpoints import router as users_router
-from src.apps.projects.api import router as projects_router
+from src.api.v1.projects.endpoints import router as projects_router
 from src.apps.dialogues.api import router as dialogues_router
 from src.apps.dialogue_templates.api import router as dialogue_templates_router
 from src.apps.blocks.api import router as blocks_router

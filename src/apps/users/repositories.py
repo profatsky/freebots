@@ -18,13 +18,13 @@ class UserRepository(BaseRepository):
         except IntegrityError:
             return None
 
-        return UserModel.convert_to_dto(user)
+        return user.to_dto()
 
     async def get_user_by_tg_id(self, tg_id: int) -> Optional[UserReadDTO]:
         user = await self._get_user_model_instance_by_tg_id(tg_id)
         if user is None:
             return None
-        return UserModel.convert_to_dto(user)
+        return user.to_dto()
 
     async def _get_user_model_instance_by_tg_id(self, tg_id: int) -> Optional[UserModel]:
         user = await self._session.execute(
@@ -38,7 +38,7 @@ class UserRepository(BaseRepository):
         user = await self._get_user_model_instance_by_id(user_id)
         if user is None:
             return None
-        return UserModel.convert_to_dto(user)
+        return user.to_dto()
 
     async def _get_user_model_instance_by_id(self, user_id: UUID) -> Optional[UserModel]:
         user = await self._session.execute(select(UserModel).where(UserModel.user_id == user_id))

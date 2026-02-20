@@ -9,7 +9,7 @@ from src.apps.plugins.exceptions.services_exceptions import (
 )
 from src.apps.plugins.schemas import PluginReadSchema
 from src.apps.projects.dependencies.services_dependencies import ProjectServiceDI
-from src.apps.projects.schemas import ProjectReadSchema
+from src.api.v1.projects.schemas import ProjectReadSchema
 from src.apps.users.dependencies.services_dependencies import UserServiceDI
 from src.core.consts import MAX_PLUGINS_PER_PROJECT
 

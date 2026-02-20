@@ -9,11 +9,11 @@ from src.apps.dialogue_templates.exceptions.services_exceptions import DialogueT
 from src.apps.dialogue_templates.schemas import DialogueTemplateReadSchema
 from src.apps.dialogues.exceptions.http_exceptions import DialoguesLimitExceededHTTPException
 from src.apps.dialogues.exceptions.services_exceptions import DialoguesLimitExceededError
-from src.apps.projects.exceptions.http_exceptions import (
+from src.api.v1.projects.exceptions import (
     ProjectNotFoundHTTPException,
     NoPermissionForProjectHTTPException,
 )
-from src.apps.projects.exceptions.services_exceptions import ProjectNotFoundError, NoPermissionForProjectError
+from src.apps.projects.errors import ProjectNotFoundError, NoPermissionForProjectError
 
 router = APIRouter(
     tags=['Templates'],

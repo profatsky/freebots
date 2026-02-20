@@ -22,7 +22,7 @@ from src.apps.subscriptions.dependencies import SubscriptionServiceDI
 from src.core.consts import MAX_DIALOGUES_WITH_FREE_PLAN
 from src.infrastructure.db.dependencies import AsyncSessionDI
 from src.apps.projects.dependencies.services_dependencies import ProjectServiceDI
-from src.apps.projects.schemas import ProjectToGenerateCodeReadSchema
+from src.api.v1.projects.schemas import ProjectToGenerateCodeReadSchema
 from src.apps.code_gen.bot_templates import code
 from src.apps.blocks.utils import escape_inner_text
 

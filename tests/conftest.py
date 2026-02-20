@@ -15,7 +15,7 @@ from src.infrastructure.db.sessions import get_async_session, Base
 from src.infrastructure.db.utils import get_dsn
 from src.main import app
 from src.apps.projects.repositories import ProjectRepository
-from src.apps.projects.schemas import ProjectReadSchema
+from src.api.v1.projects.schemas import ProjectReadSchema
 from src.apps.users.repositories import UserRepository
 from src.apps.users.schemas import UserReadSchema
 from tests.factories.dialogues import DialogueCreateSchemaFactory

@@ -2,7 +2,7 @@ import factory
 from faker import Faker
 
 from src.apps.enums import KeyboardType
-from src.apps.projects.schemas import ProjectCreateSchema, ProjectUpdateSchema
+from src.api.v1.projects.schemas import ProjectCreateSchema, ProjectUpdateSchema
 
 fake = Faker()
 

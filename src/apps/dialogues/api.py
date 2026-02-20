@@ -8,11 +8,11 @@ from src.apps.dialogues.exceptions.http_exceptions import (
 )
 from src.apps.dialogues.exceptions.services_exceptions import DialoguesLimitExceededError, DialogueNotFoundError
 from src.apps.dialogues.schemas import DialogueCreateSchema, DialogueReadSchema, TriggerUpdateSchema
-from src.apps.projects.exceptions.http_exceptions import (
+from src.api.v1.projects.exceptions import (
     ProjectNotFoundHTTPException,
     NoPermissionForProjectHTTPException,
 )
-from src.apps.projects.exceptions.services_exceptions import ProjectNotFoundError, NoPermissionForProjectError
+from src.apps.projects.errors import ProjectNotFoundError, NoPermissionForProjectError
 
 router = APIRouter(
     prefix='/projects/{project_id}/dialogues',

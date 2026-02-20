@@ -1,4 +1,5 @@
 from datetime import timedelta
+from pathlib import Path
 from typing import Annotated
 
 from authx import AuthXConfig
@@ -45,6 +46,7 @@ class Settings(BaseSettings):
 
 settings = Settings()
 
+# Auth
 auth_config = AuthXConfig(
     JWT_ALGORITHM='HS256',
     JWT_SECRET_KEY=settings.JWT_SECRET,
@@ -53,5 +55,9 @@ auth_config = AuthXConfig(
 )
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl='/api/swagger_login')
 
+# Payments
 Configuration.account_id = settings.YOOKASSA_SHOP_ID
 Configuration.secret_key = settings.YOOKASSA_API_KEY
+
+# Media
+MEDIA_DIR = Path('src/media/')

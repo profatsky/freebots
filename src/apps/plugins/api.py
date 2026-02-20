@@ -17,11 +17,11 @@ from src.apps.plugins.exceptions.services_exceptions import (
     PluginsLimitExceededError,
 )
 from src.apps.plugins.schemas import PluginReadSchema
-from src.apps.projects.exceptions.http_exceptions import (
+from src.api.v1.projects.exceptions import (
     ProjectNotFoundHTTPException,
     NoPermissionForProjectHTTPException,
 )
-from src.apps.projects.exceptions.services_exceptions import ProjectNotFoundError, NoPermissionForProjectError
+from src.apps.projects.errors import ProjectNotFoundError, NoPermissionForProjectError
 
 router = APIRouter(
     tags=['Plugins'],
