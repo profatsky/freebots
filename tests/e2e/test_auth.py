@@ -1,7 +1,7 @@
 import pytest
 from httpx import AsyncClient
 
-from src.apps.auth.schemas import AuthCredentialsSchema
+from src.api.v1.auth.schemas import AuthCredentialsSchema
 from src.apps.users.schemas import UserReadSchema
 
 

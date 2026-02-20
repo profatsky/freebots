@@ -7,7 +7,7 @@ from httpx import AsyncClient, ASGITransport
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
 
-from src.apps.auth.schemas import AuthCredentialsSchema
+from src.api.v1.auth.schemas import AuthCredentialsSchema
 from src.core.config import settings
 from src.apps.dialogues.repositories import DialogueRepository
 from src.apps.dialogues.schemas import DialogueReadSchema
