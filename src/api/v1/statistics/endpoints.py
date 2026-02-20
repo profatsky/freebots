@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends
 from src.api.v1.users.exceptions import DontHavePermissionHTTPException
 from src.apps.auth.dependencies.auth_dependencies import UserIDFromAccessTokenDI, access_token_required
 from src.apps.statistics.dependencies.services_dependencies import StatisticServiceDI
-from src.apps.statistics.schemas import StatisticSchema
+from src.api.v1.statistics.schemas import StatisticReadSchema
 from src.apps.users.errors import DontHavePermissionError
 
 router = APIRouter(
@@ -13,8 +13,7 @@ router = APIRouter(
 )
 
 
-# TODO: admin privileges require
-@router.get('', response_model=StatisticSchema)
+@router.get('', response_model=StatisticReadSchema)
 async def get_statistic(
     statistic_service: StatisticServiceDI,
     user_id: UserIDFromAccessTokenDI,
