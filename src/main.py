@@ -9,7 +9,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 import src.core.config
-from src.core.config import settings
+from src.core.config import settings, MEDIA_DIR
 from src.api.router import get_app_router
 from src.infrastructure.cache.client import CacheClient
 from src.infrastructure.db.seeds.orm import seed_database
@@ -27,7 +27,7 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(title='Freebots', lifespan=lifespan, debug=settings.DEBUG)
-app.mount('/api/media', StaticFiles(directory='src/media'), name='media')
+app.mount('/api/media', StaticFiles(directory=MEDIA_DIR), name='media')
 app.include_router(get_app_router())
 
 origins = [
