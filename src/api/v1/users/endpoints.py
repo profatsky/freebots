@@ -30,4 +30,4 @@ async def get_user(
 
     project_count = await project_service.count_projects(user_id)
 
-    return UserWithStatsReadSchema.from_dto(user=user, project_count=project_count)
+    return UserWithStatsReadSchema.from_dto(dto=user, project_count=project_count)
