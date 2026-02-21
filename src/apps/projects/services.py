@@ -19,6 +19,7 @@ from src.apps.projects.errors import (
 from src.apps.subscriptions.dependencies.services_dependencies import SubscriptionServiceDI
 from src.core.config import MEDIA_DIR
 from src.core.consts import MAX_PROJECTS_WITH_FREE_PLAN, MAX_PROJECTS_WITH_PRO_PLAN
+from src.core.utils import soft_delete_dir
 
 
 class ProjectService:
@@ -90,11 +91,8 @@ class ProjectService:
 
     async def delete_project(self, user_id: UUID, project_id: int):
         _ = await self.get_project(user_id=user_id, project_id=project_id)
-
         media_dir = MEDIA_DIR / 'users' / str(user_id) / 'projects' / str(project_id)
-        if media_dir.exists():
-            media_dir.rmdir()
-
+        await soft_delete_dir(media_dir)
         await self._project_repository.delete_project(project_id)
 
     async def count_projects(self, user_id: UUID) -> int:

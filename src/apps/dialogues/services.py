@@ -7,6 +7,7 @@ from src.apps.projects.dependencies.services_dependencies import ProjectServiceD
 from src.apps.subscriptions.dependencies.services_dependencies import SubscriptionServiceDI
 from src.core.config import MEDIA_DIR
 from src.core.consts import MAX_DIALOGUES_WITH_FREE_PLAN, MAX_DIALOGUES_WITH_PRO_PLAN
+from src.core.utils import soft_delete_dir
 
 
 class DialogueService:
@@ -53,11 +54,8 @@ class DialogueService:
 
     async def delete_dialogue(self, user_id: UUID, project_id: int, dialogue_id: int):
         _ = await self.get_dialogue(user_id=user_id, project_id=project_id, dialogue_id=dialogue_id)
-
         media_dir = MEDIA_DIR / 'users' / str(user_id) / 'projects' / str(project_id) / 'dialogues' / str(dialogue_id)
-        if media_dir.exists():
-            media_dir.rmdir()
-
+        await soft_delete_dir(media_dir)
         await self._dialogue_repository.delete_dialogue(dialogue_id)
 
     # async def raise_error_if_not_exists(self, user_id: UUID, project_id: int, dialogue_id: int):
