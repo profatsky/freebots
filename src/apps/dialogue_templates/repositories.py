@@ -4,42 +4,30 @@ from sqlalchemy import select
 from sqlalchemy.orm import joinedload, selectinload, DeclarativeBase
 
 from src.apps.blocks.models import BlockModel
+from src.apps.dialogue_templates.dto import DialogueTemplateReadDTO
 from src.core.base_repository import BaseRepository
 from src.apps.dialogue_templates.models import DialogueTemplateModel
-from src.apps.dialogue_templates.schemas import DialogueTemplateReadSchema
 from src.apps.blocks import utils
 from src.apps.dialogues.models import DialogueModel, DialogueTriggerModel
 
 
 class DialogueTemplateRepository(BaseRepository):
-    async def get_templates(
-        self,
-        offset: int,
-        limit: int,
-    ) -> list[DialogueTemplateReadSchema]:
+    async def get_templates(self, offset: int, limit: int) -> list[DialogueTemplateReadDTO]:
         templates = await self._session.execute(
             select(DialogueTemplateModel).order_by(DialogueTemplateModel.created_at).offset(offset).limit(limit)
         )
-        templates = templates.scalars().all()
-        return [DialogueTemplateReadSchema.model_validate(template) for template in templates]
+        return [template.to_dto() for template in templates.scalars().all()]
 
-    async def get_template(
-        self,
-        template_id: int,
-    ) -> Optional[DialogueTemplateReadSchema]:
+    async def get_template(self, template_id: int) -> Optional[DialogueTemplateReadDTO]:
         template = await self._session.execute(
             select(DialogueTemplateModel).where(DialogueTemplateModel.template_id == template_id)
         )
         template = template.scalar()
         if not template:
-            return
-        return DialogueTemplateReadSchema.model_validate(template)
+            return None
+        return template.to_dto()
 
-    async def create_dialogue_from_template(
-        self,
-        project_id: int,
-        template_id: int,
-    ):
+    async def create_dialogue_from_template(self, project_id: int, template_id: int):
         template = await self._session.execute(
             select(DialogueTemplateModel)
             .options(
