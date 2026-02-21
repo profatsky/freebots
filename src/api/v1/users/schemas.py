@@ -22,11 +22,11 @@ class UserWithStatsReadSchema(UserReadSchema):
     project_count: int
 
     @classmethod
-    def from_dto(cls, user: UserReadDTO, project_count: int) -> Self:
-        return UserWithStatsReadSchema(
-            user_id=user.user_id,
-            tg_id=user.tg_id,
-            is_superuser=user.is_superuser,
-            created_at=user.created_at,
+    def from_dto(cls, dto: UserReadDTO, project_count: int) -> Self:
+        return cls(
+            user_id=dto.user_id,
+            tg_id=dto.tg_id,
+            is_superuser=dto.is_superuser,
+            created_at=dto.created_at,
             project_count=project_count,
         )

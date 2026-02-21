@@ -11,6 +11,7 @@ from src.apps.projects.dto import (
     ProjectReadDTO,
     ProjectWithDialoguesAndPluginsReadDTO,
     ProjectWithPluginsReadDTO,
+    ProjectWithDialoguesReadDTO,
 )
 from src.infrastructure.db.sessions import Base
 from src.apps.plugins.models import projects_plugins
@@ -40,12 +41,12 @@ class ProjectModel(Base):
     )
 
     @classmethod
-    def from_dto(cls, project: ProjectCreateDTO) -> Self:
-        return ProjectModel(
-            user_id=project.user_id,
-            name=project.name,
-            start_message=project.start_message,
-            start_keyboard_type=project.start_keyboard_type,
+    def from_dto(cls, dto: ProjectCreateDTO) -> Self:
+        return cls(
+            user_id=dto.user_id,
+            name=dto.name,
+            start_message=dto.start_message,
+            start_keyboard_type=dto.start_keyboard_type,
         )
 
     def to_dto(self) -> ProjectReadDTO:
@@ -59,6 +60,7 @@ class ProjectModel(Base):
         )
 
     def to_dto_with_plugins(self) -> ProjectWithPluginsReadDTO:
+        plugins = [plugin.to_dto() for plugin in self.plugins]
         return ProjectWithPluginsReadDTO(
             project_id=self.project_id,
             user_id=self.user_id,
@@ -66,10 +68,24 @@ class ProjectModel(Base):
             start_message=self.start_message,
             start_keyboard_type=self.start_keyboard_type,
             created_at=self.created_at,
-            plugins=self.plugins,
+            plugins=plugins,
+        )
+
+    def to_dto_with_dialogues(self) -> ProjectWithDialoguesReadDTO:
+        dialogues = [dialogue.to_dto() for dialogue in self.dialogues]
+        return ProjectWithDialoguesReadDTO(
+            project_id=self.project_id,
+            user_id=self.user_id,
+            name=self.name,
+            start_message=self.start_message,
+            start_keyboard_type=self.start_keyboard_type,
+            created_at=self.created_at,
+            dialogues=dialogues,
         )
 
     def to_dto_with_dialogues_and_plugins(self) -> ProjectWithDialoguesAndPluginsReadDTO:
+        plugins = [plugin.to_dto() for plugin in self.plugins]
+        dialogues = [dialogue.to_dto() for dialogue in self.dialogues]
         return ProjectWithDialoguesAndPluginsReadDTO(
             project_id=self.project_id,
             user_id=self.user_id,
@@ -77,6 +93,6 @@ class ProjectModel(Base):
             start_message=self.start_message,
             start_keyboard_type=self.start_keyboard_type,
             created_at=self.created_at,
-            dialogues=self.dialogues,
-            plugins=self.plugins,
+            dialogues=dialogues,
+            plugins=plugins,
         )

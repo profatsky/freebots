@@ -2,7 +2,7 @@ import pytest
 from httpx import AsyncClient
 
 from src.apps.dialogues.repositories import DialogueRepository
-from src.apps.dialogues.schemas import DialogueReadSchema
+from src.api.v1.dialogues.schemas import DialogueReadSchema
 from src.api.v1.projects.schemas import ProjectReadSchema
 from tests.factories.dialogues import DialogueCreateSchemaFactory, TriggerUpdateSchemaFactory
 

@@ -1,3 +1,4 @@
+# TODO: move to config.py
 # Free tariff
 MAX_PROJECTS_WITH_FREE_PLAN = 1
 MAX_DIALOGUES_WITH_FREE_PLAN = 1

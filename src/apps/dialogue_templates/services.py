@@ -3,7 +3,7 @@ from uuid import UUID
 from src.apps.dialogue_templates.dependencies.repositories_dependencies import DialogueTemplateRepositoryDI
 from src.apps.dialogue_templates.exceptions.services_exceptions import DialogueTemplateNotFoundError
 from src.apps.dialogue_templates.schemas import DialogueTemplateReadSchema
-from src.apps.dialogues.exceptions.services_exceptions import DialoguesLimitExceededError
+from src.apps.dialogues.errors import DialoguesLimitExceededError
 from src.apps.projects.dependencies.services_dependencies import ProjectServiceDI
 from src.apps.subscriptions.dependencies.services_dependencies import SubscriptionServiceDI
 from src.core.consts import MAX_DIALOGUES_WITH_FREE_PLAN, MAX_DIALOGUES_WITH_PRO_PLAN

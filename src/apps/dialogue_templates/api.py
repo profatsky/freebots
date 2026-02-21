@@ -7,8 +7,8 @@ from src.apps.dialogue_templates.dependencies.services_dependencies import Dialo
 from src.apps.dialogue_templates.exceptions.http_exceptions import DialogueTemplateNotFoundHTTPException
 from src.apps.dialogue_templates.exceptions.services_exceptions import DialogueTemplateNotFoundError
 from src.apps.dialogue_templates.schemas import DialogueTemplateReadSchema
-from src.apps.dialogues.exceptions.http_exceptions import DialoguesLimitExceededHTTPException
-from src.apps.dialogues.exceptions.services_exceptions import DialoguesLimitExceededError
+from src.api.v1.dialogues.exceptions import DialoguesLimitExceededHTTPException
+from src.apps.dialogues.errors import DialoguesLimitExceededError
 from src.api.v1.projects.exceptions import (
     ProjectNotFoundHTTPException,
     NoPermissionForProjectHTTPException,

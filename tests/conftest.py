@@ -10,7 +10,7 @@ from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sess
 from src.api.v1.auth.schemas import AuthCredentialsSchema
 from src.core.config import settings
 from src.apps.dialogues.repositories import DialogueRepository
-from src.apps.dialogues.schemas import DialogueReadSchema
+from src.api.v1.dialogues.schemas import DialogueReadSchema
 from src.infrastructure.db.sessions import get_async_session, Base
 from src.infrastructure.db.utils import get_dsn
 from src.main import app

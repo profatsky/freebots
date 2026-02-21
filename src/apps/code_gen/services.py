@@ -6,7 +6,7 @@ from uuid import UUID
 
 from jinja2 import Template, Environment, FileSystemLoader
 
-from src.apps.dialogues.exceptions.services_exceptions import DialoguesLimitExceededError
+from src.apps.dialogues.errors import DialoguesLimitExceededError
 from src.apps.plugins.errors import PluginsNotAvailableForFreeUsersError
 from src.apps.enums import (
     KeyboardType,

@@ -1,13 +1,14 @@
 from fastapi import APIRouter, status, Depends
 
+from src.api.v1.dialogues.schemas.dialogues import DialogueReadSchema, DialogueCreateSchema
+from src.api.v1.dialogues.schemas.triggers import DialogueTriggerUpdateSchema
 from src.apps.auth.dependencies.auth_dependencies import UserIDFromAccessTokenDI, access_token_required
 from src.apps.dialogues.dependencies.services_dependencies import DialogueServiceDI
-from src.apps.dialogues.exceptions.http_exceptions import (
+from src.api.v1.dialogues.exceptions import (
     DialoguesLimitExceededHTTPException,
     DialogueNotFoundHTTPException,
 )
-from src.apps.dialogues.exceptions.services_exceptions import DialoguesLimitExceededError, DialogueNotFoundError
-from src.apps.dialogues.schemas import DialogueCreateSchema, DialogueReadSchema, TriggerUpdateSchema
+from src.apps.dialogues.errors import DialoguesLimitExceededError, DialogueNotFoundError
 from src.api.v1.projects.exceptions import (
     ProjectNotFoundHTTPException,
     NoPermissionForProjectHTTPException,
@@ -27,25 +28,23 @@ router = APIRouter(
     status_code=status.HTTP_201_CREATED,
 )
 async def create_dialogue(
-    project_id: int,
-    dialogue_data: DialogueCreateSchema,
     dialogue_service: DialogueServiceDI,
+    project_id: int,
+    dialogue: DialogueCreateSchema,
     user_id: UserIDFromAccessTokenDI,
 ):
     try:
-        return await dialogue_service.create_dialogue(
+        dialogue = await dialogue_service.create_dialogue(
             user_id=user_id,
-            project_id=project_id,
-            dialogue_data=dialogue_data,
+            dialogue=dialogue.to_dto(project_id=project_id),
         )
     except ProjectNotFoundError:
         raise ProjectNotFoundHTTPException
-
     except NoPermissionForProjectError:
         raise NoPermissionForProjectHTTPException
-
     except DialoguesLimitExceededError:
         raise DialoguesLimitExceededHTTPException
+    return DialogueReadSchema.from_dto(dialogue)
 
 
 @router.put(
@@ -53,27 +52,26 @@ async def create_dialogue(
     response_model=DialogueReadSchema,
 )
 async def update_dialogue_trigger(
+    dialogue_service: DialogueServiceDI,
     project_id: int,
     dialogue_id: int,
-    trigger: TriggerUpdateSchema,
-    dialogue_service: DialogueServiceDI,
+    trigger: DialogueTriggerUpdateSchema,
     user_id: UserIDFromAccessTokenDI,
 ):
     try:
-        return await dialogue_service.update_dialogue_trigger(
+        dialogue = await dialogue_service.update_dialogue_trigger(
             user_id=user_id,
             project_id=project_id,
             dialogue_id=dialogue_id,
-            trigger=trigger,
+            trigger=trigger.to_dto(),
         )
     except ProjectNotFoundError:
         raise ProjectNotFoundHTTPException
-
     except NoPermissionForProjectError:
         raise NoPermissionForProjectHTTPException
-
     except DialogueNotFoundError:
         raise DialogueNotFoundHTTPException
+    return DialogueReadSchema.from_dto(dialogue)
 
 
 @router.delete(
@@ -81,9 +79,9 @@ async def update_dialogue_trigger(
     status_code=status.HTTP_204_NO_CONTENT,
 )
 async def delete_dialogue(
+    dialogue_service: DialogueServiceDI,
     project_id: int,
     dialogue_id: int,
-    dialogue_service: DialogueServiceDI,
     user_id: UserIDFromAccessTokenDI,
 ):
     try:
@@ -94,9 +92,7 @@ async def delete_dialogue(
         )
     except ProjectNotFoundError:
         raise ProjectNotFoundHTTPException
-
     except NoPermissionForProjectError:
         raise NoPermissionForProjectHTTPException
-
     except DialogueNotFoundError:
         raise DialogueNotFoundHTTPException

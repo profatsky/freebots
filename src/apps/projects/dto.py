@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from uuid import UUID
 
+from src.apps.dialogues.dto import DialogueReadDTO
 from src.apps.enums import KeyboardType
 from src.apps.plugins.dto import PluginReadDTO
 
@@ -42,10 +43,16 @@ class ProjectWithPluginsReadDTO(ProjectReadDTO):
 
 
 @dataclass(frozen=True)
-class ProjectWithDialoguesAndPluginsReadDTO(ProjectReadDTO):
-    # TODO: uncomment
-    dialogues: list  # list[DialogueReadDTO]
-    plugins: list[PluginReadDTO]
+class ProjectWithDialoguesReadDTO(ProjectReadDTO):
+    dialogues: list[DialogueReadDTO]
+
+    def contains_specific_dialogue(self, dialogue_id: int) -> bool:
+        return dialogue_id in [dialogue.dialogue_id for dialogue in self.dialogues]
+
+
+@dataclass(frozen=True)
+class ProjectWithDialoguesAndPluginsReadDTO(ProjectWithPluginsReadDTO, ProjectWithDialoguesReadDTO):
+    pass
 
 
 @dataclass(frozen=True)

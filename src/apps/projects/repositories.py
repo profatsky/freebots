@@ -12,6 +12,7 @@ from src.apps.projects.dto import (
     ProjectWithDialoguesAndPluginsReadDTO,
     ProjectUpdateDTO,
     ProjectWithPluginsReadDTO,
+    ProjectWithDialoguesReadDTO,
 )
 from src.core.base_repository import BaseRepository
 from src.apps.dialogues.models import DialogueModel
@@ -41,7 +42,7 @@ class ProjectRepository(BaseRepository):
         projects = projects.unique().scalars().all()
         return [project.to_dto_with_dialogues_and_plugins() for project in projects]
 
-    async def get_project_with_plugins(self, project_id: UUID) -> Optional[ProjectWithPluginsReadDTO]:
+    async def get_project_with_plugins(self, project_id: int) -> Optional[ProjectWithPluginsReadDTO]:
         project = await self._session.execute(
             select(ProjectModel)
             .options(
@@ -53,6 +54,19 @@ class ProjectRepository(BaseRepository):
         if project is None:
             return None
         return project.to_dto_with_plugins()
+
+    async def get_project_with_dialogues(self, project_id: int) -> Optional[ProjectWithDialoguesReadDTO]:
+        project = await self._session.execute(
+            select(ProjectModel)
+            .options(
+                selectinload(ProjectModel.dialogues).joinedload(DialogueModel.trigger),
+            )
+            .where(ProjectModel.project_id == project_id)
+        )
+        project = project.scalar()
+        if project is None:
+            return None
+        return project.to_dto_with_dialogues()
 
     async def get_project(self, project_id: int) -> Optional[ProjectReadDTO]:
         project = await self._get_project_model_instance(project_id)

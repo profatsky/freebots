@@ -1,11 +1,11 @@
 from fastapi import APIRouter, Depends
 from fastapi.responses import StreamingResponse
 
+from src.api.v1.dialogues.schemas.dialogues import DialogueWithBlocksReadSchema
 from src.apps.auth.dependencies.auth_dependencies import UserIDFromAccessTokenDI, access_token_required
 from src.apps.code_gen.dependencies.services_dependencies import CodeGenServiceDI
-from src.apps.dialogues.exceptions.http_exceptions import DialoguesLimitExceededHTTPException
-from src.apps.dialogues.exceptions.services_exceptions import DialoguesLimitExceededError
-from src.apps.dialogues.schemas import DialogueWithBlocksReadSchema
+from src.api.v1.dialogues.exceptions import DialoguesLimitExceededHTTPException
+from src.apps.dialogues.errors import DialoguesLimitExceededError
 from src.api.v1.plugins.exceptions import PluginsNotAvailableForFreeUsersHTTPException
 from src.apps.plugins.errors import PluginsNotAvailableForFreeUsersError
 from src.api.v1.projects.exceptions import (

@@ -9,6 +9,7 @@ from src.apps.projects.dto import (
     ProjectWithDialoguesAndPluginsReadDTO,
     ProjectUpdateDTO,
     ProjectWithPluginsReadDTO,
+    ProjectWithDialoguesReadDTO,
 )
 from src.apps.projects.errors import (
     ProjectNotFoundError,
@@ -39,12 +40,6 @@ class ProjectService:
 
         return await self._project_repository.create_project(project)
 
-    async def get_projects_with_dialogues_and_plugins(
-        self,
-        user_id: UUID,
-    ) -> list[ProjectWithDialoguesAndPluginsReadDTO]:
-        return await self._project_repository.get_projects_with_dialogues_and_plugins(user_id)
-
     async def get_project_to_generate_code(
         self,
         user_id: UUID,
@@ -74,6 +69,20 @@ class ProjectService:
         if project.user_id != user_id:
             raise NoPermissionForProjectError
         return project
+
+    async def get_project_with_dialogues(self, user_id: UUID, project_id: int) -> ProjectWithDialoguesReadDTO:
+        project = await self._project_repository.get_project_with_dialogues(project_id)
+        if project is None:
+            raise ProjectNotFoundError
+        if project.user_id != user_id:
+            raise NoPermissionForProjectError
+        return project
+
+    async def get_projects_with_dialogues_and_plugins(
+        self,
+        user_id: UUID,
+    ) -> list[ProjectWithDialoguesAndPluginsReadDTO]:
+        return await self._project_repository.get_projects_with_dialogues_and_plugins(user_id)
 
     async def update_project(self, project: ProjectUpdateDTO) -> Optional[ProjectReadDTO]:
         _ = await self.get_project(user_id=project.user_id, project_id=project.project_id)

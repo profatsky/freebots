@@ -3,7 +3,7 @@ from fastapi import APIRouter
 from src.api.v1.auth.endpoints import router as auth_router
 from src.api.v1.users.endpoints import router as users_router
 from src.api.v1.projects.endpoints import router as projects_router
-from src.apps.dialogues.api import router as dialogues_router
+from src.api.v1.dialogues.endpoints import router as dialogues_router
 from src.apps.dialogue_templates.api import router as dialogue_templates_router
 from src.apps.blocks.api import router as blocks_router
 from src.api.v1.plugins.endpoints import router as plugins_router

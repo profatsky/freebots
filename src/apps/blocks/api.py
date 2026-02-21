@@ -16,8 +16,8 @@ from src.apps.blocks.exceptions.services_exceptions import (
 )
 from src.apps.blocks.openapi_examples import BLOCK_CREATE_SCHEMA_EXAMPLES, BLOCK_UPDATE_SCHEMA_EXAMPLES
 from src.apps.blocks.schemas import UnionBlockCreateSchema, UnionBlockReadSchema, UnionBlockUpdateSchema
-from src.apps.dialogues.exceptions.http_exceptions import DialogueNotFoundHTTPException
-from src.apps.dialogues.exceptions.services_exceptions import DialogueNotFoundError
+from src.api.v1.dialogues.exceptions import DialogueNotFoundHTTPException
+from src.apps.dialogues.errors import DialogueNotFoundError
 from src.apps.projects.errors import ProjectNotFoundError, NoPermissionForProjectError
 from src.api.v1.projects.exceptions import (
     ProjectNotFoundHTTPException,

@@ -1,8 +1,10 @@
 import datetime
+from typing import Self
 
 from sqlalchemy import String, DateTime, func, ForeignKey, Enum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
+from src.apps.dialogues.dto import DialogueCreateDTO, DialogueTriggerCreateDTO, DialogueReadDTO, DialogueTriggerReadDTO
 from src.infrastructure.db.sessions import Base
 from src.apps.enums import TriggerEventType
 
@@ -27,6 +29,21 @@ class DialogueModel(Base):
 
     template: Mapped['DialogueTemplateModel'] = relationship(back_populates='dialogue')
 
+    @classmethod
+    def from_dto(cls, dto: DialogueCreateDTO) -> Self:
+        return cls(
+            project_id=dto.project_id,
+            trigger=DialogueTriggerModel.from_dto(dto.trigger),
+        )
+
+    def to_dto(self) -> DialogueReadDTO:
+        return DialogueReadDTO(
+            dialogue_id=self.dialogue_id,
+            trigger=self.trigger.to_dto(),
+            project_id=self.project_id,
+            created_at=self.created_at,
+        )
+
 
 class DialogueTriggerModel(Base):
     __tablename__ = 'triggers'
@@ -36,3 +53,17 @@ class DialogueTriggerModel(Base):
     value: Mapped[str] = mapped_column(String(64))
 
     dialogue: Mapped[DialogueModel] = relationship(back_populates='trigger')
+
+    @classmethod
+    def from_dto(cls, dto: DialogueTriggerCreateDTO) -> Self:
+        return cls(
+            event_type=dto.event_type,
+            value=dto.value,
+        )
+
+    def to_dto(self) -> DialogueTriggerReadDTO:
+        return DialogueTriggerReadDTO(
+            trigger_id=self.trigger_id,
+            event_type=self.event_type,
+            value=self.value,
+        )

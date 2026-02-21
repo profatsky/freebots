@@ -4,8 +4,8 @@ from uuid import UUID
 
 from pydantic import BaseModel, Field
 
+from src.api.v1.dialogues.schemas.dialogues import DialogueWithBlocksReadSchema, DialogueReadSchema
 from src.apps.enums import KeyboardType
-from src.apps.dialogues.schemas import DialogueReadSchema, DialogueWithBlocksReadSchema
 from src.api.v1.plugins.schemas import PluginReadSchema
 from src.apps.projects.dto import (
     ProjectCreateDTO,
@@ -45,6 +45,8 @@ class ProjectWithDialoguesAndPluginsReadSchema(ProjectReadSchema):
 
     @classmethod
     def from_dto(cls, dto: ProjectWithDialoguesAndPluginsReadDTO) -> Self:
+        dialogues = [DialogueReadSchema.from_dto(dialogue) for dialogue in dto.dialogues]
+        plugins = [PluginReadSchema.from_dto(plugin) for plugin in dto.plugins]
         return cls(
             project_id=dto.project_id,
             name=dto.name,
@@ -52,8 +54,8 @@ class ProjectWithDialoguesAndPluginsReadSchema(ProjectReadSchema):
             start_message=dto.start_message,
             start_keyboard_type=dto.start_keyboard_type,
             created_at=dto.created_at,
-            dialogues=dto.dialogues,
-            plugins=dto.plugins,
+            dialogues=dialogues,
+            plugins=plugins,
         )
 
 
