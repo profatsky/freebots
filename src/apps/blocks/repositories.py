@@ -3,8 +3,8 @@ from typing import Optional
 from sqlalchemy import select, delete, exists
 from sqlalchemy.orm import selectin_polymorphic
 
+from src.api.v1.blocks.schemas import UnionBlockCreateSchema, UnionBlockReadSchema, UnionBlockUpdateSchema
 from src.apps.blocks.models import BlockModel
-from src.apps.blocks.schemas import UnionBlockCreateSchema, UnionBlockReadSchema, UnionBlockUpdateSchema
 from src.apps.blocks import utils
 from src.core.base_repository import BaseRepository
 

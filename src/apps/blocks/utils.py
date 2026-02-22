@@ -10,7 +10,7 @@ from src.apps.blocks.models import (
     ExcelBlockModel,
     APIBlockModel,
 )
-from src.apps.blocks.schemas import (
+from src.api.v1.blocks.schemas import (
     UnionBlockReadSchema,
     TextBlockReadSchema,
     ImageBlockReadSchema,

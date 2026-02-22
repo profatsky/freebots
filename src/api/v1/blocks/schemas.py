@@ -93,7 +93,7 @@ class QuestionBlockUpdateSchema(BaseQuestionBlockSchema, BlockUpdateSchema):
 class EmailBlockSchema(BaseModel):
     subject: str = Field(max_length=128)
     text: str = Field(max_length=8192)
-    recipient_email: str = Field(max_length=254)
+    recipient_email: str = Field(max_length=256)
     type: Literal[BlockType.EMAIL_BLOCK.value]
 
     @property

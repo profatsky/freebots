@@ -4,18 +4,18 @@ from fastapi import APIRouter, status, UploadFile, Depends, Body
 
 from src.apps.auth.dependencies.auth_dependencies import UserIDFromAccessTokenDI, access_token_required
 from src.apps.blocks.dependencies.services_dependencies import BlockServiceDI
-from src.apps.blocks.exceptions.http_exceptions import (
+from src.api.v1.blocks.exceptions import (
     RepeatingBlockSequenceNumberHTTPException,
     BlockNotFoundHTTPException,
     InvalidBlockTypeHTTPException,
 )
-from src.apps.blocks.exceptions.services_exceptions import (
+from src.apps.blocks.errors import (
     RepeatingBlockSequenceNumberError,
     BlockNotFoundError,
     InvalidBlockTypeError,
 )
 from src.apps.blocks.openapi_examples import BLOCK_CREATE_SCHEMA_EXAMPLES, BLOCK_UPDATE_SCHEMA_EXAMPLES
-from src.apps.blocks.schemas import UnionBlockCreateSchema, UnionBlockReadSchema, UnionBlockUpdateSchema
+from src.api.v1.blocks.schemas import UnionBlockCreateSchema, UnionBlockReadSchema, UnionBlockUpdateSchema
 from src.api.v1.dialogues.exceptions import DialogueNotFoundHTTPException
 from src.apps.dialogues.errors import DialogueNotFoundError
 from src.apps.projects.errors import ProjectNotFoundError, NoPermissionForProjectError

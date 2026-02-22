@@ -3,16 +3,16 @@ from uuid import UUID
 
 from fastapi import UploadFile
 
+from src.api.v1.blocks.schemas import (
+    UnionBlockCreateSchema,
+    UnionBlockReadSchema,
+    ImageBlockReadSchema,
+    UnionBlockUpdateSchema,
+)
 from src.apps.blocks.dependencies.repositories_dependencies import BlockRepositoryDI
 from src.apps.dialogues.dependencies.services_dependencies import DialogueServiceDI
 from src.apps.enums import BlockType
-from src.apps.blocks.schemas import (
-    UnionBlockCreateSchema,
-    UnionBlockReadSchema,
-    UnionBlockUpdateSchema,
-    ImageBlockReadSchema,
-)
-from src.apps.blocks.exceptions.services_exceptions import BlockNotFoundError, InvalidBlockTypeError
+from src.apps.blocks.errors import BlockNotFoundError, InvalidBlockTypeError
 
 
 class BlockService:
@@ -76,7 +76,7 @@ class BlockService:
             buffer.write(image.file.read())
 
         block_update = ImageBlockReadSchema(
-            **{field_name: getattr(block_read, field_name) for field_name in ImageBlockReadSchema.__fields__}
+            **{field_name: getattr(block_read, field_name) for field_name in ImageBlockReadSchema.model_fields}
         )
         # TODO: use os.path.join
         block_update.image_path = image_path.replace('src/media/', '')
@@ -115,7 +115,7 @@ class BlockService:
         project_id: int,
         dialogue_id: int,
         block_id: int,
-    ) -> UnionBlockReadSchema:
+    ):
         block = await self.get_block(
             user_id=user_id,
             project_id=project_id,

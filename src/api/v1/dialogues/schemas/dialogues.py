@@ -5,7 +5,7 @@ from pydantic import BaseModel, field_validator
 
 from src.api.v1.dialogues.schemas.triggers import DialogueTriggerCreateSchema, DialogueTriggerReadSchema
 from src.apps.blocks import utils
-from src.apps.blocks.schemas import UnionBlockReadSchema
+from src.api.v1.blocks.schemas import UnionBlockReadSchema
 from src.apps.dialogues.dto import DialogueCreateDTO, DialogueReadDTO
 
 
