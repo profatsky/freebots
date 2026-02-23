@@ -91,8 +91,7 @@ class ProjectService:
 
     async def delete_project(self, user_id: UUID, project_id: int):
         _ = await self.get_project(user_id=user_id, project_id=project_id)
-        media_dir = MEDIA_DIR / 'users' / str(user_id) / 'projects' / str(project_id)
-        await soft_delete_dir(media_dir)
+        await soft_delete_dir(MEDIA_DIR / f'users/{user_id}/projects/{project_id}')
         await self._project_repository.delete_project(project_id)
 
     async def count_projects(self, user_id: UUID) -> int:

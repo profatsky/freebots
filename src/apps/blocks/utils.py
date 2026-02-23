@@ -1,4 +1,4 @@
-from typing import Type, Union
+from typing import Type
 
 from src.apps.enums import BlockType
 from src.apps.blocks.models import (
@@ -9,30 +9,11 @@ from src.apps.blocks.models import (
     CSVBlockModel,
     ExcelBlockModel,
     APIBlockModel,
-)
-from src.api.v1.blocks.schemas import (
-    UnionBlockReadSchema,
-    TextBlockReadSchema,
-    ImageBlockReadSchema,
-    QuestionBlockReadSchema,
-    EmailBlockReadSchema,
-    CSVBlockReadSchema,
-    ExcelBlockReadSchema,
-    APIBlockReadSchema,
+    BlockModel,
 )
 
-UnionBlockModel = Union[
-    TextBlockModel,
-    ImageBlockModel,
-    QuestionBlockModel,
-    EmailBlockModel,
-    CSVBlockModel,
-    ExcelBlockModel,
-    APIBlockModel,
-]
 
-
-def get_block_model_by_type(block_type: BlockType) -> Type[UnionBlockModel]:
+def get_block_model_by_type(block_type: BlockType) -> Type[BlockModel]:
     types_to_blocks = {
         BlockType.TEXT_BLOCK.value: TextBlockModel,
         BlockType.IMAGE_BLOCK.value: ImageBlockModel,
@@ -42,25 +23,7 @@ def get_block_model_by_type(block_type: BlockType) -> Type[UnionBlockModel]:
         BlockType.EXCEL_BLOCK.value: ExcelBlockModel,
         BlockType.API_BLOCK.value: APIBlockModel,
     }
-    return types_to_blocks[block_type]
-
-
-def validate_block_from_db(block: UnionBlockModel) -> UnionBlockReadSchema:
-    block_schema = get_block_schema_by_type(block.type)
-    return block_schema.model_validate(block)
-
-
-def get_block_schema_by_type(block_type: BlockType) -> Type[UnionBlockReadSchema]:
-    types_to_blocks = {
-        BlockType.TEXT_BLOCK.value: TextBlockReadSchema,
-        BlockType.IMAGE_BLOCK.value: ImageBlockReadSchema,
-        BlockType.QUESTION_BLOCK.value: QuestionBlockReadSchema,
-        BlockType.EMAIL_BLOCK.value: EmailBlockReadSchema,
-        BlockType.CSV_BLOCK.value: CSVBlockReadSchema,
-        BlockType.EXCEL_BLOCK.value: ExcelBlockReadSchema,
-        BlockType.API_BLOCK.value: APIBlockReadSchema,
-    }
-    return types_to_blocks[block_type]
+    return types_to_blocks[block_type]  # TODO: fix type hint
 
 
 def escape_inner_text(text: str) -> str:

@@ -47,13 +47,3 @@ class DialogueRepository(BaseRepository):
     async def delete_dialogue(self, dialogue_id: int):
         await self._session.execute(delete(DialogueModel).where(DialogueModel.dialogue_id == dialogue_id))
         await self._session.commit()
-
-    # async def exists_by_id(self, project_id: int, dialogue_id: int) -> bool:
-    #     return await self._session.scalar(
-    #         select(
-    #             exists().where(
-    #                 DialogueModel.project_id == project_id,
-    #                 DialogueModel.dialogue_id == dialogue_id,
-    #             )
-    #         )
-    #     )

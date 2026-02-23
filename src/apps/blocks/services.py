@@ -1,18 +1,15 @@
-import os
 from uuid import UUID
 
 from fastapi import UploadFile
 
-from src.api.v1.blocks.schemas import (
-    UnionBlockCreateSchema,
-    UnionBlockReadSchema,
-    ImageBlockReadSchema,
-    UnionBlockUpdateSchema,
-)
 from src.apps.blocks.dependencies.repositories_dependencies import BlockRepositoryDI
+from src.apps.blocks.dto.base import BlockCreateDTO, BlockReadDTO, BlockUpdateDTO
+from src.apps.blocks.dto.image import ImageBlockUpdateDTO, ImageBlockReadDTO
 from src.apps.dialogues.dependencies.services_dependencies import DialogueServiceDI
 from src.apps.enums import BlockType
 from src.apps.blocks.errors import BlockNotFoundError, InvalidBlockTypeError
+from src.core.config import MEDIA_DIR
+from src.core.utils import soft_delete_file
 
 
 class BlockService:
@@ -29,21 +26,27 @@ class BlockService:
         user_id: UUID,
         project_id: int,
         dialogue_id: int,
-        block_data: UnionBlockCreateSchema,
-    ) -> UnionBlockReadSchema:
-        await self._dialogue_service.raise_error_if_not_exists(user_id, project_id, dialogue_id)
-        return await self._block_repository.create_block(dialogue_id, block_data)
+        block: BlockCreateDTO,
+    ) -> BlockReadDTO:
+        _ = await self._dialogue_service.get_dialogue(user_id=user_id, project_id=project_id, dialogue_id=dialogue_id)
+        return await self._block_repository.create_block(dialogue_id=dialogue_id, block=block)
 
-    async def get_blocks(
+    async def get_blocks(self, user_id: UUID, project_id: int, dialogue_id: int) -> list[BlockReadDTO]:
+        _ = await self._dialogue_service.get_dialogue(user_id=user_id, project_id=project_id, dialogue_id=dialogue_id)
+        return await self._block_repository.get_blocks(dialogue_id)
+
+    async def get_block(
         self,
         user_id: UUID,
         project_id: int,
         dialogue_id: int,
-    ) -> list[UnionBlockReadSchema]:
-        await self._dialogue_service.raise_error_if_not_exists(user_id, project_id, dialogue_id)
-        blocks = await self._block_repository.get_blocks(dialogue_id)
-        blocks.sort(key=lambda x: x.sequence_number)
-        return blocks
+        block_id: int,
+    ) -> BlockReadDTO:
+        _ = await self._dialogue_service.get_dialogue(user_id=user_id, project_id=project_id, dialogue_id=dialogue_id)
+        block = await self._block_repository.get_block(block_id)
+        if block is None:
+            raise BlockNotFoundError
+        return block
 
     async def upload_image_for_image_block(
         self,
@@ -52,41 +55,42 @@ class BlockService:
         dialogue_id: int,
         block_id: int,
         image: UploadFile,
-    ) -> ImageBlockReadSchema:
-        block_read = await self.get_block(
+    ) -> ImageBlockReadDTO:
+        block = await self.get_block(
             user_id=user_id,
             project_id=project_id,
             dialogue_id=dialogue_id,
             block_id=block_id,
         )
-        if block_read.type != BlockType.IMAGE_BLOCK.value:
+        if block.type != BlockType.IMAGE_BLOCK.value:
             raise InvalidBlockTypeError
 
-        if block_read.image_path:
-            full_image_path = os.path.join('src', 'media', block_read.image_path)
-            if os.path.exists(full_image_path):
-                os.remove(full_image_path)
+        # TODO: fix type hint warning
+        if block.image_path:
+            await soft_delete_file(MEDIA_DIR / block.image_path)
 
-        # TODO: use os.path.join
-        image_path = f'src/media/users/{user_id}/projects/{project_id}/dialogues/{dialogue_id}/{image.filename}'
-        if not os.path.exists(os.path.dirname(image_path)):
-            os.makedirs(os.path.dirname(image_path))
+        image_path = MEDIA_DIR / f'users/{user_id}/projects/{project_id}/dialogues/{dialogue_id}/{image.filename}'
 
+        # TODO: async
+        if not image_path.parent.exists():
+            image_path.parent.mkdir(parents=True)
+
+        # TODO: async
         with open(image_path, 'wb+') as buffer:
             buffer.write(image.file.read())
 
-        block_update = ImageBlockReadSchema(
-            **{field_name: getattr(block_read, field_name) for field_name in ImageBlockReadSchema.model_fields}
+        block_to_update = ImageBlockUpdateDTO(
+            type=block.type,
+            image_path=str(image_path.relative_to(MEDIA_DIR)),
         )
-        # TODO: use os.path.join
-        block_update.image_path = image_path.replace('src/media/', '')
 
+        # TODO: fix type hint warning
         return await self.update_block(
             user_id=user_id,
             project_id=project_id,
             dialogue_id=dialogue_id,
             block_id=block_id,
-            block_data=block_update,
+            block=block_to_update,
         )
 
     async def update_block(
@@ -95,19 +99,10 @@ class BlockService:
         project_id: int,
         dialogue_id: int,
         block_id: int,
-        block_data: UnionBlockUpdateSchema,
-    ) -> UnionBlockReadSchema:
-        await self.raise_error_if_not_exists(
-            user_id=user_id,
-            project_id=project_id,
-            dialogue_id=dialogue_id,
-            block_id=block_id,
-        )
-        return await self._block_repository.update_block(
-            dialogue_id=dialogue_id,
-            block_id=block_id,
-            block_data=block_data,
-        )
+        block: BlockUpdateDTO,
+    ) -> BlockReadDTO:
+        _ = await self.get_block(user_id=user_id, project_id=project_id, dialogue_id=dialogue_id, block_id=block_id)
+        return await self._block_repository.update_block(dialogue_id=dialogue_id, block_id=block_id, block=block)
 
     async def delete_block(
         self,
@@ -116,40 +111,9 @@ class BlockService:
         dialogue_id: int,
         block_id: int,
     ):
-        block = await self.get_block(
-            user_id=user_id,
-            project_id=project_id,
-            dialogue_id=dialogue_id,
-            block_id=block_id,
-        )
+        block = await self.get_block(user_id=user_id, project_id=project_id, dialogue_id=dialogue_id, block_id=block_id)
+        # TODO: fix type hint warning
         if block.type == BlockType.IMAGE_BLOCK.value and block.image_path:
-            full_image_path = os.path.join('src', 'media', block.image_path)
-            if os.path.exists(full_image_path):
-                os.remove(full_image_path)
+            await soft_delete_file(MEDIA_DIR / block.image_path)
 
         await self._block_repository.delete_block(dialogue_id, block_id)
-
-    # TODO: refactor, use repo method
-    async def get_block(
-        self,
-        user_id: UUID,
-        project_id: int,
-        dialogue_id: int,
-        block_id: int,
-    ) -> UnionBlockReadSchema:
-        blocks = await self.get_blocks(
-            user_id=user_id,
-            project_id=project_id,
-            dialogue_id=dialogue_id,
-        )
-
-        block_with_specified_id = [block for block in blocks if block.block_id == block_id]
-        if not block_with_specified_id:
-            raise BlockNotFoundError
-
-        return block_with_specified_id[0]
-
-    async def raise_error_if_not_exists(self, user_id: UUID, project_id: int, dialogue_id: int, block_id: int):
-        await self._dialogue_service.raise_error_if_not_exists(user_id, project_id, dialogue_id)
-        if not await self._block_repository.exists_by_id(dialogue_id, block_id):
-            raise BlockNotFoundError

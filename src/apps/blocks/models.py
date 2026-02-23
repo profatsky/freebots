@@ -2,6 +2,14 @@ from sqlalchemy import String, ForeignKey, Enum, UniqueConstraint
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
+from src.apps.blocks.dto.api import APIBlockReadDTO
+from src.apps.blocks.dto.base import BlockReadDTO
+from src.apps.blocks.dto.csv import CSVBlockReadDTO
+from src.apps.blocks.dto.email import EmailBlockReadDTO
+from src.apps.blocks.dto.excel import ExcelBlockReadDTO
+from src.apps.blocks.dto.image import ImageBlockReadDTO
+from src.apps.blocks.dto.question import QuestionBlockReadDTO
+from src.apps.blocks.dto.text import TextBlockReadDTO
 from src.infrastructure.db.sessions import Base
 from src.apps.enums import AnswerMessageType, HTTPMethod
 from src.apps.dialogues.models import DialogueModel
@@ -26,6 +34,9 @@ class BlockModel(Base):
 
     __table_args__ = (UniqueConstraint('dialogue_id', 'sequence_number'),)
 
+    def to_dto(self) -> BlockReadDTO:
+        raise NotImplementedError
+
 
 class TextBlockModel(BlockModel):
     __tablename__ = 'text_blocks'
@@ -37,6 +48,14 @@ class TextBlockModel(BlockModel):
     __mapper_args__ = {
         'polymorphic_identity': 'text_block',
     }
+
+    def to_dto(self) -> TextBlockReadDTO:
+        return TextBlockReadDTO(
+            block_id=self.block_id,
+            sequence_number=self.sequence_number,
+            type=self.type,  # TODO: fix type hint
+            message_text=self.message_text,
+        )
 
 
 class ImageBlockModel(BlockModel):
@@ -50,6 +69,14 @@ class ImageBlockModel(BlockModel):
         'polymorphic_identity': 'image_block',
     }
 
+    def to_dto(self) -> ImageBlockReadDTO:
+        return ImageBlockReadDTO(
+            block_id=self.block_id,
+            sequence_number=self.sequence_number,
+            type=self.type,  # TODO: fix type hint
+            image_path=self.image_path,
+        )
+
 
 class QuestionBlockModel(BlockModel):
     __tablename__ = 'question_blocks'
@@ -62,6 +89,15 @@ class QuestionBlockModel(BlockModel):
     __mapper_args__ = {
         'polymorphic_identity': 'question_block',
     }
+
+    def to_dto(self) -> QuestionBlockReadDTO:
+        return QuestionBlockReadDTO(
+            block_id=self.block_id,
+            sequence_number=self.sequence_number,
+            type=self.type,  # TODO: fix type hint
+            message_text=self.message_text,
+            answer_type=self.answer_type,
+        )
 
 
 class EmailBlockModel(BlockModel):
@@ -77,6 +113,16 @@ class EmailBlockModel(BlockModel):
         'polymorphic_identity': 'email_block',
     }
 
+    def to_dto(self) -> EmailBlockReadDTO:
+        return EmailBlockReadDTO(
+            block_id=self.block_id,
+            sequence_number=self.sequence_number,
+            type=self.type,  # TODO: fix type hint
+            subject=self.subject,
+            text=self.text,
+            recipient_email=self.recipient_email,
+        )
+
 
 class CSVBlockModel(BlockModel):
     __tablename__ = 'csv_blocks'
@@ -90,6 +136,15 @@ class CSVBlockModel(BlockModel):
         'polymorphic_identity': 'csv_block',
     }
 
+    def to_dto(self) -> CSVBlockReadDTO:
+        return CSVBlockReadDTO(
+            block_id=self.block_id,
+            sequence_number=self.sequence_number,
+            type=self.type,  # TODO: fix type hint
+            file_path=self.file_path,
+            data=self.data,
+        )
+
 
 class ExcelBlockModel(BlockModel):
     __tablename__ = 'excel_blocks'
@@ -102,6 +157,15 @@ class ExcelBlockModel(BlockModel):
     __mapper_args__ = {
         'polymorphic_identity': 'excel_block',
     }
+
+    def to_dto(self) -> ExcelBlockReadDTO:
+        return ExcelBlockReadDTO(
+            block_id=self.block_id,
+            sequence_number=self.sequence_number,
+            type=self.type,  # TODO: fix type hint
+            file_path=self.file_path,
+            data=self.data,
+        )
 
 
 class APIBlockModel(BlockModel):
@@ -117,3 +181,14 @@ class APIBlockModel(BlockModel):
     __mapper_args__ = {
         'polymorphic_identity': 'api_block',
     }
+
+    def to_dto(self) -> APIBlockReadDTO:
+        return APIBlockReadDTO(
+            block_id=self.block_id,
+            sequence_number=self.sequence_number,
+            type=self.type,  # TODO: fix type hint
+            url=self.url,
+            http_method=self.http_method,
+            headers=self.headers,
+            body=self.body,
+        )

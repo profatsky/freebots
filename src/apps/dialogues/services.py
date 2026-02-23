@@ -54,11 +54,5 @@ class DialogueService:
 
     async def delete_dialogue(self, user_id: UUID, project_id: int, dialogue_id: int):
         _ = await self.get_dialogue(user_id=user_id, project_id=project_id, dialogue_id=dialogue_id)
-        media_dir = MEDIA_DIR / 'users' / str(user_id) / 'projects' / str(project_id) / 'dialogues' / str(dialogue_id)
-        await soft_delete_dir(media_dir)
+        await soft_delete_dir(MEDIA_DIR / f'users/{user_id}/projects/{project_id}/dialogues/{dialogue_id}')
         await self._dialogue_repository.delete_dialogue(dialogue_id)
-
-    # async def raise_error_if_not_exists(self, user_id: UUID, project_id: int, dialogue_id: int):
-    #     await self._project_service.raise_error_if_not_exists(user_id, project_id)
-    #     if not await self._dialogue_repository.exists_by_id(project_id, dialogue_id):
-    #         raise DialogueNotFoundError

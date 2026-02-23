@@ -17,7 +17,7 @@ class TriggerEventType(enum.Enum):
     BUTTON = 'button'
 
 
-class BlockType(enum.Enum):
+class BlockType(enum.StrEnum):
     TEXT_BLOCK = 'text_block'
     IMAGE_BLOCK = 'image_block'
     QUESTION_BLOCK = 'question_block'
