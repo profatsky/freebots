@@ -15,15 +15,15 @@ from src.apps.blocks.models import (
 
 def get_block_model_by_type(block_type: BlockType) -> Type[BlockModel]:
     types_to_blocks = {
-        BlockType.TEXT_BLOCK.value: TextBlockModel,
-        BlockType.IMAGE_BLOCK.value: ImageBlockModel,
-        BlockType.QUESTION_BLOCK.value: QuestionBlockModel,
-        BlockType.EMAIL_BLOCK.value: EmailBlockModel,
-        BlockType.CSV_BLOCK.value: CSVBlockModel,
-        BlockType.EXCEL_BLOCK.value: ExcelBlockModel,
-        BlockType.API_BLOCK.value: APIBlockModel,
+        BlockType.TEXT_BLOCK: TextBlockModel,
+        BlockType.IMAGE_BLOCK: ImageBlockModel,
+        BlockType.QUESTION_BLOCK: QuestionBlockModel,
+        BlockType.EMAIL_BLOCK: EmailBlockModel,
+        BlockType.CSV_BLOCK: CSVBlockModel,
+        BlockType.EXCEL_BLOCK: ExcelBlockModel,
+        BlockType.API_BLOCK: APIBlockModel,
     }
-    return types_to_blocks[block_type]  # TODO: fix type hint
+    return types_to_blocks[block_type]
 
 
 def escape_inner_text(text: str) -> str:
