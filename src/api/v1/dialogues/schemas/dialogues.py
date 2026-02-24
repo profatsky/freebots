@@ -3,9 +3,9 @@ from typing import Self
 
 from pydantic import BaseModel, field_validator
 
+from src.api.v1.blocks.schemas.base import BlockReadSchema
 from src.api.v1.dialogues.schemas.triggers import DialogueTriggerCreateSchema, DialogueTriggerReadSchema
 from src.apps.blocks import utils
-from src.api.v1.blocks.schemas import UnionBlockReadSchema
 from src.apps.dialogues.dto import DialogueCreateDTO, DialogueReadDTO
 
 
@@ -38,7 +38,7 @@ class DialogueReadSchema(BaseModel):
 
 
 class DialogueWithBlocksReadSchema(DialogueReadSchema):
-    blocks: list[UnionBlockReadSchema]
+    blocks: list[BlockReadSchema]
 
     @field_validator('blocks')
     @classmethod

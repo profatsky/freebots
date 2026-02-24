@@ -1,6 +1,7 @@
 import io
 import os
 import zipfile
+from pathlib import Path
 from typing import Optional
 from uuid import UUID
 
@@ -26,7 +27,7 @@ from src.api.v1.projects.schemas import ProjectToGenerateCodeReadSchema
 from src.apps.code_gen.bot_templates import code
 from src.apps.blocks.utils import escape_inner_text
 
-BOT_FILE_TEMPLATES_DIR = os.path.join('src', 'apps', 'code_gen', 'bot_templates', 'project_structure')
+BOT_FILE_TEMPLATES_DIR = Path('src') / 'apps' / 'code_gen' / 'bot_templates' / 'project_structure'
 
 
 # TODO: create repositories layer
@@ -52,42 +53,27 @@ class CodeGenService:
                 raise DialoguesLimitExceededError
 
         zip_data = io.BytesIO()
-
-        # TODO: async
+        # TODO: anyio.to_thread
         with zipfile.ZipFile(zip_data, mode='w') as zipf:
             self._add_custom_handlers_code_to_zip(project, zipf)
             self._add_plugins_code_to_zip(project, zipf)
             self._add_images_to_zip(project, zipf)
 
-            main_file = os.path.join(BOT_FILE_TEMPLATES_DIR, 'main.py.j2')
-            zipf.write(main_file, 'main.py')
-
-            loader_file = os.path.join(BOT_FILE_TEMPLATES_DIR, 'loader.py.j2')
-            zipf.write(loader_file, 'loader.py')
-
-            config_file = os.path.join(BOT_FILE_TEMPLATES_DIR, 'config.py.j2')
-            zipf.write(config_file, 'config.py')
-
-            db_file = os.path.join(BOT_FILE_TEMPLATES_DIR, 'db', 'base.py.j2')
-            zipf.write(db_file, os.path.join('db', 'base.py'))
-
-            middlewares_file = os.path.join(BOT_FILE_TEMPLATES_DIR, 'middlewares.py.j2')
-            zipf.write(middlewares_file, 'middlewares.py')
-
-            env_file = os.path.join(BOT_FILE_TEMPLATES_DIR, '.env.example')
-            zipf.write(env_file, '.env.example')
-
-            requirements_file = os.path.join(BOT_FILE_TEMPLATES_DIR, 'requirements.txt')
-            zipf.write(requirements_file, 'requirements.txt')
-
-            dockerfile = os.path.join(BOT_FILE_TEMPLATES_DIR, 'Dockerfile')
-            zipf.write(dockerfile, 'Dockerfile')
-
-            manual_file = os.path.join(BOT_FILE_TEMPLATES_DIR, 'ИНСТРУКЦИЯ.txt')
-            zipf.write(manual_file, 'ИНСТРУКЦИЯ.txt')
+            template_paths = [
+                'main.py.j2',
+                'loader.py.j2',
+                'config.py.j2',
+                Path('db/base.py.j2'),
+                'middlewares.py.j2',
+                '.env.example',
+                'requirements.txt',
+                'Dockerfile',
+                'ИНСТРУКЦИЯ.txt',
+            ]
+            for path in template_paths:
+                zipf.write(BOT_FILE_TEMPLATES_DIR / path, str(path).removesuffix('.j2'))
 
         zip_data.seek(0)
-
         return zip_data
 
     # TODO refactoring
