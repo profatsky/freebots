@@ -10,7 +10,7 @@ from src.apps.enums import BlockType
 class ExcelBlockSchema(BaseModel):
     file_path: str = Field(max_length=256)
     data: dict[str, Union[int, str]]
-    type: Literal[BlockType.EXCEL_BLOCK.value]
+    type: Literal[BlockType.EXCEL_BLOCK]
 
     @field_validator('data')
     @classmethod

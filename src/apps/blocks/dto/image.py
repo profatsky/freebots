@@ -8,7 +8,7 @@ from src.apps.enums import BlockType
 @dataclass(frozen=True, kw_only=True)
 class BaseImageBlockDTO:
     image_path: str
-    type: Literal[BlockType.IMAGE_BLOCK.value] = BlockType.IMAGE_BLOCK.value
+    type: Literal[BlockType.IMAGE_BLOCK] = BlockType.IMAGE_BLOCK
 
     @property
     def is_draft(self) -> bool:

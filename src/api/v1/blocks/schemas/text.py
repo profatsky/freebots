@@ -9,7 +9,7 @@ from src.apps.enums import BlockType
 
 class BaseTextBlockSchema(BaseModel):
     message_text: str = Field(max_length=4096)
-    type: Literal[BlockType.TEXT_BLOCK.value]
+    type: Literal[BlockType.TEXT_BLOCK]
 
     @property
     def is_draft(self) -> bool:

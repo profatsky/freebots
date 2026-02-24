@@ -10,7 +10,7 @@ from src.apps.enums import BlockType
 class BaseExcelBlockDTO:
     file_path: str
     data: dict[str, int | str]
-    type: Literal[BlockType.EXCEL_BLOCK.value] = BlockType.CSV_BLOCK.value
+    type: Literal[BlockType.EXCEL_BLOCK] = BlockType.CSV_BLOCK
 
     def __post_init__(self):
         self._validate_file_path()

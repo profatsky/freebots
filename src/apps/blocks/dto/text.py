@@ -8,7 +8,7 @@ from src.apps.enums import BlockType
 @dataclass(frozen=True, kw_only=True)
 class BaseTextBlockDTO:
     message_text: str
-    type: Literal[BlockType.TEXT_BLOCK.value] = BlockType.TEXT_BLOCK.value
+    type: Literal[BlockType.TEXT_BLOCK] = BlockType.TEXT_BLOCK
 
     def __post_init__(self):
         self._validate_message_text()

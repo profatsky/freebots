@@ -11,7 +11,7 @@ class BaseAPIBlockDTO:
     http_method: HTTPMethod
     headers: dict[str, str]
     body: dict[str, str | int]
-    type: Literal[BlockType.API_BLOCK.value] = BlockType.API_BLOCK.value
+    type: Literal[BlockType.API_BLOCK] = BlockType.API_BLOCK
 
     def __post_init__(self):
         self._validate_headers()

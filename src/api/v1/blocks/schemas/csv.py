@@ -10,7 +10,7 @@ from src.apps.enums import BlockType
 class CSVBlockSchema(BaseModel):
     file_path: str = Field(max_length=256)
     data: dict[str, Union[int, str]]
-    type: Literal[BlockType.CSV_BLOCK.value]
+    type: Literal[BlockType.CSV_BLOCK]
 
     @field_validator('data')
     @classmethod

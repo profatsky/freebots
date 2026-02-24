@@ -13,7 +13,7 @@ class APIBlockSchema(BaseModel):
     http_method: HTTPMethod
     headers: dict[str, str]
     body: dict[str, Union[str, int]]
-    type: Literal[BlockType.API_BLOCK.value]
+    type: Literal[BlockType.API_BLOCK]
 
     @field_validator('headers')
     @classmethod

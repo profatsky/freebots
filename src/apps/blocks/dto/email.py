@@ -10,7 +10,7 @@ class BaseEmailBlockDTO:
     subject: str
     text: str
     recipient_email: str
-    type: Literal[BlockType.QUESTION_BLOCK.value] = BlockType.QUESTION_BLOCK.value
+    type: Literal[BlockType.QUESTION_BLOCK] = BlockType.QUESTION_BLOCK
 
     def __post_init__(self):
         self._validate_subject()

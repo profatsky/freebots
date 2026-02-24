@@ -11,7 +11,7 @@ class EmailBlockSchema(BaseModel):
     subject: str = Field(max_length=128)
     text: str = Field(max_length=8192)
     recipient_email: str = Field(max_length=256)
-    type: Literal[BlockType.EMAIL_BLOCK.value]
+    type: Literal[BlockType.EMAIL_BLOCK]
 
     @property
     def is_draft(self) -> bool:

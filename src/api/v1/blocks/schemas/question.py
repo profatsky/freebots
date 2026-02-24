@@ -10,7 +10,7 @@ from src.apps.enums import AnswerMessageType, BlockType
 class BaseQuestionBlockSchema(BaseModel):
     message_text: str = Field(max_length=4096)
     answer_type: AnswerMessageType
-    type: Literal[BlockType.QUESTION_BLOCK.value]
+    type: Literal[BlockType.QUESTION_BLOCK]
 
     @property
     def is_draft(self) -> bool:

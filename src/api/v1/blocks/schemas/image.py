@@ -9,7 +9,7 @@ from src.apps.enums import BlockType
 
 class BaseImageBlockSchema(BaseModel):
     image_path: str = Field(max_length=256)
-    type: Literal[BlockType.IMAGE_BLOCK.value]
+    type: Literal[BlockType.IMAGE_BLOCK]
 
     @property
     def is_draft(self) -> bool:

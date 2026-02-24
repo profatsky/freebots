@@ -9,7 +9,7 @@ from src.apps.enums import BlockType, AnswerMessageType
 class BaseQuestionBlockDTO:
     message_text: str
     answer_type: AnswerMessageType
-    type: Literal[BlockType.QUESTION_BLOCK.value] = BlockType.QUESTION_BLOCK.value
+    type: Literal[BlockType.QUESTION_BLOCK] = BlockType.QUESTION_BLOCK
 
     def __post_init__(self):
         self._validate_message_text()
