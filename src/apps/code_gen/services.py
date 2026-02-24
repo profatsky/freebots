@@ -17,7 +17,7 @@ from src.apps.enums import (
     HTTPMethod,
     AiohttpSessionMethod,
 )
-from src.apps.code_gen.schemas import HandlerSchema, StateSchema, StatesGroupSchema, KeyboardSchema
+from src.api.v1.code_gen.schemas import HandlerSchema, StateSchema, StatesGroupSchema, KeyboardSchema
 from src.apps.subscriptions.dependencies import SubscriptionServiceDI
 from src.core.consts import MAX_DIALOGUES_WITH_FREE_PLAN
 from src.infrastructure.db.dependencies import AsyncSessionDI
@@ -41,15 +41,8 @@ class CodeGenService:
         self._project_service = project_service
         self._subscription_service = subscription_service
 
-    async def get_bot_code_in_zip(
-        self,
-        user_id: UUID,
-        project_id: int,
-    ) -> io.BytesIO:
-        project = await self._project_service.get_project_to_generate_code(
-            user_id=user_id,
-            project_id=project_id,
-        )
+    async def get_bot_code_in_zip(self, user_id: UUID, project_id: int) -> io.BytesIO:
+        project = await self._project_service.get_project_to_generate_code(user_id=user_id, project_id=project_id)
 
         active_subscription = await self._subscription_service.get_active_subscription(user_id)
         if active_subscription is None:
@@ -60,6 +53,7 @@ class CodeGenService:
 
         zip_data = io.BytesIO()
 
+        # TODO: async
         with zipfile.ZipFile(zip_data, mode='w') as zipf:
             self._add_custom_handlers_code_to_zip(project, zipf)
             self._add_plugins_code_to_zip(project, zipf)

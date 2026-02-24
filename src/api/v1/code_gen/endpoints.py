@@ -27,9 +27,9 @@ router = APIRouter(
     response_model=list[DialogueWithBlocksReadSchema],
 )
 async def get_bot_code(
-    project_id: int,
     code_gen_service: CodeGenServiceDI,
     statistic_service: StatisticServiceDI,
+    project_id: int,
     user_id: UserIDFromAccessTokenDI,
 ):
     try:
@@ -39,13 +39,10 @@ async def get_bot_code(
         )
     except ProjectNotFoundError:
         raise ProjectNotFoundHTTPException
-
     except NoPermissionForProjectError:
         raise NoPermissionForProjectHTTPException
-
     except DialoguesLimitExceededError:
         raise DialoguesLimitExceededHTTPException
-
     except PluginsNotAvailableForFreeUsersError:
         raise PluginsNotAvailableForFreeUsersHTTPException
 

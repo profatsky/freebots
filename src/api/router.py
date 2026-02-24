@@ -7,7 +7,7 @@ from src.api.v1.dialogues.endpoints import router as dialogues_router
 from src.api.v1.dialogue_templates.endpoints import router as dialogue_templates_router
 from src.api.v1.blocks.endpoints import router as blocks_router
 from src.api.v1.plugins.endpoints import router as plugins_router
-from src.apps.code_gen.api import router as code_gen_router
+from src.api.v1.code_gen.endpoints import router as code_gen_router
 from src.api.v1.statistics.endpoints import router as statistics_router
 from src.apps.subscriptions.api import router as subscriptions_router
 
