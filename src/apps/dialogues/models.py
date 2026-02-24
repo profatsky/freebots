@@ -4,6 +4,7 @@ from typing import Self
 from sqlalchemy import String, DateTime, func, ForeignKey, Enum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
+from src.apps.code_gen.dto import DialogueWithBlocksReadDTO
 from src.apps.dialogues.dto import DialogueCreateDTO, DialogueTriggerCreateDTO, DialogueReadDTO, DialogueTriggerReadDTO
 from src.infrastructure.db.sessions import Base
 from src.apps.enums import TriggerEventType
@@ -42,6 +43,16 @@ class DialogueModel(Base):
             trigger=self.trigger.to_dto(),
             project_id=self.project_id,
             created_at=self.created_at,
+        )
+
+    def to_dto_with_blocks(self) -> DialogueWithBlocksReadDTO:
+        blocks = [block.to_dto() for block in self.blocks]
+        return DialogueWithBlocksReadDTO(
+            dialogue_id=self.dialogue_id,
+            trigger=self.trigger.to_dto(),
+            project_id=self.project_id,
+            created_at=self.created_at,
+            blocks=blocks,
         )
 
 

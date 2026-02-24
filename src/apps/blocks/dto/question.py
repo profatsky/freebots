@@ -18,6 +18,10 @@ class BaseQuestionBlockDTO:
         if len(self.message_text) > 4096:
             raise ValueError('Invalid message text')
 
+    @property
+    def is_draft(self) -> bool:
+        return not (self.message_text and self.answer_type)
+
 
 @dataclass(frozen=True)
 class QuestionBlockReadDTO(BaseQuestionBlockDTO, BlockReadDTO):

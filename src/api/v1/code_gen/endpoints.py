@@ -1,7 +1,6 @@
 from fastapi import APIRouter, Depends
 from fastapi.responses import StreamingResponse
 
-from src.api.v1.dialogues.schemas.dialogues import DialogueWithBlocksReadSchema
 from src.apps.auth.dependencies.auth_dependencies import UserIDFromAccessTokenDI, access_token_required
 from src.apps.code_gen.dependencies.services_dependencies import CodeGenServiceDI
 from src.api.v1.dialogues.exceptions import DialoguesLimitExceededHTTPException
@@ -22,10 +21,7 @@ router = APIRouter(
 )
 
 
-@router.get(
-    '/{project_id}/code',
-    response_model=list[DialogueWithBlocksReadSchema],
-)
+@router.get('/{project_id}/code')
 async def get_bot_code(
     code_gen_service: CodeGenServiceDI,
     statistic_service: StatisticServiceDI,

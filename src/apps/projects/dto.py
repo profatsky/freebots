@@ -46,9 +46,6 @@ class ProjectWithPluginsReadDTO(ProjectReadDTO):
 class ProjectWithDialoguesReadDTO(ProjectReadDTO):
     dialogues: list[DialogueReadDTO]
 
-    def contains_specific_dialogue(self, dialogue_id: int) -> bool:
-        return dialogue_id in [dialogue.dialogue_id for dialogue in self.dialogues]
-
 
 @dataclass(frozen=True)
 class ProjectWithDialoguesAndPluginsReadDTO(ProjectWithPluginsReadDTO, ProjectWithDialoguesReadDTO):

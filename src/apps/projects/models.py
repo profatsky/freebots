@@ -5,6 +5,7 @@ from uuid import UUID
 from sqlalchemy import String, DateTime, func, ForeignKey, Enum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
+from src.apps.code_gen.dto import ProjectCodeGenReadDTO
 from src.apps.enums import KeyboardType
 from src.apps.projects.dto import (
     ProjectCreateDTO,
@@ -84,9 +85,23 @@ class ProjectModel(Base):
         )
 
     def to_dto_with_dialogues_and_plugins(self) -> ProjectWithDialoguesAndPluginsReadDTO:
-        plugins = [plugin.to_dto() for plugin in self.plugins]
         dialogues = [dialogue.to_dto() for dialogue in self.dialogues]
+        plugins = [plugin.to_dto() for plugin in self.plugins]
         return ProjectWithDialoguesAndPluginsReadDTO(
+            project_id=self.project_id,
+            user_id=self.user_id,
+            name=self.name,
+            start_message=self.start_message,
+            start_keyboard_type=self.start_keyboard_type,
+            created_at=self.created_at,
+            dialogues=dialogues,
+            plugins=plugins,
+        )
+
+    def to_code_gen_dto(self) -> ProjectCodeGenReadDTO:
+        dialogues = [dialogue.to_dto_with_blocks() for dialogue in self.dialogues]
+        plugins = [plugin.to_dto() for plugin in self.plugins]
+        return ProjectCodeGenReadDTO(
             project_id=self.project_id,
             user_id=self.user_id,
             name=self.name,

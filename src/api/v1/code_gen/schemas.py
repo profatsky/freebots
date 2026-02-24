@@ -5,6 +5,8 @@ from pydantic import BaseModel, Field
 
 from src.apps.enums import HandlerType, KeyboardType
 
+# TODO: create dto instead of schemas
+
 
 class StateSchema(BaseModel):
     name: str

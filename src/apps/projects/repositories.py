@@ -2,9 +2,8 @@ from typing import Optional
 from uuid import UUID
 
 from sqlalchemy import select, delete, func
-from sqlalchemy.orm import selectinload, joinedload
+from sqlalchemy.orm import selectinload
 
-from src.apps.blocks.models import BlockModel
 from src.apps.plugins.models import PluginModel
 from src.apps.projects.dto import (
     ProjectCreateDTO,
@@ -17,7 +16,6 @@ from src.apps.projects.dto import (
 from src.core.base_repository import BaseRepository
 from src.apps.dialogues.models import DialogueModel
 from src.apps.projects.models import ProjectModel
-from src.api.v1.projects.schemas import ProjectToGenerateCodeReadSchema
 
 
 class ProjectRepository(BaseRepository):
@@ -73,23 +71,6 @@ class ProjectRepository(BaseRepository):
         if not project:
             return None
         return project.to_dto()
-
-    async def get_project_to_generate_code(self, project_id: int) -> Optional[ProjectToGenerateCodeReadSchema]:
-        project = await self._session.execute(
-            select(ProjectModel)
-            .options(
-                selectinload(ProjectModel.plugins).selectinload(PluginModel.triggers),
-                selectinload(ProjectModel.dialogues).options(
-                    joinedload(DialogueModel.trigger),
-                    selectinload(DialogueModel.blocks).selectin_polymorphic(BlockModel.__subclasses__()),
-                ),
-            )
-            .where(ProjectModel.project_id == project_id)
-        )
-        project = project.scalar()
-        if project is None:
-            return None
-        return ProjectToGenerateCodeReadSchema.model_validate(project)
 
     async def update_project(self, project: ProjectUpdateDTO) -> Optional[ProjectReadDTO]:
         project_for_update = await self._get_project_model_instance(project.project_id)

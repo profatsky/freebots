@@ -2,7 +2,6 @@ from typing import Optional
 from uuid import UUID
 
 from src.apps.projects.dependencies.repositories_dependencies import ProjectRepositoryDI
-from src.api.v1.projects.schemas import ProjectToGenerateCodeReadSchema
 from src.apps.projects.dto import (
     ProjectCreateDTO,
     ProjectReadDTO,
@@ -40,20 +39,6 @@ class ProjectService:
             raise ProjectsLimitExceededError
 
         return await self._project_repository.create_project(project)
-
-    async def get_project_to_generate_code(
-        self,
-        user_id: UUID,
-        project_id: int,
-    ) -> Optional[ProjectToGenerateCodeReadSchema]:
-        project = await self._project_repository.get_project_to_generate_code(project_id)
-        if project is None:
-            raise ProjectNotFoundError
-
-        if project.user_id != user_id:
-            raise NoPermissionForProjectError
-
-        return project
 
     async def get_project(self, user_id: UUID, project_id: int) -> ProjectReadDTO:
         project = await self._project_repository.get_project(project_id)

@@ -20,6 +20,10 @@ class BlockReadDTO:
         if self.sequence_number <= 0:
             raise ValueError('Invalid sequence number')
 
+    @property
+    def is_draft(self) -> bool:
+        raise NotImplementedError
+
 
 @dataclass(frozen=True)
 class BlockCreateDTO:

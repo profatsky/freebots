@@ -7,6 +7,8 @@ from uuid import UUID
 
 from jinja2 import Template, Environment, FileSystemLoader
 
+from src.apps.code_gen.dependencies.repositories_dependencies import CodeGenRepositoryDI
+from src.apps.code_gen.dto import ProjectCodeGenReadDTO
 from src.apps.dialogues.errors import DialoguesLimitExceededError
 from src.apps.plugins.errors import PluginsNotAvailableForFreeUsersError
 from src.apps.enums import (
@@ -19,31 +21,29 @@ from src.apps.enums import (
     AiohttpSessionMethod,
 )
 from src.api.v1.code_gen.schemas import HandlerSchema, StateSchema, StatesGroupSchema, KeyboardSchema
+from src.apps.projects.errors import ProjectNotFoundError, NoPermissionForProjectError
 from src.apps.subscriptions.dependencies import SubscriptionServiceDI
 from src.core.consts import MAX_DIALOGUES_WITH_FREE_PLAN
 from src.infrastructure.db.dependencies import AsyncSessionDI
-from src.apps.projects.dependencies.services_dependencies import ProjectServiceDI
-from src.api.v1.projects.schemas import ProjectToGenerateCodeReadSchema
 from src.apps.code_gen.bot_templates import code
 from src.apps.blocks.utils import escape_inner_text
 
 BOT_FILE_TEMPLATES_DIR = Path('src') / 'apps' / 'code_gen' / 'bot_templates' / 'project_structure'
 
 
-# TODO: create repositories layer
 class CodeGenService:
     def __init__(
         self,
         session: AsyncSessionDI,
-        project_service: ProjectServiceDI,
         subscription_service: SubscriptionServiceDI,
+        code_gen_repository: CodeGenRepositoryDI,
     ):
         self._session = session
-        self._project_service = project_service
         self._subscription_service = subscription_service
+        self._code_gen_repository = code_gen_repository
 
     async def get_bot_code_in_zip(self, user_id: UUID, project_id: int) -> io.BytesIO:
-        project = await self._project_service.get_project_to_generate_code(user_id=user_id, project_id=project_id)
+        project = await self._get_project_to_generate_code(user_id=user_id, project_id=project_id)
 
         active_subscription = await self._subscription_service.get_active_subscription(user_id)
         if active_subscription is None:
@@ -77,7 +77,7 @@ class CodeGenService:
         return zip_data
 
     # TODO refactoring
-    def _add_plugins_code_to_zip(self, project: ProjectToGenerateCodeReadSchema, zip_file: zipfile.ZipFile):
+    def _add_plugins_code_to_zip(self, project: ProjectCodeGenReadDTO, zip_file: zipfile.ZipFile):
         handlers_file_names = []
         db_funcs_file_names = []
 
@@ -121,14 +121,15 @@ class CodeGenService:
         zip_file.writestr(os.path.join('db', '__init__.py'), db_funcs_init_in_memory_file.getvalue())
 
     @staticmethod
-    def _add_images_to_zip(project: ProjectToGenerateCodeReadSchema, zip_file: zipfile.ZipFile):
+    def _add_images_to_zip(project: ProjectCodeGenReadDTO, zip_file: zipfile.ZipFile):
         for dialogue in project.dialogues:
             for block in dialogue.blocks:
                 if block.type == BlockType.IMAGE_BLOCK.value:
+                    # TODO: fix type hint
                     image_path = os.path.join('src', 'media', block.image_path)
                     zip_file.write(image_path, os.path.join('img', os.path.basename(block.image_path)))
 
-    def _add_custom_handlers_code_to_zip(self, project: ProjectToGenerateCodeReadSchema, zip_file: zipfile.ZipFile):
+    def _add_custom_handlers_code_to_zip(self, project: ProjectCodeGenReadDTO, zip_file: zipfile.ZipFile):
         custom_handlers_code = self._generate_custom_handlers_code(project)
         custom_handlers_in_memory_file = io.BytesIO(str.encode(custom_handlers_code))
         zip_file.writestr(os.path.join('handlers', 'custom.py'), custom_handlers_in_memory_file.getvalue())
@@ -136,7 +137,7 @@ class CodeGenService:
     # TODO refactoring
     # TODO add customize env variables
     # TODO change start func call
-    def _generate_custom_handlers_code(self, project: ProjectToGenerateCodeReadSchema) -> str:
+    def _generate_custom_handlers_code(self, project: ProjectCodeGenReadDTO) -> str:
         utils_funcs = set()
         states_groups: list[StatesGroupSchema] = []
         handlers: list[HandlerSchema] = []
@@ -393,3 +394,11 @@ class CodeGenService:
             lstrip_blocks=True,
         )
         return env.from_string(template_str)
+
+    async def _get_project_to_generate_code(self, user_id: UUID, project_id: int) -> Optional[ProjectCodeGenReadDTO]:
+        project = await self._code_gen_repository.get_project_to_generate_code(project_id)
+        if project is None:
+            raise ProjectNotFoundError
+        if project.user_id != user_id:
+            raise NoPermissionForProjectError
+        return project
