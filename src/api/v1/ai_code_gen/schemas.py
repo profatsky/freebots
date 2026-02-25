@@ -3,15 +3,15 @@ from typing import Optional, Self
 
 from pydantic import BaseModel, Field
 
-from src.apps.ai_code_gen.dto import AICodeGenSessionWithMessagesReadDTO
+from src.apps.ai_code_gen.dto import (
+    AICodeGenSessionWithMessagesReadDTO,
+    AICodeGenMessageReadDTO,
+    AICodeGenSessionReadDTO,
+)
 from src.apps.enums import AICodeGenRole, AICodeGenSessionStatus
 
 
 class AICodeGenSessionCreateSchema(BaseModel):
-    prompt: str = Field(min_length=1, max_length=4000)
-
-
-class AICodeGenMessageCreateSchema(BaseModel):
     prompt: str = Field(min_length=1, max_length=4000)
 
 
@@ -21,9 +21,18 @@ class AICodeGenSessionReadSchema(BaseModel):
     created_at: datetime
     updated_at: datetime
 
-    model_config = {
-        'from_attributes': True,
-    }
+    @classmethod
+    def from_dto(cls, session: AICodeGenSessionReadDTO) -> Self:
+        return cls(
+            session_id=session.session_id,
+            status=session.status,
+            created_at=session.created_at,
+            updated_at=session.updated_at,
+        )
+
+
+class AICodeGenMessageCreateSchema(BaseModel):
+    prompt: str = Field(min_length=1, max_length=4000)
 
 
 class AICodeGenMessageReadSchema(BaseModel):
@@ -33,9 +42,15 @@ class AICodeGenMessageReadSchema(BaseModel):
     meta: Optional[dict]
     created_at: datetime
 
-    model_config = {
-        'from_attributes': True,
-    }
+    @classmethod
+    def from_dto(cls, dto: AICodeGenMessageReadDTO) -> Self:
+        return cls(
+            message_id=dto.message_id,
+            role=dto.role,
+            content=dto.content,
+            meta=dto.meta,
+            created_at=dto.created_at,
+        )
 
 
 class AICodeGenSessionWithMessagesReadSchema(BaseModel):
@@ -44,7 +59,14 @@ class AICodeGenSessionWithMessagesReadSchema(BaseModel):
 
     @classmethod
     def from_dto(cls, dto: AICodeGenSessionWithMessagesReadDTO) -> Self:
+        session = AICodeGenSessionReadSchema(
+            session_id=dto.session_id,
+            status=dto.status,
+            created_at=dto.created_at,
+            updated_at=dto.updated_at,
+        )
+        messages = [AICodeGenMessageReadSchema.from_dto(message) for message in dto.messages]
         return cls(
-            session=AICodeGenSessionReadSchema.model_validate(dto.session),
-            messages=[AICodeGenMessageReadSchema.model_validate(message) for message in dto.messages],
+            session=session,
+            messages=messages,
         )

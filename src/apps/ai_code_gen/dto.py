@@ -40,6 +40,5 @@ class AICodeGenMessageReadDTO:
 
 
 @dataclass(frozen=True)
-class AICodeGenSessionWithMessagesReadDTO:
-    session: AICodeGenSessionReadDTO
+class AICodeGenSessionWithMessagesReadDTO(AICodeGenSessionReadDTO):
     messages: list[AICodeGenMessageReadDTO]

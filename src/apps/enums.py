@@ -1,4 +1,5 @@
 import enum
+from enum import StrEnum
 
 
 class KeyboardType(enum.Enum):
@@ -57,14 +58,14 @@ class AiohttpSessionMethod(enum.Enum):
     OPTIONS = 'options'
 
 
-class AICodeGenSessionStatus(enum.Enum):
+class AICodeGenSessionStatus(StrEnum):
     QUEUED = 'queued'
     RUNNING = 'running'
     SUCCEEDED = 'succeeded'
     FAILED = 'failed'
 
 
-class AICodeGenRole(enum.Enum):
+class AICodeGenRole(StrEnum):
     USER = 'user'
     ASSISTANT = 'assistant'
     SYSTEM = 'system'

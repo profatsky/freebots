@@ -1,10 +1,13 @@
 import io
 import json
 import zipfile
-from typing import Any
+from typing import TypedDict
 from uuid import UUID
 
+from loguru import logger
 from openai import AsyncOpenAI
+from openai.types.responses import ResponseTextConfigParam
+from openai.types.shared_params import ResponseFormatText
 
 from src.apps.ai_code_gen.dependencies.repositories_dependencies import AICodeGenRepositoryDI
 from src.apps.ai_code_gen.dto import (
@@ -14,7 +17,7 @@ from src.apps.ai_code_gen.dto import (
 )
 from src.apps.ai_code_gen.errors import (
     AICodeGenSessionNotFoundError,
-    AICodeGenNoPermissionError,
+    AICodeGenSessionNoPermissionError,
     AICodeGenPromptTooLongError,
     AICodeGenMessagesLimitExceededError,
     AICodeGenInvalidResponseError,
@@ -25,12 +28,29 @@ from src.apps.enums import AICodeGenSessionStatus, AICodeGenRole
 from src.core.config import settings
 
 
+SYSTEM_PROMPT = (
+    'Ты создаешь Telegram-бота на Python с использованием aiogram 3. '
+    'Верни ответ строго в JSON формате с ключами: summary, main_py, requirements, dockerfile. '
+    'Не используй markdown и не оборачивай JSON в кодовые блоки. '
+    'main_py должен содержать полный код бота в одном файле. '
+    'requirements должен содержать минимальные зависимости. '
+    'dockerfile должен быть минимальным и запускать main.py. '
+    'Не включай секреты и токены. Используй переменную окружения BOT_TOKEN.'
+)
+
+
+class LLMChatMessage(TypedDict):
+    role: AICodeGenRole
+    content: str
+
+
 class AICodeGenService:
     def __init__(
         self,
         ai_code_gen_repository: AICodeGenRepositoryDI,
     ):
         self._ai_code_gen_repository = ai_code_gen_repository
+        # TODO: create custom client with structured output
         self._client = AsyncOpenAI(api_key=settings.OPENAI_API_KEY)
 
     async def create_session(self, user_id: UUID, prompt: str) -> AICodeGenSessionWithMessagesReadDTO:
@@ -76,12 +96,8 @@ class AICodeGenService:
         if session is None:
             raise AICodeGenSessionNotFoundError
         if session.user_id != user_id:
-            raise AICodeGenNoPermissionError
-
-        return AICodeGenSessionWithMessagesReadDTO(
-            session=session.to_dto(),
-            messages=[message.to_dto() for message in session.messages],
-        )
+            raise AICodeGenSessionNoPermissionError
+        return session
 
     async def get_zip(self, user_id: UUID, session_id: int) -> io.BytesIO:
         await self._assert_session_owner(user_id=user_id, session_id=session_id)
@@ -103,6 +119,7 @@ class AICodeGenService:
         zip_data.seek(0)
         return zip_data
 
+    # TODO: remove using open ai lib from service
     async def _generate_and_store_response(self, session_id: int) -> None:
         await self._ai_code_gen_repository.update_session_status(session_id, AICodeGenSessionStatus.RUNNING)
         messages_for_llm = await self._build_llm_messages(session_id)
@@ -111,11 +128,12 @@ class AICodeGenService:
             response = await self._client.responses.create(
                 model=settings.OPENAI_MODEL,
                 input=messages_for_llm,
-                text={'format': {'type': 'json_object'}},
+                text=ResponseTextConfigParam(format=ResponseFormatText(type='text')),
                 temperature=settings.OPENAI_TEMPERATURE,
                 max_output_tokens=settings.OPENAI_MAX_OUTPUT_TOKENS,
             )
         except Exception as exc:
+            logger.error(str(exc))
             await self._ai_code_gen_repository.update_session_status(session_id, AICodeGenSessionStatus.FAILED)
             raise AICodeGenInvalidResponseError from exc
 
@@ -164,26 +182,18 @@ class AICodeGenService:
 
         await self._ai_code_gen_repository.update_session_status(session_id, AICodeGenSessionStatus.SUCCEEDED)
 
-    async def _build_llm_messages(self, session_id: int) -> list[dict[str, Any]]:
-        history = await self._ai_code_gen_repository.get_messages_for_context(
-            session_id,
-            limit=settings.AI_CODEGEN_MAX_MESSAGES_PER_SESSION,
-        )
-        messages = [
-            {
-                'role': 'system',
-                'content': self._system_prompt(),
-            }
-        ]
+    async def _build_llm_messages(self, session_id: int) -> list[LLMChatMessage]:
+        history = await self._ai_code_gen_repository.get_messages(session_id)
+        messages = [LLMChatMessage(role=AICodeGenRole.SYSTEM, content=SYSTEM_PROMPT)]
         for message in history:
             if message.role == AICodeGenRole.USER:
-                messages.append({'role': 'user', 'content': message.content})
+                messages.append(LLMChatMessage(role=AICodeGenRole.USER, content=message.content))
             elif message.role == AICodeGenRole.ASSISTANT:
                 summary = ''
                 if message.meta and isinstance(message.meta, dict):
                     summary = message.meta.get('summary') or ''
                 content = summary or 'Предыдущий ответ уже был сгенерирован.'
-                messages.append({'role': 'assistant', 'content': content})
+                messages.append(LLMChatMessage(role=AICodeGenRole.ASSISTANT, content=content))
         return messages
 
     def _validate_prompt(self, prompt: str) -> None:
@@ -217,16 +227,4 @@ class AICodeGenService:
         if session is None:
             raise AICodeGenSessionNotFoundError
         if session.user_id != user_id:
-            raise AICodeGenNoPermissionError
-
-    @staticmethod
-    def _system_prompt() -> str:
-        return (
-            'Ты создаешь Telegram-бота на Python с использованием aiogram 3. '
-            'Верни ответ строго в JSON формате с ключами: summary, main_py, requirements, dockerfile. '
-            'Не используй markdown и не оборачивай JSON в кодовые блоки. '
-            'main_py должен содержать полный код бота в одном файле. '
-            'requirements должен содержать минимальные зависимости. '
-            'dockerfile должен быть минимальным и запускать main.py. '
-            'Не включай секреты и токены. Используй переменную окружения BOT_TOKEN.'
-        )
+            raise AICodeGenSessionNoPermissionError

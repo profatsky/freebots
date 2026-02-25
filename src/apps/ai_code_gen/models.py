@@ -1,4 +1,5 @@
 import datetime
+from typing import Self
 from uuid import UUID
 
 from sqlalchemy import DateTime, Enum, ForeignKey, Text, func
@@ -11,6 +12,7 @@ from src.apps.ai_code_gen.dto import (
     AICodeGenSessionReadDTO,
     AICodeGenMessageCreateDTO,
     AICodeGenMessageReadDTO,
+    AICodeGenSessionWithMessagesReadDTO,
 )
 from src.infrastructure.db.sessions import Base
 
@@ -44,7 +46,7 @@ class AICodeGenSessionModel(Base):
     )
 
     @classmethod
-    def from_dto(cls, dto: AICodeGenSessionCreateDTO) -> 'AICodeGenSessionModel':
+    def from_dto(cls, dto: AICodeGenSessionCreateDTO) -> Self:
         return cls(
             user_id=dto.user_id,
             status=dto.status,
@@ -57,6 +59,17 @@ class AICodeGenSessionModel(Base):
             status=self.status,
             created_at=self.created_at,
             updated_at=self.updated_at,
+        )
+
+    def to_dto_with_messages(self) -> AICodeGenSessionWithMessagesReadDTO:
+        messages = [message.to_dto() for message in self.messages]
+        return AICodeGenSessionWithMessagesReadDTO(
+            session_id=self.session_id,
+            user_id=self.user_id,
+            status=self.status,
+            created_at=self.created_at,
+            updated_at=self.updated_at,
+            messages=messages,
         )
 
 
@@ -76,7 +89,7 @@ class AICodeGenMessageModel(Base):
     session: Mapped['AICodeGenSessionModel'] = relationship(back_populates='messages')
 
     @classmethod
-    def from_dto(cls, dto: AICodeGenMessageCreateDTO) -> 'AICodeGenMessageModel':
+    def from_dto(cls, dto: AICodeGenMessageCreateDTO) -> Self:
         return cls(
             session_id=dto.session_id,
             role=dto.role,

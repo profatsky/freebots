@@ -2,7 +2,7 @@ class AICodeGenSessionNotFoundError(Exception):
     pass
 
 
-class AICodeGenNoPermissionError(Exception):
+class AICodeGenSessionNoPermissionError(Exception):
     pass
 
 

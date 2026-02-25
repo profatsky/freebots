@@ -19,7 +19,7 @@ from src.api.v1.ai_code_gen.exceptions import (
 )
 from src.apps.ai_code_gen.errors import (
     AICodeGenSessionNotFoundError,
-    AICodeGenNoPermissionError,
+    AICodeGenSessionNoPermissionError,
     AICodeGenPromptTooLongError,
     AICodeGenMessagesLimitExceededError,
     AICodeGenInvalidResponseError,
@@ -61,7 +61,7 @@ async def get_session(
         session = await ai_code_gen_service.get_session_with_messages(user_id=user_id, session_id=session_id)
     except AICodeGenSessionNotFoundError:
         raise AICodeGenSessionNotFoundHTTPException
-    except AICodeGenNoPermissionError:
+    except AICodeGenSessionNoPermissionError:
         raise AICodeGenNoPermissionHTTPException
     return AICodeGenSessionWithMessagesReadSchema.from_dto(session)
 
@@ -81,7 +81,7 @@ async def add_message(
         )
     except AICodeGenSessionNotFoundError:
         raise AICodeGenSessionNotFoundHTTPException
-    except AICodeGenNoPermissionError:
+    except AICodeGenSessionNoPermissionError:
         raise AICodeGenNoPermissionHTTPException
     except AICodeGenPromptTooLongError:
         raise AICodeGenPromptTooLongHTTPException
@@ -104,7 +104,7 @@ async def download_code(
         zip_data = await ai_code_gen_service.get_zip(user_id=user_id, session_id=session_id)
     except AICodeGenSessionNotFoundError:
         raise AICodeGenSessionNotFoundHTTPException
-    except AICodeGenNoPermissionError:
+    except AICodeGenSessionNoPermissionError:
         raise AICodeGenNoPermissionHTTPException
     except AICodeGenNoAssistantMessageError:
         raise AICodeGenNoAssistantMessageHTTPException
