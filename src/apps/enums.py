@@ -55,3 +55,16 @@ class AiohttpSessionMethod(enum.Enum):
     CONNECT = 'ws_connect'
     HEAD = 'head'
     OPTIONS = 'options'
+
+
+class AICodeGenSessionStatus(enum.Enum):
+    QUEUED = 'queued'
+    RUNNING = 'running'
+    SUCCEEDED = 'succeeded'
+    FAILED = 'failed'
+
+
+class AICodeGenRole(enum.Enum):
+    USER = 'user'
+    ASSISTANT = 'assistant'
+    SYSTEM = 'system'

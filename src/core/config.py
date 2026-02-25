@@ -38,6 +38,17 @@ class Settings(BaseSettings):
 
     TEST_DB_NAME: str
 
+    OPENAI_API_KEY: str
+    OPENAI_MODEL: str = 'gpt-4o-mini'
+    OPENAI_TEMPERATURE: float = 0.2
+    OPENAI_MAX_OUTPUT_TOKENS: int = 12000
+
+    AI_CODEGEN_MAX_PROMPT_CHARS: int = 4000
+    AI_CODEGEN_MAX_MAIN_PY_CHARS: int = 60000
+    AI_CODEGEN_MAX_REQUIREMENTS_CHARS: int = 2000
+    AI_CODEGEN_MAX_DOCKERFILE_CHARS: int = 4000
+    AI_CODEGEN_MAX_MESSAGES_PER_SESSION: int = 20
+
     @field_validator('YOOKASSA_IPS', mode='before')
     @classmethod
     def validate_yookassa_ips(cls, value: str) -> list[str]:

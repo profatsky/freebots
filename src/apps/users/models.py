@@ -29,6 +29,7 @@ class UserModel(Base):
     projects: Mapped[list['ProjectModel']] = relationship(back_populates='user')
     subscriptions: Mapped[list['SubscriptionModel']] = relationship(back_populates='user')
     payments: Mapped[list[PaymentModel]] = relationship(back_populates='user')
+    ai_codegen_sessions: Mapped[list['AICodeGenSessionModel']] = relationship(back_populates='user')
 
     def to_dto(self) -> UserReadDTO:
         return UserReadDTO(

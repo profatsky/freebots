@@ -18,6 +18,7 @@ from src.apps.plugins.models import *
 from src.apps.statistics.services import *
 from src.apps.subscriptions.models import *
 from src.apps.payments.models import *
+from src.apps.ai_code_gen.models import *
 from src.infrastructure.db.utils import get_dsn
 from src.infrastructure.db.sessions import Base
 
