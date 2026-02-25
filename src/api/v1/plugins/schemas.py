@@ -1,4 +1,5 @@
 import datetime
+from pathlib import Path
 from typing import Self
 
 from pydantic import BaseModel, Field
@@ -64,11 +65,12 @@ class PluginReadSchema(BaseModel):
         )
 
 
+# TODO: move to dto
 class PluginCreateSchema(BaseModel):
     name: str
     summary: str
-    image_path: str
-    handlers_file_path: str
-    db_funcs_file_path: str
-    readme_file_path: str
+    image_path: Path
+    handlers_file_path: Path
+    db_funcs_file_path: Path
+    readme_file_path: Path
     triggers: list[PluginTriggerCreateSchema] = []

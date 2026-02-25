@@ -1,5 +1,5 @@
 import asyncio
-import os
+from pathlib import Path
 
 from sqlalchemy import select
 
@@ -33,10 +33,10 @@ async def _create_plugin(plugin: PluginCreateSchema):
             plugin = PluginModel(
                 name=plugin.name,
                 summary=plugin.summary,
-                image_path=plugin.image_path,
-                handlers_file_path=plugin.handlers_file_path,
-                db_funcs_file_path=plugin.db_funcs_file_path,
-                readme_file_path=plugin.readme_file_path,
+                image_path=str(plugin.image_path),
+                handlers_file_path=str(plugin.handlers_file_path),
+                db_funcs_file_path=str(plugin.db_funcs_file_path),
+                readme_file_path=str(plugin.readme_file_path),
                 triggers=triggers,
             )
 
@@ -45,10 +45,10 @@ async def _create_plugin(plugin: PluginCreateSchema):
 
 
 async def create_statistics_plugin():
-    image_path = os.path.join('plugins', 'statistic', 'cover.svg')
-    readme_file_path = os.path.join('plugins', 'statistic', 'README.md')
-    handlers_file_path = os.path.join('code_gen', 'bot_templates', 'project_structure', 'handlers', 'statistic.py.j2')
-    db_funcs_file_path = os.path.join('code_gen', 'bot_templates', 'project_structure', 'db', 'statistic.py.j2')
+    image_path = Path('plugins', 'statistic', 'cover.svg')
+    readme_file_path = Path('plugins', 'statistic', 'README.md')
+    handlers_file_path = Path('handlers', 'statistic.py.j2')
+    db_funcs_file_path = Path('db', 'statistic.py.j2')
 
     triggers = [
         PluginTriggerCreateSchema(event_type=TriggerEventType.BUTTON, value='📊 Статистика', is_admin=True),
@@ -68,10 +68,10 @@ async def create_statistics_plugin():
 
 
 async def create_catalog_plugin():
-    image_path = os.path.join('plugins', 'catalog', 'cover.svg')
-    readme_file_path = os.path.join('plugins', 'catalog', 'README.md')
-    handlers_file_path = os.path.join('code_gen', 'bot_templates', 'project_structure', 'handlers', 'catalog.py.j2')
-    db_funcs_file_path = os.path.join('code_gen', 'bot_templates', 'project_structure', 'db', 'catalog.py.j2')
+    image_path = Path('plugins', 'catalog', 'cover.svg')
+    readme_file_path = Path('plugins', 'catalog', 'README.md')
+    handlers_file_path = Path('handlers', 'catalog.py.j2')
+    db_funcs_file_path = Path('db', 'catalog.py.j2')
 
     triggers = [
         PluginTriggerCreateSchema(event_type=TriggerEventType.BUTTON, value='🛍️ Каталог', is_admin=False),
@@ -92,10 +92,10 @@ async def create_catalog_plugin():
 
 
 async def create_support_plugin():
-    image_path = os.path.join('plugins', 'support', 'cover.svg')
-    readme_file_path = os.path.join('plugins', 'support', 'README.md')
-    handlers_file_path = os.path.join('code_gen', 'bot_templates', 'project_structure', 'handlers', 'support.py.j2')
-    db_funcs_file_path = os.path.join('code_gen', 'bot_templates', 'project_structure', 'db', 'support.py.j2')
+    image_path = Path('plugins', 'support', 'cover.svg')
+    readme_file_path = Path('plugins', 'support', 'README.md')
+    handlers_file_path = Path('handlers', 'support.py.j2')
+    db_funcs_file_path = Path('db', 'support.py.j2')
 
     triggers = [
         PluginTriggerCreateSchema(event_type=TriggerEventType.BUTTON, value='❓Тех.поддержка', is_admin=False),

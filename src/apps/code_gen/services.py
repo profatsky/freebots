@@ -1,5 +1,4 @@
 import io
-import os
 import zipfile
 from pathlib import Path
 from typing import Optional
@@ -23,12 +22,11 @@ from src.apps.enums import (
 from src.api.v1.code_gen.schemas import HandlerSchema, StateSchema, StatesGroupSchema, KeyboardSchema
 from src.apps.projects.errors import ProjectNotFoundError, NoPermissionForProjectError
 from src.apps.subscriptions.dependencies import SubscriptionServiceDI
+from src.core.config import BOT_TEMPLATES_DIR, MEDIA_DIR
 from src.core.consts import MAX_DIALOGUES_WITH_FREE_PLAN
 from src.infrastructure.db.dependencies import AsyncSessionDI
 from src.apps.code_gen.bot_templates import code
 from src.apps.blocks.utils import escape_inner_text
-
-BOT_FILE_TEMPLATES_DIR = Path('src') / 'apps' / 'code_gen' / 'bot_templates' / 'project_structure'
 
 
 class CodeGenService:
@@ -52,10 +50,14 @@ class CodeGenService:
             if len(project.dialogues) > MAX_DIALOGUES_WITH_FREE_PLAN:
                 raise DialoguesLimitExceededError
 
+        custom_handlers_code = self._generate_custom_handlers_code(project)
+        custom_handlers_path = Path('handlers') / 'custom.py'
+
         zip_data = io.BytesIO()
         # TODO: anyio.to_thread
         with zipfile.ZipFile(zip_data, mode='w') as zipf:
-            self._add_custom_handlers_code_to_zip(project, zipf)
+            zipf.writestr(str(custom_handlers_path), custom_handlers_code)
+
             self._add_plugins_code_to_zip(project, zipf)
             self._add_images_to_zip(project, zipf)
 
@@ -71,7 +73,7 @@ class CodeGenService:
                 'ИНСТРУКЦИЯ.txt',
             ]
             for path in template_paths:
-                zipf.write(BOT_FILE_TEMPLATES_DIR / path, str(path).removesuffix('.j2'))
+                zipf.write(BOT_TEMPLATES_DIR / path, str(path).removesuffix('.j2'))
 
         zip_data.seek(0)
         return zip_data
@@ -82,57 +84,36 @@ class CodeGenService:
         db_funcs_file_names = []
 
         for plugin in project.plugins:
-            # handlers
-            handlers_file_name = os.path.basename(plugin.handlers_file_path)
-            handlers_file_name_with_py_extension = os.path.splitext(handlers_file_name)[0]
+            handlers_file_name_without_j2_extension = Path(plugin.handlers_file_path).stem
+            zip_file.write(
+                filename=BOT_TEMPLATES_DIR / plugin.handlers_file_path,
+                arcname=Path('handlers') / handlers_file_name_without_j2_extension,
+            )
+            handlers_file_names.append(handlers_file_name_without_j2_extension)
 
-            handlers_file_name_without_extension = os.path.splitext(handlers_file_name_with_py_extension)[0]
-            handlers_file_names.append(handlers_file_name_without_extension)
+            db_funcs_file_name_without_j2_extension = Path(plugin.db_funcs_file_path).stem
+            zip_file.write(
+                filename=BOT_TEMPLATES_DIR / plugin.db_funcs_file_path,
+                arcname=Path('db') / db_funcs_file_name_without_j2_extension,
+            )
+            db_funcs_file_names.append(db_funcs_file_name_without_j2_extension)
 
-            handlers_file_path = os.path.join('src', 'apps', plugin.handlers_file_path)
-            zip_file.write(handlers_file_path, os.path.join('handlers', handlers_file_name_with_py_extension))
+        handlers_init_template = self._get_template(BOT_TEMPLATES_DIR / 'handlers' / '__init__.py.j2')
+        handlers_init_code = handlers_init_template.render(handlers_file_names=handlers_file_names)
+        zip_file.writestr(str(Path('handlers') / '__init__.py'), handlers_init_code)
 
-            # database funcs
-            db_funcs_file_name = os.path.basename(plugin.handlers_file_path)
-            db_funcs_file_name_with_py_extension = os.path.splitext(db_funcs_file_name)[0]
-
-            db_funcs_file_name_without_extension = os.path.splitext(db_funcs_file_name_with_py_extension)[0]
-            db_funcs_file_names.append(db_funcs_file_name_without_extension)
-
-            db_funcs_file_path = os.path.join('src', 'apps', plugin.db_funcs_file_path)
-            zip_file.write(db_funcs_file_path, os.path.join('db', db_funcs_file_name_with_py_extension))
-
-        handlers_init_template = self._get_template(os.path.join(BOT_FILE_TEMPLATES_DIR, 'handlers', '__init__.py.j2'))
-        handlers_init_code = handlers_init_template.render(
-            {
-                'handlers_file_names': handlers_file_names,
-            }
-        )
-        handlers_init_in_memory_file = io.BytesIO(str.encode(handlers_init_code))
-        zip_file.writestr(os.path.join('handlers', '__init__.py'), handlers_init_in_memory_file.getvalue())
-
-        db_funcs_init_template = self._get_template(os.path.join(BOT_FILE_TEMPLATES_DIR, 'db', '__init__.py.j2'))
-        db_funcs_init_code = db_funcs_init_template.render(
-            {
-                'db_funcs_file_names': db_funcs_file_names,
-            }
-        )
-        db_funcs_init_in_memory_file = io.BytesIO(str.encode(db_funcs_init_code))
-        zip_file.writestr(os.path.join('db', '__init__.py'), db_funcs_init_in_memory_file.getvalue())
+        db_funcs_init_template = self._get_template(BOT_TEMPLATES_DIR / 'db' / '__init__.py.j2')
+        db_funcs_init_code = db_funcs_init_template.render(db_funcs_file_names=db_funcs_file_names)
+        zip_file.writestr(str(Path('db') / '__init__.py'), db_funcs_init_code)
 
     @staticmethod
     def _add_images_to_zip(project: ProjectCodeGenReadDTO, zip_file: zipfile.ZipFile):
         for dialogue in project.dialogues:
             for block in dialogue.blocks:
-                if block.type == BlockType.IMAGE_BLOCK.value:
+                if block.type == BlockType.IMAGE_BLOCK:
                     # TODO: fix type hint
-                    image_path = os.path.join('src', 'media', block.image_path)
-                    zip_file.write(image_path, os.path.join('img', os.path.basename(block.image_path)))
-
-    def _add_custom_handlers_code_to_zip(self, project: ProjectCodeGenReadDTO, zip_file: zipfile.ZipFile):
-        custom_handlers_code = self._generate_custom_handlers_code(project)
-        custom_handlers_in_memory_file = io.BytesIO(str.encode(custom_handlers_code))
-        zip_file.writestr(os.path.join('handlers', 'custom.py'), custom_handlers_in_memory_file.getvalue())
+                    image_path = MEDIA_DIR / block.image_path
+                    zip_file.write(image_path, Path('img') / Path(block.image_path).name)
 
     # TODO refactoring
     # TODO add customize env variables
@@ -187,14 +168,14 @@ class CodeGenService:
                 if block.is_draft:
                     continue
 
-                if block.type == BlockType.TEXT_BLOCK.value:
+                if block.type == BlockType.TEXT_BLOCK:
                     handler.add_to_body(code.message_answer.format(message_text=escape_inner_text(block.message_text)))
 
-                elif block.type == BlockType.IMAGE_BLOCK.value:
-                    image_path_in_bot_project = os.path.join('img/', os.path.basename(block.image_path))
+                elif block.type == BlockType.IMAGE_BLOCK:
+                    image_path_in_bot_project = Path('img') / Path(block.image_path).name
                     handler.add_to_body(code.image_block.format(image_path=image_path_in_bot_project))
 
-                elif block.type == BlockType.QUESTION_BLOCK.value:
+                elif block.type == BlockType.QUESTION_BLOCK:
                     if states_group is None:
                         state = StateSchema(name=f'state_from_block{block.sequence_number}')
                         states_group = StatesGroupSchema(name=f'StatesGroup{len(states_groups) + 1}', states=[state])
@@ -271,7 +252,7 @@ class CodeGenService:
                     utils_funcs.add(code.send_email.strip())
                     utils_funcs.add(code.is_answer_from_user.strip())
 
-                elif block.type == BlockType.CSV_BLOCK.value:
+                elif block.type == BlockType.CSV_BLOCK:
                     handler.add_to_body(
                         code.csv_block.format(
                             file_path=block.file_path,
@@ -279,7 +260,7 @@ class CodeGenService:
                         )
                     )
 
-                elif block.type == BlockType.EXCEL_BLOCK.value:
+                elif block.type == BlockType.EXCEL_BLOCK:
                     handler.add_to_body(
                         code.excel_block.format(
                             file_path=block.file_path,
@@ -287,7 +268,7 @@ class CodeGenService:
                         )
                     )
 
-                elif block.type == BlockType.API_BLOCK.value:
+                elif block.type == BlockType.API_BLOCK:
                     aiohttp_session_method = self._get_aiohttp_session_method(block.http_method)
 
                     handler.add_to_body(
@@ -319,7 +300,7 @@ class CodeGenService:
                     else:
                         keyboard.add_to_buttons(code.reply_keyboard_button.format(text=trigger.value))
 
-        template = self._get_template(os.path.join(BOT_FILE_TEMPLATES_DIR, 'handlers', 'custom.py.j2'))
+        template = self._get_template(BOT_TEMPLATES_DIR / 'handlers' / 'custom.py.j2')
         bot_code = template.render(
             {
                 'utils_funcs': utils_funcs,
@@ -383,13 +364,15 @@ class CodeGenService:
         }
         return http_methods_to_aiohttp_methods[http_method]
 
+    # TODO: remove from service
+    # TODO: async
     @staticmethod
-    def _get_template(file_path: str) -> Template:
+    def _get_template(file_path: Path) -> Template:
         with open(file_path, 'r', encoding='utf-8') as f:
             template_str = f.read()
 
         env = Environment(
-            loader=FileSystemLoader(os.path.join('src', 'code_gen', 'bot_templates')),
+            loader=FileSystemLoader(Path('src', 'code_gen', 'bot_templates')),
             trim_blocks=True,
             lstrip_blocks=True,
         )
