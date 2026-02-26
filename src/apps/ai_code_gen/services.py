@@ -24,7 +24,7 @@ from src.apps.ai_code_gen.errors import (
     AICodeGenResponseTooLongError,
     AICodeGenNoAssistantMessageError,
 )
-from src.apps.enums import AICodeGenSessionStatus, AICodeGenRole
+from src.apps.ai_code_gen.enums import AICodeGenSessionStatus, AICodeGenRole
 from src.core.config import settings
 
 

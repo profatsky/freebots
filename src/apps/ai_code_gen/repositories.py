@@ -12,7 +12,7 @@ from src.apps.ai_code_gen.dto import (
     AICodeGenSessionWithMessagesReadDTO,
 )
 from src.apps.ai_code_gen.models import AICodeGenSessionModel, AICodeGenMessageModel
-from src.apps.enums import AICodeGenRole
+from src.apps.ai_code_gen.enums import AICodeGenRole
 
 
 class AICodeGenRepository(BaseRepository):

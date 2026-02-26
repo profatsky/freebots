@@ -3,7 +3,7 @@ from datetime import datetime
 from typing import Optional
 from uuid import UUID
 
-from src.apps.enums import AICodeGenSessionStatus, AICodeGenRole
+from src.apps.ai_code_gen.enums import AICodeGenSessionStatus, AICodeGenRole
 
 
 @dataclass(frozen=True)

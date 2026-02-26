@@ -8,7 +8,7 @@ from src.apps.ai_code_gen.dto import (
     AICodeGenMessageReadDTO,
     AICodeGenSessionReadDTO,
 )
-from src.apps.enums import AICodeGenRole, AICodeGenSessionStatus
+from src.apps.ai_code_gen.enums import AICodeGenSessionStatus, AICodeGenRole
 
 
 class AICodeGenSessionCreateSchema(BaseModel):

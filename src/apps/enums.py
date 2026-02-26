@@ -1,5 +1,4 @@
 import enum
-from enum import StrEnum
 
 
 class KeyboardType(enum.Enum):
@@ -56,16 +55,3 @@ class AiohttpSessionMethod(enum.Enum):
     CONNECT = 'ws_connect'
     HEAD = 'head'
     OPTIONS = 'options'
-
-
-class AICodeGenSessionStatus(StrEnum):
-    QUEUED = 'queued'
-    RUNNING = 'running'
-    SUCCEEDED = 'succeeded'
-    FAILED = 'failed'
-
-
-class AICodeGenRole(StrEnum):
-    USER = 'user'
-    ASSISTANT = 'assistant'
-    SYSTEM = 'system'
