@@ -1,7 +1,6 @@
 import io
 import json
 import zipfile
-from typing import TypedDict
 from uuid import UUID
 
 from loguru import logger
@@ -24,9 +23,10 @@ from src.apps.ai_code_gen.errors import (
     AICodeGenResponseTooLongError,
     AICodeGenNoAssistantMessageError,
 )
-from src.apps.ai_code_gen.enums import AICodeGenSessionStatus, AICodeGenRole
+from src.apps.ai_code_gen.enums import AICodeGenSessionStatus
 from src.core.config import settings
-
+from src.infrastructure.llm.enums import LLMChatMemberRole
+from src.infrastructure.llm.types import LLMChatMessage
 
 SYSTEM_PROMPT = (
     'Ты создаешь Telegram-бота на Python с использованием aiogram 3. '
@@ -37,11 +37,6 @@ SYSTEM_PROMPT = (
     'dockerfile должен быть минимальным и запускать main.py. '
     'Не включай секреты и токены. Используй переменную окружения BOT_TOKEN.'
 )
-
-
-class LLMChatMessage(TypedDict):
-    role: AICodeGenRole
-    content: str
 
 
 class AICodeGenService:
@@ -64,7 +59,7 @@ class AICodeGenService:
         await self._ai_code_gen_repository.add_message(
             AICodeGenMessageCreateDTO(
                 session_id=session.session_id,
-                role=AICodeGenRole.USER,
+                role=LLMChatMemberRole.USER,
                 content=prompt,
                 meta=None,
             )
@@ -83,7 +78,7 @@ class AICodeGenService:
         await self._ai_code_gen_repository.add_message(
             AICodeGenMessageCreateDTO(
                 session_id=session_id,
-                role=AICodeGenRole.USER,
+                role=LLMChatMemberRole.USER,
                 content=prompt,
                 meta=None,
             )
@@ -167,7 +162,7 @@ class AICodeGenService:
         await self._ai_code_gen_repository.add_message(
             AICodeGenMessageCreateDTO(
                 session_id=session_id,
-                role=AICodeGenRole.ASSISTANT,
+                role=LLMChatMemberRole.ASSISTANT,
                 content=main_py,
                 meta={
                     'summary': summary,
@@ -184,16 +179,16 @@ class AICodeGenService:
 
     async def _build_llm_messages(self, session_id: int) -> list[LLMChatMessage]:
         history = await self._ai_code_gen_repository.get_messages(session_id)
-        messages = [LLMChatMessage(role=AICodeGenRole.SYSTEM, content=SYSTEM_PROMPT)]
+        messages = [LLMChatMessage(role=LLMChatMemberRole.SYSTEM, content=SYSTEM_PROMPT)]
         for message in history:
-            if message.role == AICodeGenRole.USER:
-                messages.append(LLMChatMessage(role=AICodeGenRole.USER, content=message.content))
-            elif message.role == AICodeGenRole.ASSISTANT:
+            if message.role == LLMChatMemberRole.USER:
+                messages.append(LLMChatMessage(role=LLMChatMemberRole.USER, content=message.content))
+            elif message.role == LLMChatMemberRole.ASSISTANT:
                 summary = ''
                 if message.meta and isinstance(message.meta, dict):
                     summary = message.meta.get('summary') or ''
                 content = summary or 'Предыдущий ответ уже был сгенерирован.'
-                messages.append(LLMChatMessage(role=AICodeGenRole.ASSISTANT, content=content))
+                messages.append(LLMChatMessage(role=LLMChatMemberRole.ASSISTANT, content=content))
         return messages
 
     def _validate_prompt(self, prompt: str) -> None:

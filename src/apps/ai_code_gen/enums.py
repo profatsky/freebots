@@ -6,9 +6,3 @@ class AICodeGenSessionStatus(StrEnum):
     RUNNING = 'running'
     SUCCEEDED = 'succeeded'
     FAILED = 'failed'
-
-
-class AICodeGenRole(StrEnum):
-    USER = 'user'
-    ASSISTANT = 'assistant'
-    SYSTEM = 'system'
