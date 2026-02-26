@@ -3,16 +3,18 @@ from typing import Optional, Self
 
 from pydantic import BaseModel, Field
 
+from src.api.v1.ai_code_gen.enums import AICodeGenRole
 from src.apps.ai_code_gen.dto import (
     AICodeGenSessionWithMessagesReadDTO,
     AICodeGenMessageReadDTO,
     AICodeGenSessionReadDTO,
 )
 from src.apps.ai_code_gen.enums import AICodeGenSessionStatus
+from src.core.config import settings
 
 
 class AICodeGenSessionCreateSchema(BaseModel):
-    prompt: str = Field(min_length=1, max_length=4000)
+    prompt: str = Field(min_length=1, max_length=settings.AI_CODEGEN_MAX_PROMPT_CHARS)
 
 
 class AICodeGenSessionReadSchema(BaseModel):
@@ -32,7 +34,7 @@ class AICodeGenSessionReadSchema(BaseModel):
 
 
 class AICodeGenMessageCreateSchema(BaseModel):
-    prompt: str = Field(min_length=1, max_length=4000)
+    prompt: str = Field(min_length=1, max_length=settings.AI_CODEGEN_MAX_PROMPT_CHARS)
 
 
 class AICodeGenMessageReadSchema(BaseModel):

@@ -14,7 +14,6 @@ from src.api.v1.ai_code_gen.exceptions import (
     AICodeGenPromptTooLongHTTPException,
     AICodeGenMessagesLimitExceededHTTPException,
     AICodeGenInvalidResponseHTTPException,
-    AICodeGenResponseTooLongHTTPException,
     AICodeGenNoAssistantMessageHTTPException,
 )
 from src.apps.ai_code_gen.errors import (
@@ -23,7 +22,6 @@ from src.apps.ai_code_gen.errors import (
     AICodeGenPromptTooLongError,
     AICodeGenMessagesLimitExceededError,
     AICodeGenInvalidResponseError,
-    AICodeGenResponseTooLongError,
     AICodeGenNoAssistantMessageError,
 )
 
@@ -46,8 +44,6 @@ async def create_session(
         raise AICodeGenPromptTooLongHTTPException
     except AICodeGenInvalidResponseError:
         raise AICodeGenInvalidResponseHTTPException
-    except AICodeGenResponseTooLongError:
-        raise AICodeGenResponseTooLongHTTPException
     return AICodeGenSessionWithMessagesReadSchema.from_dto(session)
 
 
@@ -89,8 +85,6 @@ async def add_message(
         raise AICodeGenMessagesLimitExceededHTTPException
     except AICodeGenInvalidResponseError:
         raise AICodeGenInvalidResponseHTTPException
-    except AICodeGenResponseTooLongError:
-        raise AICodeGenResponseTooLongHTTPException
     return AICodeGenSessionWithMessagesReadSchema.from_dto(session)
 
 

@@ -12,18 +12,17 @@ from src.apps.ai_code_gen.dto import (
     AICodeGenSessionWithMessagesReadDTO,
     AICodeGenMessageMetaDTO,
 )
-from src.apps.ai_code_gen.llm_schemas import AICodeGenLLMResponse
+from src.apps.ai_code_gen.llm_response import LLMResponse
 from src.apps.ai_code_gen.errors import (
     AICodeGenSessionNotFoundError,
     AICodeGenSessionNoPermissionError,
-    AICodeGenPromptTooLongError,
     AICodeGenMessagesLimitExceededError,
     AICodeGenInvalidResponseError,
-    AICodeGenResponseTooLongError,
     AICodeGenNoAssistantMessageError,
 )
 from src.apps.ai_code_gen.enums import AICodeGenSessionStatus
 from src.apps.ai_code_gen.prompts import SYSTEM_PROMPT
+from src.apps.ai_code_gen.validators import validate_user_prompt
 from src.core.config import settings
 from src.infrastructure.llm.cli.openai import AsyncOpenAICli
 from src.infrastructure.llm.enums import LLMChatMemberRole
@@ -39,7 +38,7 @@ class AICodeGenService:
         self._client = AsyncOpenAICli(model=settings.OPENAI_MODEL)
 
     async def create_session(self, user_id: UUID, prompt: str) -> AICodeGenSessionWithMessagesReadDTO:
-        self._validate_prompt(prompt)
+        validate_user_prompt(prompt)
         session = await self._ai_code_gen_repository.create_session(
             AICodeGenSessionCreateDTO(
                 user_id=user_id,
@@ -58,7 +57,7 @@ class AICodeGenService:
         return await self.get_session_with_messages(user_id=user_id, session_id=session.session_id)
 
     async def add_message(self, user_id: UUID, session_id: int, prompt: str) -> AICodeGenSessionWithMessagesReadDTO:
-        self._validate_prompt(prompt)
+        validate_user_prompt(prompt)
         await self._assert_session_owner(user_id=user_id, session_id=session_id)
 
         messages_count = await self._ai_code_gen_repository.count_messages(session_id)
@@ -99,18 +98,21 @@ class AICodeGenService:
         zip_data = io.BytesIO()
         with zipfile.ZipFile(zip_data, mode='w') as zipf:
             zipf.writestr('main.py', main_py)
-            zipf.writestr('requirements.txt', requirements)
+            zipf.writestr('requirements.txt', '\n'.join(requirements))
             zipf.writestr('Dockerfile', dockerfile)
         zip_data.seek(0)
         return zip_data
 
     async def _generate_and_store_response(self, session_id: int) -> None:
-        await self._ai_code_gen_repository.update_session_status(session_id, AICodeGenSessionStatus.RUNNING)
+        await self._ai_code_gen_repository.update_session_status(
+            session_id=session_id,
+            status=AICodeGenSessionStatus.RUNNING,
+        )
         messages_for_llm = await self._build_llm_messages(session_id)
 
         try:
             response = await self._client.make_structured_request(
-                object_type=AICodeGenLLMResponse,
+                object_type=LLMResponse,
                 history=messages_for_llm,
             )
         except Exception as exc:
@@ -118,27 +120,16 @@ class AICodeGenService:
             await self._ai_code_gen_repository.update_session_status(session_id, AICodeGenSessionStatus.FAILED)
             raise AICodeGenInvalidResponseError from exc
 
-        summary = response.summary
-        main_py = response.main_py
-        requirements = '\n'.join(response.requirements)
-        dockerfile = response.dockerfile
-
-        try:
-            self._validate_response(main_py=main_py, requirements=requirements, dockerfile=dockerfile)
-        except (AICodeGenResponseTooLongError, AICodeGenInvalidResponseError):
-            await self._ai_code_gen_repository.update_session_status(session_id, AICodeGenSessionStatus.FAILED)
-            raise
-
         await self._ai_code_gen_repository.add_message(
             AICodeGenMessageCreateDTO(
                 session_id=session_id,
                 role=AICodeGenRole.ASSISTANT,
-                content=main_py,
+                content=response.main_py,
                 meta=AICodeGenMessageMetaDTO(
-                    summary=summary,
-                    main_py=main_py,
-                    requirements=requirements,
-                    dockerfile=dockerfile,
+                    summary=response.summary,
+                    main_py=response.main_py,
+                    requirements=response.requirements,
+                    dockerfile=response.dockerfile,
                     model=settings.OPENAI_MODEL,
                     usage=None,
                 ),
@@ -160,20 +151,6 @@ class AICodeGenService:
                 content = summary or 'Предыдущий ответ уже был сгенерирован.'
                 messages.append(LLMChatMessage(role=LLMChatMemberRole.ASSISTANT, content=content))
         return messages
-
-    def _validate_prompt(self, prompt: str) -> None:
-        if len(prompt) > settings.AI_CODEGEN_MAX_PROMPT_CHARS:
-            raise AICodeGenPromptTooLongError
-
-    def _validate_response(self, main_py: str, requirements: str, dockerfile: str) -> None:
-        if (
-            len(main_py) > settings.AI_CODEGEN_MAX_MAIN_PY_CHARS
-            or len(requirements) > settings.AI_CODEGEN_MAX_REQUIREMENTS_CHARS
-            or len(dockerfile) > settings.AI_CODEGEN_MAX_DOCKERFILE_CHARS
-        ):
-            raise AICodeGenResponseTooLongError
-        if not main_py or not requirements or not dockerfile:
-            raise AICodeGenInvalidResponseError
 
     async def _assert_session_owner(self, user_id: UUID, session_id: int) -> None:
         session = await self._ai_code_gen_repository.get_session(session_id)

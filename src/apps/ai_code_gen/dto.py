@@ -26,7 +26,7 @@ class AICodeGenSessionReadDTO:
 class AICodeGenMessageMetaDTO:
     summary: str
     main_py: str
-    requirements: str
+    requirements: list[str]
     dockerfile: str
     model: str
     usage: None

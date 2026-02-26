@@ -41,14 +41,6 @@ class AICodeGenInvalidResponseHTTPException(HTTPException):
         )
 
 
-class AICodeGenResponseTooLongHTTPException(HTTPException):
-    def __init__(self):
-        super().__init__(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail='Generated response is too long',
-        )
-
-
 class AICodeGenNoAssistantMessageHTTPException(HTTPException):
     def __init__(self):
         super().__init__(

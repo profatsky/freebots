@@ -3,6 +3,7 @@ from typing import Optional
 from sqlalchemy import select, func
 from sqlalchemy.orm import selectinload
 
+from src.api.v1.ai_code_gen.enums import AICodeGenRole
 from src.core.base_repository import BaseRepository
 from src.apps.ai_code_gen.dto import (
     AICodeGenSessionCreateDTO,
@@ -12,7 +13,6 @@ from src.apps.ai_code_gen.dto import (
     AICodeGenSessionWithMessagesReadDTO,
 )
 from src.apps.ai_code_gen.models import AICodeGenSessionModel, AICodeGenMessageModel
-from src.apps.ai_code_gen.enums import AICodeGenRole
 
 
 class AICodeGenRepository(BaseRepository):

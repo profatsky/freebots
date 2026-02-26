@@ -18,9 +18,5 @@ class AICodeGenInvalidResponseError(Exception):
     pass
 
 
-class AICodeGenResponseTooLongError(Exception):
-    pass
-
-
 class AICodeGenNoAssistantMessageError(Exception):
     pass
