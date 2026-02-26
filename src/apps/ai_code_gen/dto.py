@@ -3,7 +3,8 @@ from datetime import datetime
 from typing import Optional
 from uuid import UUID
 
-from src.apps.ai_code_gen.enums import AICodeGenSessionStatus, AICodeGenRole
+from src.api.v1.ai_code_gen.enums import AICodeGenRole
+from src.apps.ai_code_gen.enums import AICodeGenSessionStatus
 
 
 @dataclass(frozen=True)
@@ -22,11 +23,21 @@ class AICodeGenSessionReadDTO:
 
 
 @dataclass(frozen=True)
+class AICodeGenMessageMetaDTO:
+    summary: str
+    main_py: str
+    requirements: str
+    dockerfile: str
+    model: str
+    usage: None
+
+
+@dataclass(frozen=True)
 class AICodeGenMessageCreateDTO:
     session_id: int
     role: AICodeGenRole
     content: str
-    meta: Optional[dict]
+    meta: Optional[AICodeGenMessageMetaDTO]
 
 
 @dataclass(frozen=True)
@@ -35,7 +46,7 @@ class AICodeGenMessageReadDTO:
     session_id: int
     role: AICodeGenRole
     content: str
-    meta: Optional[dict]
+    meta: Optional[AICodeGenMessageMetaDTO]
     created_at: datetime
 
 

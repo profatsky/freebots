@@ -6,13 +6,15 @@ from sqlalchemy import DateTime, Enum, ForeignKey, Text, func
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from src.apps.ai_code_gen.enums import AICodeGenSessionStatus, AICodeGenRole
+from src.api.v1.ai_code_gen.enums import AICodeGenRole
+from src.apps.ai_code_gen.enums import AICodeGenSessionStatus
 from src.apps.ai_code_gen.dto import (
     AICodeGenSessionCreateDTO,
     AICodeGenSessionReadDTO,
     AICodeGenMessageCreateDTO,
     AICodeGenMessageReadDTO,
     AICodeGenSessionWithMessagesReadDTO,
+    AICodeGenMessageMetaDTO,
 )
 from src.infrastructure.db.sessions import Base
 
@@ -94,15 +96,23 @@ class AICodeGenMessageModel(Base):
             session_id=dto.session_id,
             role=dto.role,
             content=dto.content,
-            meta=dto.meta,
+            meta=dto.meta.__dict__,
         )
 
     def to_dto(self) -> AICodeGenMessageReadDTO:
+        meta = AICodeGenMessageMetaDTO(
+            summary=self.meta['summary'],
+            main_py=self.meta['main_py'],
+            requirements=self.meta['requirements'],
+            dockerfile=self.meta['dockerfile'],
+            model=self.meta['model'],
+            usage=None,
+        )
         return AICodeGenMessageReadDTO(
             message_id=self.message_id,
             session_id=self.session_id,
             role=self.role,
             content=self.content,
-            meta=self.meta,
+            meta=meta,
             created_at=self.created_at,
         )

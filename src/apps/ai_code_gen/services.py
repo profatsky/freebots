@@ -1,19 +1,18 @@
 import io
-import json
 import zipfile
 from uuid import UUID
 
 from loguru import logger
-from openai import AsyncOpenAI
-from openai.types.responses import ResponseTextConfigParam
-from openai.types.shared_params import ResponseFormatText
 
+from src.api.v1.ai_code_gen.enums import AICodeGenRole
 from src.apps.ai_code_gen.dependencies.repositories_dependencies import AICodeGenRepositoryDI
 from src.apps.ai_code_gen.dto import (
     AICodeGenSessionCreateDTO,
     AICodeGenMessageCreateDTO,
     AICodeGenSessionWithMessagesReadDTO,
+    AICodeGenMessageMetaDTO,
 )
+from src.apps.ai_code_gen.llm_schemas import AICodeGenLLMResponse
 from src.apps.ai_code_gen.errors import (
     AICodeGenSessionNotFoundError,
     AICodeGenSessionNoPermissionError,
@@ -25,6 +24,7 @@ from src.apps.ai_code_gen.errors import (
 )
 from src.apps.ai_code_gen.enums import AICodeGenSessionStatus
 from src.core.config import settings
+from src.infrastructure.llm.cli.openai import AsyncOpenAICli
 from src.infrastructure.llm.enums import LLMChatMemberRole
 from src.infrastructure.llm.types import LLMChatMessage
 
@@ -45,8 +45,7 @@ class AICodeGenService:
         ai_code_gen_repository: AICodeGenRepositoryDI,
     ):
         self._ai_code_gen_repository = ai_code_gen_repository
-        # TODO: create custom client with structured output
-        self._client = AsyncOpenAI(api_key=settings.OPENAI_API_KEY)
+        self._client = AsyncOpenAICli(model=settings.OPENAI_MODEL)
 
     async def create_session(self, user_id: UUID, prompt: str) -> AICodeGenSessionWithMessagesReadDTO:
         self._validate_prompt(prompt)
@@ -59,7 +58,7 @@ class AICodeGenService:
         await self._ai_code_gen_repository.add_message(
             AICodeGenMessageCreateDTO(
                 session_id=session.session_id,
-                role=LLMChatMemberRole.USER,
+                role=AICodeGenRole.USER,
                 content=prompt,
                 meta=None,
             )
@@ -78,7 +77,7 @@ class AICodeGenService:
         await self._ai_code_gen_repository.add_message(
             AICodeGenMessageCreateDTO(
                 session_id=session_id,
-                role=LLMChatMemberRole.USER,
+                role=AICodeGenRole.USER,
                 content=prompt,
                 meta=None,
             )
@@ -100,9 +99,9 @@ class AICodeGenService:
         if last_message is None or not last_message.meta:
             raise AICodeGenNoAssistantMessageError
 
-        main_py = last_message.meta.get('main_py')
-        requirements = last_message.meta.get('requirements')
-        dockerfile = last_message.meta.get('dockerfile')
+        main_py = last_message.meta.main_py
+        requirements = last_message.meta.requirements
+        dockerfile = last_message.meta.dockerfile
         if not main_py or not requirements or not dockerfile:
             raise AICodeGenNoAssistantMessageError
 
@@ -114,40 +113,24 @@ class AICodeGenService:
         zip_data.seek(0)
         return zip_data
 
-    # TODO: remove using open ai lib from service
     async def _generate_and_store_response(self, session_id: int) -> None:
         await self._ai_code_gen_repository.update_session_status(session_id, AICodeGenSessionStatus.RUNNING)
         messages_for_llm = await self._build_llm_messages(session_id)
 
         try:
-            response = await self._client.responses.create(
-                model=settings.OPENAI_MODEL,
-                input=messages_for_llm,
-                text=ResponseTextConfigParam(format=ResponseFormatText(type='text')),
-                temperature=settings.OPENAI_TEMPERATURE,
-                max_output_tokens=settings.OPENAI_MAX_OUTPUT_TOKENS,
+            response = await self._client.make_structured_request(
+                object_type=AICodeGenLLMResponse,
+                history=messages_for_llm,
             )
         except Exception as exc:
             logger.error(str(exc))
             await self._ai_code_gen_repository.update_session_status(session_id, AICodeGenSessionStatus.FAILED)
             raise AICodeGenInvalidResponseError from exc
 
-        try:
-            payload = json.loads(response.output_text)
-        except json.JSONDecodeError as exc:
-            await self._ai_code_gen_repository.update_session_status(session_id, AICodeGenSessionStatus.FAILED)
-            raise AICodeGenInvalidResponseError from exc
-
-        summary = payload.get('summary', '')
-        main_py = payload.get('main_py', '')
-        requirements = payload.get('requirements', '')
-        dockerfile = payload.get('dockerfile', '')
-
-        main_py, requirements, dockerfile = self._normalize_response(
-            main_py=main_py,
-            requirements=requirements,
-            dockerfile=dockerfile,
-        )
+        summary = response.summary
+        main_py = response.main_py
+        requirements = '\n'.join(response.requirements)
+        dockerfile = response.dockerfile
 
         try:
             self._validate_response(main_py=main_py, requirements=requirements, dockerfile=dockerfile)
@@ -155,23 +138,19 @@ class AICodeGenService:
             await self._ai_code_gen_repository.update_session_status(session_id, AICodeGenSessionStatus.FAILED)
             raise
 
-        usage = None
-        if getattr(response, 'usage', None):
-            usage = response.usage.model_dump()
-
         await self._ai_code_gen_repository.add_message(
             AICodeGenMessageCreateDTO(
                 session_id=session_id,
-                role=LLMChatMemberRole.ASSISTANT,
+                role=AICodeGenRole.ASSISTANT,
                 content=main_py,
-                meta={
-                    'summary': summary,
-                    'main_py': main_py,
-                    'requirements': requirements,
-                    'dockerfile': dockerfile,
-                    'model': settings.OPENAI_MODEL,
-                    'usage': usage,
-                },
+                meta=AICodeGenMessageMetaDTO(
+                    summary=summary,
+                    main_py=main_py,
+                    requirements=requirements,
+                    dockerfile=dockerfile,
+                    model=settings.OPENAI_MODEL,
+                    usage=None,
+                ),
             )
         )
 
@@ -204,18 +183,6 @@ class AICodeGenService:
             raise AICodeGenResponseTooLongError
         if not main_py or not requirements or not dockerfile:
             raise AICodeGenInvalidResponseError
-
-    @staticmethod
-    def _normalize_response(main_py, requirements, dockerfile) -> tuple[str, str, str]:
-        if isinstance(requirements, list):
-            requirements = '\n'.join(str(item) for item in requirements if item)
-        if not isinstance(main_py, str):
-            main_py = str(main_py or '')
-        if not isinstance(requirements, str):
-            requirements = str(requirements or '')
-        if not isinstance(dockerfile, str):
-            dockerfile = str(dockerfile or '')
-        return main_py, requirements, dockerfile
 
     async def _assert_session_owner(self, user_id: UUID, session_id: int) -> None:
         session = await self._ai_code_gen_repository.get_session(session_id)
