@@ -14,15 +14,13 @@ from src.apps.ai_code_gen.dto import (
 )
 from src.apps.ai_code_gen.llm_response import LLMResponse
 from src.apps.ai_code_gen.errors import (
-    AICodeGenSessionNotFoundError,
-    AICodeGenSessionNoPermissionError,
     AICodeGenMessagesLimitExceededError,
     AICodeGenInvalidResponseError,
     AICodeGenNoAssistantMessageError,
 )
 from src.apps.ai_code_gen.enums import AICodeGenSessionStatus
 from src.apps.ai_code_gen.prompts import SYSTEM_PROMPT
-from src.apps.ai_code_gen.validators import validate_user_prompt
+from src.apps.ai_code_gen.validators import validate_user_prompt, validate_session_and_ownership
 from src.core.config import settings
 from src.infrastructure.llm.cli.openai import AsyncOpenAICli
 from src.infrastructure.llm.enums import LLMChatMemberRole
@@ -58,7 +56,9 @@ class AICodeGenService:
 
     async def add_message(self, user_id: UUID, session_id: int, prompt: str) -> AICodeGenSessionWithMessagesReadDTO:
         validate_user_prompt(prompt)
-        await self._assert_session_owner(user_id=user_id, session_id=session_id)
+
+        session = await self._ai_code_gen_repository.get_session_with_messages(session_id)
+        validate_session_and_ownership(session=session, user_id=user_id)
 
         messages_count = await self._ai_code_gen_repository.count_messages(session_id)
         if messages_count >= settings.AI_CODEGEN_MAX_MESSAGES_PER_SESSION:
@@ -77,14 +77,13 @@ class AICodeGenService:
 
     async def get_session_with_messages(self, user_id: UUID, session_id: int) -> AICodeGenSessionWithMessagesReadDTO:
         session = await self._ai_code_gen_repository.get_session_with_messages(session_id)
-        if session is None:
-            raise AICodeGenSessionNotFoundError
-        if session.user_id != user_id:
-            raise AICodeGenSessionNoPermissionError
+        validate_session_and_ownership(session=session, user_id=user_id)
         return session
 
     async def get_zip(self, user_id: UUID, session_id: int) -> io.BytesIO:
-        await self._assert_session_owner(user_id=user_id, session_id=session_id)
+        session = await self._ai_code_gen_repository.get_session(session_id)
+        validate_session_and_ownership(session=session, user_id=user_id)
+
         last_message = await self._ai_code_gen_repository.get_latest_assistant_message(session_id)
         if last_message is None or not last_message.meta:
             raise AICodeGenNoAssistantMessageError
@@ -151,10 +150,3 @@ class AICodeGenService:
                 content = summary or 'Предыдущий ответ уже был сгенерирован.'
                 messages.append(LLMChatMessage(role=LLMChatMemberRole.ASSISTANT, content=content))
         return messages
-
-    async def _assert_session_owner(self, user_id: UUID, session_id: int) -> None:
-        session = await self._ai_code_gen_repository.get_session(session_id)
-        if session is None:
-            raise AICodeGenSessionNotFoundError
-        if session.user_id != user_id:
-            raise AICodeGenSessionNoPermissionError
