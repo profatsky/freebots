@@ -96,18 +96,20 @@ class AICodeGenMessageModel(Base):
             session_id=dto.session_id,
             role=dto.role,
             content=dto.content,
-            meta=dto.meta.__dict__,
+            meta=dto.meta.__dict__ if dto.meta else None,
         )
 
     def to_dto(self) -> AICodeGenMessageReadDTO:
-        meta = AICodeGenMessageMetaDTO(
-            summary=self.meta['summary'],
-            main_py=self.meta['main_py'],
-            requirements=self.meta['requirements'],
-            dockerfile=self.meta['dockerfile'],
-            model=self.meta['model'],
-            usage=None,
-        )
+        meta = None
+        if self.meta:
+            meta = AICodeGenMessageMetaDTO(
+                summary=self.meta['summary'],
+                main_py=self.meta['main_py'],
+                requirements=self.meta['requirements'],
+                dockerfile=self.meta['dockerfile'],
+                model=self.meta['model'],
+                # usage=None,
+            )
         return AICodeGenMessageReadDTO(
             message_id=self.message_id,
             session_id=self.session_id,

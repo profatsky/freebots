@@ -29,7 +29,7 @@ class AICodeGenMessageMetaDTO:
     requirements: list[str]
     dockerfile: str
     model: str
-    usage: None
+    # usage: None
 
 
 @dataclass(frozen=True)

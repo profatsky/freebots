@@ -130,7 +130,7 @@ class AICodeGenService:
                     requirements=response.requirements,
                     dockerfile=response.dockerfile,
                     model=settings.OPENAI_MODEL,
-                    usage=None,
+                    # usage=None,
                 ),
             )
         )
@@ -144,9 +144,5 @@ class AICodeGenService:
             if message.role == LLMChatMemberRole.USER:
                 messages.append(LLMChatMessage(role=LLMChatMemberRole.USER, content=message.content))
             elif message.role == LLMChatMemberRole.ASSISTANT:
-                summary = ''
-                if message.meta and isinstance(message.meta, dict):
-                    summary = message.meta.get('summary') or ''
-                content = summary or 'Предыдущий ответ уже был сгенерирован.'
-                messages.append(LLMChatMessage(role=LLMChatMemberRole.ASSISTANT, content=content))
+                messages.append(LLMChatMessage(role=LLMChatMemberRole.ASSISTANT, content=message.meta.summary))
         return messages

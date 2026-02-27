@@ -39,7 +39,7 @@ class Settings(BaseSettings):
     TEST_DB_NAME: str
 
     OPENAI_API_KEY: str
-    OPENAI_MODEL: str = 'gpt-4o-mini'
+    OPENAI_MODEL: str = 'gpt-4o'
     OPENAI_TEMPERATURE: float = 0.2
     OPENAI_MAX_OUTPUT_TOKENS: int = 12000
 
