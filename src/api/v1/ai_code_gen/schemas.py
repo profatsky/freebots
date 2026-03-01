@@ -8,7 +8,6 @@ from src.apps.ai_code_gen.dto import (
     AICodeGenSessionWithMessagesReadDTO,
     AICodeGenMessageReadDTO,
     AICodeGenSessionReadDTO,
-    AICodeGenMessageMetaDTO,
 )
 from src.apps.ai_code_gen.enums import AICodeGenSessionStatus
 from src.core.config import settings
@@ -38,40 +37,20 @@ class AICodeGenMessageCreateSchema(BaseModel):
     prompt: str = Field(min_length=1, max_length=settings.AI_CODEGEN_MAX_PROMPT_CHARS)
 
 
-class AICodeGenMessageMetaReadSchema(BaseModel):
-    summary: str
-    main_py: str
-    requirements: list[str]
-    dockerfile: str
-    model: str
-    # usage: None
-
-    @classmethod
-    def from_dto(cls, dto: AICodeGenMessageMetaDTO) -> Self:
-        return cls(
-            summary=dto.summary,
-            main_py=dto.main_py,
-            requirements=dto.requirements,
-            dockerfile=dto.dockerfile,
-            model=dto.model,
-        )
-
-
 class AICodeGenMessageReadSchema(BaseModel):
     message_id: int
     role: AICodeGenRole
     content: str
-    meta: Optional[AICodeGenMessageMetaReadSchema]
+    meta: Optional[dict]
     created_at: datetime
 
     @classmethod
     def from_dto(cls, dto: AICodeGenMessageReadDTO) -> Self:
-        meta = AICodeGenMessageMetaReadSchema.from_dto(dto.meta) if dto.meta else None
         return cls(
             message_id=dto.message_id,
             role=dto.role,
             content=dto.content,
-            meta=meta,
+            meta=dto.meta,
             created_at=dto.created_at,
         )
 

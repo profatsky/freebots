@@ -10,7 +10,6 @@ from src.apps.ai_code_gen.dto import (
     AICodeGenSessionCreateDTO,
     AICodeGenMessageCreateDTO,
     AICodeGenSessionWithMessagesReadDTO,
-    AICodeGenMessageMetaDTO,
 )
 from src.apps.ai_code_gen.llm_response import LLMResponse
 from src.apps.ai_code_gen.errors import (
@@ -88,11 +87,9 @@ class AICodeGenService:
         if last_message is None or not last_message.meta:
             raise AICodeGenNoAssistantMessageError
 
-        main_py = last_message.meta.main_py
-        requirements = last_message.meta.requirements
-        dockerfile = last_message.meta.dockerfile
-        if not main_py or not requirements or not dockerfile:
-            raise AICodeGenNoAssistantMessageError
+        main_py = last_message.meta['main_py']
+        requirements = last_message.meta['requirements']
+        dockerfile = last_message.meta['dockerfile']
 
         zip_data = io.BytesIO()
         with zipfile.ZipFile(zip_data, mode='w') as zipf:
@@ -124,17 +121,15 @@ class AICodeGenService:
                 session_id=session_id,
                 role=AICodeGenRole.ASSISTANT,
                 content=response.main_py,
-                meta=AICodeGenMessageMetaDTO(
-                    summary=response.summary,
-                    main_py=response.main_py,
-                    requirements=response.requirements,
-                    dockerfile=response.dockerfile,
-                    model=settings.OPENAI_MODEL,
-                    # usage=None,
-                ),
+                meta={
+                    'summary': response.summary,
+                    'main_py': response.main_py,
+                    'requirements': response.requirements,
+                    'dockerfile': response.dockerfile,
+                    'model': settings.OPENAI_MODEL,
+                },
             )
         )
-
         await self._ai_code_gen_repository.update_session_status(session_id, AICodeGenSessionStatus.SUCCEEDED)
 
     async def _build_llm_messages(self, session_id: int) -> list[LLMChatMessage]:
@@ -144,5 +139,5 @@ class AICodeGenService:
             if message.role == LLMChatMemberRole.USER:
                 messages.append(LLMChatMessage(role=LLMChatMemberRole.USER, content=message.content))
             elif message.role == LLMChatMemberRole.ASSISTANT:
-                messages.append(LLMChatMessage(role=LLMChatMemberRole.ASSISTANT, content=message.meta.summary))
+                messages.append(LLMChatMessage(role=LLMChatMemberRole.ASSISTANT, content=message.content))
         return messages

@@ -23,21 +23,11 @@ class AICodeGenSessionReadDTO:
 
 
 @dataclass(frozen=True)
-class AICodeGenMessageMetaDTO:
-    summary: str
-    main_py: str
-    requirements: list[str]
-    dockerfile: str
-    model: str
-    # usage: None
-
-
-@dataclass(frozen=True)
 class AICodeGenMessageCreateDTO:
     session_id: int
     role: AICodeGenRole
     content: str
-    meta: Optional[AICodeGenMessageMetaDTO]
+    meta: Optional[dict]
 
 
 @dataclass(frozen=True)
@@ -46,7 +36,7 @@ class AICodeGenMessageReadDTO:
     session_id: int
     role: AICodeGenRole
     content: str
-    meta: Optional[AICodeGenMessageMetaDTO]
+    meta: Optional[dict]
     created_at: datetime
 
 

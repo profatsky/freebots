@@ -14,7 +14,6 @@ from src.apps.ai_code_gen.dto import (
     AICodeGenMessageCreateDTO,
     AICodeGenMessageReadDTO,
     AICodeGenSessionWithMessagesReadDTO,
-    AICodeGenMessageMetaDTO,
 )
 from src.infrastructure.db.sessions import Base
 
@@ -96,25 +95,15 @@ class AICodeGenMessageModel(Base):
             session_id=dto.session_id,
             role=dto.role,
             content=dto.content,
-            meta=dto.meta.__dict__ if dto.meta else None,
+            meta=dto.meta,
         )
 
     def to_dto(self) -> AICodeGenMessageReadDTO:
-        meta = None
-        if self.meta:
-            meta = AICodeGenMessageMetaDTO(
-                summary=self.meta['summary'],
-                main_py=self.meta['main_py'],
-                requirements=self.meta['requirements'],
-                dockerfile=self.meta['dockerfile'],
-                model=self.meta['model'],
-                # usage=None,
-            )
         return AICodeGenMessageReadDTO(
             message_id=self.message_id,
             session_id=self.session_id,
             role=self.role,
             content=self.content,
-            meta=meta,
+            meta=self.meta,
             created_at=self.created_at,
         )
