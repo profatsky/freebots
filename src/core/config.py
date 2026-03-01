@@ -71,7 +71,7 @@ Configuration.account_id = settings.YOOKASSA_SHOP_ID
 Configuration.secret_key = settings.YOOKASSA_API_KEY
 
 # Media
-MEDIA_DIR = Path('src') / 'media'
+MEDIA_DIR = Path('src', 'media')
 
 # Code templates
-BOT_TEMPLATES_DIR = Path('src') / 'apps' / 'code_gen' / 'bot_templates' / 'project_structure'
+BOT_TEMPLATES_DIR = Path('src', 'apps', 'code_gen', 'bot_templates', 'project_structure')
