@@ -19,7 +19,7 @@ from src.apps.ai_code_gen.errors import (
 from src.apps.ai_code_gen.enums import AICodeGenSessionStatus, AICodeGenRole
 from src.apps.ai_code_gen.prompts import SYSTEM_PROMPT
 from src.apps.ai_code_gen.validators import validate_user_prompt, validate_session_and_ownership
-from src.core.config import settings
+from src.core.config import settings, BOT_TEMPLATES_DIR
 from src.infrastructure.llm.cli.openai import AsyncOpenAICli
 from src.infrastructure.llm.enums import LLMChatMemberRole
 from src.infrastructure.llm.types import LLMChatMessage
@@ -86,15 +86,11 @@ class AICodeGenService:
         if last_message is None or not last_message.meta:
             raise AICodeGenNoAssistantMessageError
 
-        main_py = last_message.meta['main_py']
-        requirements = last_message.meta['requirements']
-        dockerfile = last_message.meta['dockerfile']
-
         zip_data = io.BytesIO()
         with zipfile.ZipFile(zip_data, mode='w') as zipf:
-            zipf.writestr('main.py', main_py)
-            zipf.writestr('requirements.txt', '\n'.join(requirements))
-            zipf.writestr('Dockerfile', dockerfile)
+            zipf.writestr('main.py', last_message.meta['code'])
+            zipf.writestr('requirements.txt', '\n'.join(last_message.meta['requirements']))
+            zipf.write(BOT_TEMPLATES_DIR / 'Dockerfile', 'Dockerfile')
         zip_data.seek(0)
         return zip_data
 
@@ -119,17 +115,19 @@ class AICodeGenService:
             AICodeGenMessageCreateDTO(
                 session_id=session_id,
                 role=AICodeGenRole.ASSISTANT,
-                content=response.main_py,
+                content=response.summary,
                 meta={
                     'summary': response.summary,
-                    'main_py': response.main_py,
+                    'code': response.code,
                     'requirements': response.requirements,
-                    'dockerfile': response.dockerfile,
                     'model': settings.OPENAI_MODEL,
                 },
             )
         )
-        await self._ai_code_gen_repository.update_session_status(session_id, AICodeGenSessionStatus.SUCCEEDED)
+        await self._ai_code_gen_repository.update_session_status(
+            session_id=session_id,
+            status=AICodeGenSessionStatus.SUCCEEDED,
+        )
 
     async def _build_llm_messages(self, session_id: int) -> list[LLMChatMessage]:
         history = await self._ai_code_gen_repository.get_messages(session_id)

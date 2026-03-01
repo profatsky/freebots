@@ -21,7 +21,7 @@ class AsyncOpenAICli(AsyncLLMClient):
         object_type: Type[T],
         history: list[LLMChatMessage],
         model: Optional[str] = settings.OPENAI_MODEL,
-        max_tokens: int = settings.OPENAI_MAX_TOKENS,
+        max_tokens: int = settings.OPENAI_MAX_OUTPUT_TOKENS,
     ) -> T:
         if model is None:
             model = self.model

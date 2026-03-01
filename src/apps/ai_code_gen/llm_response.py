@@ -5,11 +5,8 @@ from src.core.config import settings
 
 class LLMResponse(BaseModel):
     summary: str
-    # TODO: rename to code file or something else
-    main_py: str = Field(max_length=settings.AI_CODEGEN_MAX_MAIN_PY_CHARS)
+    code: str = Field(max_length=settings.AI_CODEGEN_MAX_CODE_CHARS)
     requirements: list[str]
-    # TODO: generate manually without LLM
-    dockerfile: str = Field(max_length=settings.AI_CODEGEN_MAX_DOCKERFILE_CHARS)
 
     @field_validator('requirements', mode='after')
     @classmethod
