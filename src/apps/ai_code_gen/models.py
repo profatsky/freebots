@@ -6,8 +6,7 @@ from sqlalchemy import DateTime, Enum, ForeignKey, Text, func
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from src.api.v1.ai_code_gen.enums import AICodeGenRole
-from src.apps.ai_code_gen.enums import AICodeGenSessionStatus
+from src.apps.ai_code_gen.enums import AICodeGenSessionStatus, AICodeGenRole
 from src.apps.ai_code_gen.dto import (
     AICodeGenSessionCreateDTO,
     AICodeGenSessionReadDTO,

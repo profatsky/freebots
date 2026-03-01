@@ -4,7 +4,6 @@ from uuid import UUID
 
 from loguru import logger
 
-from src.api.v1.ai_code_gen.enums import AICodeGenRole
 from src.apps.ai_code_gen.dependencies.repositories_dependencies import AICodeGenRepositoryDI
 from src.apps.ai_code_gen.dto import (
     AICodeGenSessionCreateDTO,
@@ -17,7 +16,7 @@ from src.apps.ai_code_gen.errors import (
     AICodeGenInvalidResponseError,
     AICodeGenNoAssistantMessageError,
 )
-from src.apps.ai_code_gen.enums import AICodeGenSessionStatus
+from src.apps.ai_code_gen.enums import AICodeGenSessionStatus, AICodeGenRole
 from src.apps.ai_code_gen.prompts import SYSTEM_PROMPT
 from src.apps.ai_code_gen.validators import validate_user_prompt, validate_session_and_ownership
 from src.core.config import settings

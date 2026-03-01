@@ -3,7 +3,7 @@ from typing import Optional
 from sqlalchemy import select, func
 from sqlalchemy.orm import selectinload
 
-from src.api.v1.ai_code_gen.enums import AICodeGenRole
+from src.apps.ai_code_gen.enums import AICodeGenRole
 from src.core.base_repository import BaseRepository
 from src.apps.ai_code_gen.dto import (
     AICodeGenSessionCreateDTO,
