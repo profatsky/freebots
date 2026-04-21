@@ -10,6 +10,7 @@ from src.apps.ai_code_gen.enums import AICodeGenSessionStatus
 @dataclass(frozen=True)
 class AICodeGenSessionCreateDTO:
     user_id: UUID
+    title: str
     status: AICodeGenSessionStatus
 
 
@@ -17,6 +18,7 @@ class AICodeGenSessionCreateDTO:
 class AICodeGenSessionReadDTO:
     session_id: UUID
     user_id: UUID
+    title: str
     status: AICodeGenSessionStatus
     created_at: datetime
     updated_at: datetime

@@ -2,7 +2,7 @@ import datetime
 from typing import Self
 from uuid import UUID, uuid4
 
-from sqlalchemy import DateTime, Enum, ForeignKey, Text, func
+from sqlalchemy import DateTime, Enum, ForeignKey, String, Text, func
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -24,6 +24,7 @@ class AICodeGenSessionModel(Base):
         primary_key=True,
         default=uuid4,
     )
+    title: Mapped[str] = mapped_column(String(128))
     status: Mapped[AICodeGenSessionStatus] = mapped_column(
         Enum(AICodeGenSessionStatus).values_callable,
         nullable=False,
@@ -52,6 +53,7 @@ class AICodeGenSessionModel(Base):
     def from_dto(cls, dto: AICodeGenSessionCreateDTO) -> Self:
         return cls(
             user_id=dto.user_id,
+            title=dto.title,
             status=dto.status,
         )
 
@@ -59,6 +61,7 @@ class AICodeGenSessionModel(Base):
         return AICodeGenSessionReadDTO(
             session_id=self.session_id,
             user_id=self.user_id,
+            title=self.title,
             status=self.status,
             created_at=self.created_at,
             updated_at=self.updated_at,
@@ -69,6 +72,7 @@ class AICodeGenSessionModel(Base):
         return AICodeGenSessionWithMessagesReadDTO(
             session_id=self.session_id,
             user_id=self.user_id,
+            title=self.title,
             status=self.status,
             created_at=self.created_at,
             updated_at=self.updated_at,

@@ -20,6 +20,7 @@ class AICodeGenSessionCreateSchema(BaseModel):
 
 class AICodeGenSessionReadSchema(BaseModel):
     session_id: UUID
+    title: str
     status: AICodeGenSessionStatus
     created_at: datetime
     updated_at: datetime
@@ -28,6 +29,7 @@ class AICodeGenSessionReadSchema(BaseModel):
     def from_dto(cls, session: AICodeGenSessionReadDTO) -> Self:
         return cls(
             session_id=session.session_id,
+            title=session.title,
             status=session.status,
             created_at=session.created_at,
             updated_at=session.updated_at,
@@ -64,6 +66,7 @@ class AICodeGenSessionWithMessagesReadSchema(BaseModel):
     def from_dto(cls, dto: AICodeGenSessionWithMessagesReadDTO) -> Self:
         session = AICodeGenSessionReadSchema(
             session_id=dto.session_id,
+            title=dto.title,
             status=dto.status,
             created_at=dto.created_at,
             updated_at=dto.updated_at,

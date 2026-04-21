@@ -26,6 +26,7 @@ from src.infrastructure.llm.enums import LLMChatMemberRole
 from src.infrastructure.llm.types import LLMChatMessage
 
 AI_CODEGEN_SESSIONS_PER_PAGE = 20
+AI_CODEGEN_SESSION_TITLE_MAX_CHARS = 128
 
 
 class AICodeGenService:
@@ -48,6 +49,7 @@ class AICodeGenService:
         session = await self._ai_code_gen_repository.create_session(
             AICodeGenSessionCreateDTO(
                 user_id=user_id,
+                title=prompt[:AI_CODEGEN_SESSION_TITLE_MAX_CHARS],
                 status=AICodeGenSessionStatus.QUEUED,
             )
         )
