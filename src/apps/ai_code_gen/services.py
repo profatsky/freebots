@@ -52,7 +52,7 @@ class AICodeGenService:
         await self._generate_and_store_response(session_id=session.session_id)
         return await self.get_session_with_messages(user_id=user_id, session_id=session.session_id)
 
-    async def add_message(self, user_id: UUID, session_id: int, prompt: str) -> AICodeGenSessionWithMessagesReadDTO:
+    async def add_message(self, user_id: UUID, session_id: UUID, prompt: str) -> AICodeGenSessionWithMessagesReadDTO:
         validate_user_prompt(prompt)
 
         session = await self._ai_code_gen_repository.get_session_with_messages(session_id)
@@ -73,12 +73,12 @@ class AICodeGenService:
         await self._generate_and_store_response(session_id=session_id)
         return await self.get_session_with_messages(user_id=user_id, session_id=session_id)
 
-    async def get_session_with_messages(self, user_id: UUID, session_id: int) -> AICodeGenSessionWithMessagesReadDTO:
+    async def get_session_with_messages(self, user_id: UUID, session_id: UUID) -> AICodeGenSessionWithMessagesReadDTO:
         session = await self._ai_code_gen_repository.get_session_with_messages(session_id)
         validate_session_and_ownership(session=session, user_id=user_id)
         return session
 
-    async def get_zip(self, user_id: UUID, session_id: int) -> io.BytesIO:
+    async def get_zip(self, user_id: UUID, session_id: UUID) -> io.BytesIO:
         session = await self._ai_code_gen_repository.get_session(session_id)
         validate_session_and_ownership(session=session, user_id=user_id)
 
@@ -94,7 +94,7 @@ class AICodeGenService:
         zip_data.seek(0)
         return zip_data
 
-    async def _generate_and_store_response(self, session_id: int) -> None:
+    async def _generate_and_store_response(self, session_id: UUID) -> None:
         await self._ai_code_gen_repository.update_session_status(
             session_id=session_id,
             status=AICodeGenSessionStatus.RUNNING,
@@ -129,7 +129,7 @@ class AICodeGenService:
             status=AICodeGenSessionStatus.SUCCEEDED,
         )
 
-    async def _build_llm_messages(self, session_id: int) -> list[LLMChatMessage]:
+    async def _build_llm_messages(self, session_id: UUID) -> list[LLMChatMessage]:
         history = await self._ai_code_gen_repository.get_messages(session_id)
         messages = [LLMChatMessage(role=LLMChatMemberRole.SYSTEM, content=SYSTEM_PROMPT)]
         for message in history:

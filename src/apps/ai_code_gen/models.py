@@ -1,6 +1,6 @@
 import datetime
 from typing import Self
-from uuid import UUID
+from uuid import UUID, uuid4
 
 from sqlalchemy import DateTime, Enum, ForeignKey, Text, func
 from sqlalchemy.dialects.postgresql import JSONB
@@ -20,7 +20,10 @@ from src.infrastructure.db.sessions import Base
 class AICodeGenSessionModel(Base):
     __tablename__ = 'ai_codegen_sessions'
 
-    session_id: Mapped[int] = mapped_column(primary_key=True)
+    session_id: Mapped[UUID] = mapped_column(
+        primary_key=True,
+        default=uuid4,
+    )
     status: Mapped[AICodeGenSessionStatus] = mapped_column(
         Enum(AICodeGenSessionStatus).values_callable,
         nullable=False,
@@ -76,7 +79,10 @@ class AICodeGenSessionModel(Base):
 class AICodeGenMessageModel(Base):
     __tablename__ = 'ai_codegen_messages'
 
-    message_id: Mapped[int] = mapped_column(primary_key=True)
+    message_id: Mapped[UUID] = mapped_column(
+        primary_key=True,
+        default=uuid4,
+    )
     role: Mapped[AICodeGenRole] = mapped_column(Enum(AICodeGenRole).values_callable, nullable=False)
     content: Mapped[str] = mapped_column(Text, nullable=False)
     meta: Mapped[dict] = mapped_column(JSONB, nullable=True)
@@ -85,7 +91,7 @@ class AICodeGenMessageModel(Base):
         server_default=func.now(),
     )
 
-    session_id: Mapped[int] = mapped_column(ForeignKey('ai_codegen_sessions.session_id', ondelete='CASCADE'))
+    session_id: Mapped[UUID] = mapped_column(ForeignKey('ai_codegen_sessions.session_id', ondelete='CASCADE'))
     session: Mapped['AICodeGenSessionModel'] = relationship(back_populates='messages')
 
     @classmethod

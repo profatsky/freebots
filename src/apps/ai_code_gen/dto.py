@@ -15,7 +15,7 @@ class AICodeGenSessionCreateDTO:
 
 @dataclass(frozen=True)
 class AICodeGenSessionReadDTO:
-    session_id: int
+    session_id: UUID
     user_id: UUID
     status: AICodeGenSessionStatus
     created_at: datetime
@@ -24,7 +24,7 @@ class AICodeGenSessionReadDTO:
 
 @dataclass(frozen=True)
 class AICodeGenMessageCreateDTO:
-    session_id: int
+    session_id: UUID
     role: AICodeGenRole
     content: str
     meta: Optional[dict]
@@ -32,8 +32,8 @@ class AICodeGenMessageCreateDTO:
 
 @dataclass(frozen=True)
 class AICodeGenMessageReadDTO:
-    message_id: int
-    session_id: int
+    message_id: UUID
+    session_id: UUID
     role: AICodeGenRole
     content: str
     meta: Optional[dict]

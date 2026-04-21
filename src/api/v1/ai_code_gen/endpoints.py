@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from fastapi import APIRouter, Depends
 from fastapi.responses import StreamingResponse
 
@@ -50,7 +52,7 @@ async def create_session(
 @router.get('/sessions/{session_id}')
 async def get_session(
     ai_code_gen_service: AICodeGenServiceDI,
-    session_id: int,
+    session_id: UUID,
     user_id: UserIDFromAccessTokenDI,
 ) -> AICodeGenSessionWithMessagesReadSchema:
     try:
@@ -65,7 +67,7 @@ async def get_session(
 @router.post('/sessions/{session_id}/messages')
 async def add_message(
     ai_code_gen_service: AICodeGenServiceDI,
-    session_id: int,
+    session_id: UUID,
     payload: AICodeGenMessageCreateSchema,
     user_id: UserIDFromAccessTokenDI,
 ) -> AICodeGenSessionWithMessagesReadSchema:
@@ -91,7 +93,7 @@ async def add_message(
 @router.get('/sessions/{session_id}/download')
 async def download_code(
     ai_code_gen_service: AICodeGenServiceDI,
-    session_id: int,
+    session_id: UUID,
     user_id: UserIDFromAccessTokenDI,
 ):
     try:

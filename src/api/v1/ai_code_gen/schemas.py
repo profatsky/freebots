@@ -1,5 +1,6 @@
 from datetime import datetime
 from typing import Optional, Self
+from uuid import UUID
 
 from pydantic import BaseModel, Field
 
@@ -18,7 +19,7 @@ class AICodeGenSessionCreateSchema(BaseModel):
 
 
 class AICodeGenSessionReadSchema(BaseModel):
-    session_id: int
+    session_id: UUID
     status: AICodeGenSessionStatus
     created_at: datetime
     updated_at: datetime
@@ -38,7 +39,7 @@ class AICodeGenMessageCreateSchema(BaseModel):
 
 
 class AICodeGenMessageReadSchema(BaseModel):
-    message_id: int
+    message_id: UUID
     role: AICodeGenRole
     content: str
     meta: Optional[dict]

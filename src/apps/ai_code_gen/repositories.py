@@ -1,4 +1,5 @@
 from typing import Optional
+from uuid import UUID
 
 from sqlalchemy import select, func
 from sqlalchemy.orm import selectinload
@@ -22,7 +23,7 @@ class AICodeGenRepository(BaseRepository):
         await self._session.commit()
         return session.to_dto()
 
-    async def update_session_status(self, session_id: int, status) -> Optional[AICodeGenSessionReadDTO]:
+    async def update_session_status(self, session_id: UUID, status) -> Optional[AICodeGenSessionReadDTO]:
         session = await self._get_session_model(session_id)
         if session is None:
             return None
@@ -37,13 +38,13 @@ class AICodeGenRepository(BaseRepository):
         await self._session.commit()
         return message.to_dto()
 
-    async def get_session(self, session_id: int) -> Optional[AICodeGenSessionReadDTO]:
+    async def get_session(self, session_id: UUID) -> Optional[AICodeGenSessionReadDTO]:
         session = await self._get_session_model(session_id)
         if session is None:
             return None
         return session.to_dto()
 
-    async def get_session_with_messages(self, session_id: int) -> Optional[AICodeGenSessionWithMessagesReadDTO]:
+    async def get_session_with_messages(self, session_id: UUID) -> Optional[AICodeGenSessionWithMessagesReadDTO]:
         session = await self._session.execute(
             select(AICodeGenSessionModel)
             .options(selectinload(AICodeGenSessionModel.messages))
@@ -54,13 +55,13 @@ class AICodeGenRepository(BaseRepository):
             return None
         return session.to_dto_with_messages()
 
-    async def count_messages(self, session_id: int) -> int:
+    async def count_messages(self, session_id: UUID) -> int:
         result = await self._session.execute(
             select(func.count(AICodeGenMessageModel.message_id)).where(AICodeGenMessageModel.session_id == session_id)
         )
         return result.scalar_one()
 
-    async def get_messages(self, session_id: int) -> list[AICodeGenMessageReadDTO]:
+    async def get_messages(self, session_id: UUID) -> list[AICodeGenMessageReadDTO]:
         result = await self._session.execute(
             select(AICodeGenMessageModel)
             .where(AICodeGenMessageModel.session_id == session_id)
@@ -68,7 +69,7 @@ class AICodeGenRepository(BaseRepository):
         )
         return [message.to_dto() for message in result.scalars().all()]
 
-    async def get_latest_assistant_message(self, session_id: int) -> Optional[AICodeGenMessageReadDTO]:
+    async def get_latest_assistant_message(self, session_id: UUID) -> Optional[AICodeGenMessageReadDTO]:
         result = await self._session.execute(
             select(AICodeGenMessageModel)
             .where(AICodeGenMessageModel.session_id == session_id)
@@ -80,7 +81,7 @@ class AICodeGenRepository(BaseRepository):
             return None
         return message.to_dto()
 
-    async def _get_session_model(self, session_id: int) -> Optional[AICodeGenSessionModel]:
+    async def _get_session_model(self, session_id: UUID) -> Optional[AICodeGenSessionModel]:
         result = await self._session.execute(
             select(AICodeGenSessionModel).where(AICodeGenSessionModel.session_id == session_id)
         )
