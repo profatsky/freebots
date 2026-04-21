@@ -17,6 +17,16 @@ from src.apps.ai_code_gen.models import AICodeGenSessionModel, AICodeGenMessageM
 
 
 class AICodeGenRepository(BaseRepository):
+    async def get_sessions(self, user_id: UUID, offset: int, limit: int) -> list[AICodeGenSessionReadDTO]:
+        sessions = await self._session.execute(
+            select(AICodeGenSessionModel)
+            .where(AICodeGenSessionModel.user_id == user_id)
+            .order_by(AICodeGenSessionModel.updated_at.desc())
+            .offset(offset)
+            .limit(limit)
+        )
+        return [session.to_dto() for session in sessions.scalars().all()]
+
     async def create_session(self, dto: AICodeGenSessionCreateDTO) -> AICodeGenSessionReadDTO:
         session = AICodeGenSessionModel.from_dto(dto)
         self._session.add(session)

@@ -1,6 +1,7 @@
 from uuid import UUID
+from typing import Annotated
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 from fastapi.responses import StreamingResponse
 
 from src.apps.auth.dependencies.auth_dependencies import UserIDFromAccessTokenDI, access_token_required
@@ -8,6 +9,7 @@ from src.apps.ai_code_gen.dependencies.services_dependencies import AICodeGenSer
 from src.api.v1.ai_code_gen.schemas import (
     AICodeGenSessionCreateSchema,
     AICodeGenMessageCreateSchema,
+    AICodeGenSessionReadSchema,
     AICodeGenSessionWithMessagesReadSchema,
 )
 from src.api.v1.ai_code_gen.exceptions import (
@@ -47,6 +49,16 @@ async def create_session(
     except AICodeGenInvalidResponseError:
         raise AICodeGenInvalidResponseHTTPException
     return AICodeGenSessionWithMessagesReadSchema.from_dto(session)
+
+
+@router.get('/sessions')
+async def get_sessions(
+    ai_code_gen_service: AICodeGenServiceDI,
+    user_id: UserIDFromAccessTokenDI,
+    page: Annotated[int, Query(ge=1)] = 1,
+) -> list[AICodeGenSessionReadSchema]:
+    sessions = await ai_code_gen_service.get_sessions(user_id=user_id, page=page)
+    return [AICodeGenSessionReadSchema.from_dto(session) for session in sessions]
 
 
 @router.get('/sessions/{session_id}')

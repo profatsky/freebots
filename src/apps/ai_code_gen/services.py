@@ -8,6 +8,7 @@ from src.apps.ai_code_gen.dependencies.repositories_dependencies import AICodeGe
 from src.apps.ai_code_gen.dto import (
     AICodeGenSessionCreateDTO,
     AICodeGenMessageCreateDTO,
+    AICodeGenSessionReadDTO,
     AICodeGenSessionWithMessagesReadDTO,
 )
 from src.apps.ai_code_gen.llm_response import LLMResponse
@@ -24,6 +25,8 @@ from src.infrastructure.llm.cli.openai import AsyncOpenAICli
 from src.infrastructure.llm.enums import LLMChatMemberRole
 from src.infrastructure.llm.types import LLMChatMessage
 
+AI_CODEGEN_SESSIONS_PER_PAGE = 20
+
 
 class AICodeGenService:
     def __init__(
@@ -32,6 +35,13 @@ class AICodeGenService:
     ):
         self._ai_code_gen_repository = ai_code_gen_repository
         self._client = AsyncOpenAICli(model=settings.OPENAI_MODEL)
+
+    async def get_sessions(self, user_id: UUID, page: int) -> list[AICodeGenSessionReadDTO]:
+        return await self._ai_code_gen_repository.get_sessions(
+            user_id=user_id,
+            offset=(page - 1) * AI_CODEGEN_SESSIONS_PER_PAGE,
+            limit=AI_CODEGEN_SESSIONS_PER_PAGE,
+        )
 
     async def create_session(self, user_id: UUID, prompt: str) -> AICodeGenSessionWithMessagesReadDTO:
         validate_user_prompt(prompt)
