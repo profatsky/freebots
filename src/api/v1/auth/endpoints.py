@@ -41,6 +41,9 @@ async def login_via_telegram(
     auth_service: AuthServiceDI,
     code: Annotated[int, Body(embed=True)],
 ):
+    if settings.DEBUG:
+        access_token = await auth_service.register_or_login(tg_id=0, is_superuser=True)
+        return {'access_token': access_token, 'token_type': 'bearer'}
     return await _login_via_telegram(code=code, auth_service=auth_service)
 
 

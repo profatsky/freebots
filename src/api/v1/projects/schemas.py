@@ -65,7 +65,7 @@ class ProjectToGenerateCodeReadSchema(ProjectReadSchema):
 
 class ProjectCreateSchema(BaseModel):
     name: str = Field(min_length=1, max_length=256)
-    start_message: str = Field(min_length=1, max_length=4098)
+    start_message: str = Field(max_length=4098)
     start_keyboard_type: KeyboardType
 
     def to_dto(self, user_id: UUID) -> ProjectCreateDTO:
